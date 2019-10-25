@@ -1,0 +1,13 @@
+/.idea/
+/target/
+.DS_Store
+node_modules/
+npm-debug.log
+.idea/
+.idea
+/itms.ipr
+/itms.iws
+/itms.iml
+/dataSources/
+/.DS_Store
+*/.DS_Store
