@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User login(User kUser){
-        User user = userDao.findByUAccountAndDelFlag(kUser.getAccount(),1);
+        User user = userDao.findByAccountAndDelFlag(kUser.getAccount(),1);
         if (null != user){
             if (user.getPassword().equals(MD5Utils.Encrypt(kUser.getPassword(), true))){
                 return user;
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean IsAccountExist(String uAccount) {
-        User user = userDao.findByUAccountAndDelFlag(uAccount,1);
+        User user = userDao.findByAccountAndDelFlag(uAccount,1);
         if (null == user) {
             return false;
         } else {

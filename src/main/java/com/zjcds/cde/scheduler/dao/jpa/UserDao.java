@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface UserDao extends CustomRepostory<User,Integer> {
 
-    public User findByUAccountAndDelFlag(String uAccount,Integer delflag);
+    public User findByAccountAndDelFlag(String account,Integer delflag);
 }
