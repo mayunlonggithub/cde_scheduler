@@ -1,21 +1,27 @@
 package com.zjcds.cde.scheduler.service;
 
+import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.common.base.domain.page.Paging;
 import com.zjcds.common.jpa.PageResult;
 
 import java.util.List;
 
+/**
+ * jackson 相关配置
+ *
+ * @author J on 20191107.
+ */
 public interface UserService {
 
     /**
      * @Title login
      * @Description 登陆
-     * @param kUser 用户信息对象
+     * @param userLogin 用户信息对象
      * @return
      * @return KUser
      */
-    public User login(User kUser);
+    public User login(UserForm.UserLogin userLogin);
 
     /**
      * @Title isAdmin
@@ -42,12 +48,12 @@ public interface UserService {
     public void delete(Integer uId);
 
     /**
-     * @Title insert
+     * @Title addUser
      * @Description 插入一个用户
-     * @param kUser
+     * @param addTUser
      * @return void
      */
-    public void insert(User kUser, Integer uId);
+    public void addUser(UserForm.AddUser addTUser, Integer uId);
 
     /**
      * @Title IsAccountExist
@@ -69,9 +75,9 @@ public interface UserService {
     /**
      * @Title update
      * @Description 更新用户
-     * @param kUser 用户对象
+     * @param updateUser 用户对象
      * @param uId 用户ID
      * @return void
      */
-    public void update(User kUser, Integer uId);
+    public void updateUser(UserForm.UpdateUser updateUser, Integer uId);
 }

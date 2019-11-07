@@ -14,8 +14,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import java.io.IOException;
 
 /**
- * @author huangyj  on 2019-06-14
- * @program 51-baojiadan-service
+ * @author J  on 20191107
  * @description 返回json空值去掉null和""
  */
 

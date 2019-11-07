@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * jackson 相关配置
  *
- * @author luokp on 2018/5/24.
+ * @author J on 20191107.
  */
 @JsonComponent
 public class CustomJacksonConfiguration {
