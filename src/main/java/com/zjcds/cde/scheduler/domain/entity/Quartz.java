@@ -4,35 +4,58 @@ import com.zjcds.common.jpa.domain.CreateModifyTime;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Date;
-
-/**
- * @author J on 20191024
- * 定时策略信息
- */
 @Entity
 @Table(name = "t_quartz")
-public class Quartz extends CreateModifyTime {
-    //任务ID
-    private Integer quartzId;
-    //任务描述
+public class Quartz extends CreateModifyTime{
+        //调度策略ID
+    private int quartzId;
+    //策略描述
     private String quartzDescription;
-    //定时策略
+    //策略Corn表达式
     private String quartzCron;
-    //添加者
+    //策略添加者
     private Integer createUser;
-    //编辑者
+    //策略编辑者
     private Integer modifyUser;
     //是否删除
     private Integer delFlag;
+    //策略开始时间
+    private Timestamp startTime;
+    //策略结束时间
+    private Timestamp endTime;
+    //策略生成方式选择
+    private Integer quartzFlag;
+    //单元选择
+    private String unitType;
+    //秒间隔
+    private int secInterval;
+    //分间隔
+    private int minInterval;
+    //时间隔
+    private Integer hourInterval;
+    //执行秒
+    private Integer execSec;
+    //执行分
+    private Integer execMin;
+    //执行时
+    private Integer execHour;
+    //执行天
+    private Integer execDay;
+    //执行周
+    private Integer execWeek;
+    //执行月
+    private Integer execMonth;
+
 
     @Id
     @Column(name = "quartz_id")
-    public Integer getQuartzId() {
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "t_quartz", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
+    public int getQuartzId() {
         return quartzId;
     }
 
-    public void setQuartzId(Integer quartzId) {
+    public void setQuartzId(int quartzId) {
         this.quartzId = quartzId;
     }
 
@@ -86,5 +109,134 @@ public class Quartz extends CreateModifyTime {
         this.delFlag = delFlag;
     }
 
+    @Basic
+    @Column(name = "start_time")
+    public Timestamp getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+    }
+
+    @Basic
+    @Column(name = "end_time")
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
+
+    @Basic
+    @Column(name = "quartz_flag")
+    public Integer getQuartzFlag() {
+        return quartzFlag;
+    }
+
+    public void setQuartzFlag(Integer quartzFlag) {
+        this.quartzFlag = quartzFlag;
+    }
+
+    @Basic
+    @Column(name = "unit_type")
+    public String getUnitType() {
+        return unitType;
+    }
+
+    public void setUnitType(String unitType) {
+        this.unitType = unitType;
+    }
+
+    @Basic
+    @Column(name = "sec_interval")
+    public int getSecInterval() {
+        return secInterval;
+    }
+
+    public void setSecInterval(int secInterval) {
+        this.secInterval = secInterval;
+    }
+
+    @Basic
+    @Column(name = "min_interval")
+    public int getMinInterval() {
+        return minInterval;
+    }
+
+    public void setMinInterval(int minInterval) {
+        this.minInterval = minInterval;
+    }
+
+    @Basic
+    @Column(name = "hour_interval")
+    public Integer getHourInterval() {
+        return hourInterval;
+    }
+
+    public void setHourInterval(Integer hourInterval) {
+        this.hourInterval = hourInterval;
+    }
+
+    @Basic
+    @Column(name = "exec_sec")
+    public Integer getExecSec() {
+        return execSec;
+    }
+
+    public void setExecSec(Integer execSec) {
+        this.execSec = execSec;
+    }
+
+    @Basic
+    @Column(name = "exec_min")
+    public Integer getExecMin() {
+        return execMin;
+    }
+
+    public void setExecMin(Integer execMin) {
+        this.execMin = execMin;
+    }
+
+    @Basic
+    @Column(name = "exec_hour")
+    public Integer getExecHour() {
+        return execHour;
+    }
+
+    public void setExecHour(Integer execHour) {
+        this.execHour = execHour;
+    }
+
+    @Basic
+    @Column(name = "exec_day")
+    public Integer getExecDay() {
+        return execDay;
+    }
+
+    public void setExecDay(Integer execDay) {
+        this.execDay = execDay;
+    }
+
+    @Basic
+    @Column(name = "exec_week")
+    public Integer getExecWeek() {
+        return execWeek;
+    }
+
+    public void setExecWeek(Integer execWeek) {
+        this.execWeek = execWeek;
+    }
+
+    @Basic
+    @Column(name = "exec_month")
+    public Integer getExecMonth() {
+        return execMonth;
+    }
+
+    public void setExecMonth(Integer execMonth) {
+        this.execMonth = execMonth;
+    }
 
 }
