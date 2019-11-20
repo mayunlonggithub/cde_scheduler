@@ -16,7 +16,7 @@ public class Job extends CreateModifyTime {
     //作业ID
     private Integer jobId;
     //类别ID
-    private Integer categoryId;
+//    private Integer categoryId;
     //作业名称
     private String jobName;
     //任务描述
@@ -44,6 +44,8 @@ public class Job extends CreateModifyTime {
 
     @Id
     @Column(name = "job_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "job", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getJobId() {
         return jobId;
     }
@@ -52,15 +54,15 @@ public class Job extends CreateModifyTime {
         this.jobId = jobId;
     }
 
-    @Basic
-    @Column(name = "category_id")
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
+//    @Basic
+//    @Column(name = "category_id")
+//    public Integer getCategoryId() {
+//        return categoryId;
+//    }
+//
+//    public void setCategoryId(Integer categoryId) {
+//        this.categoryId = categoryId;
+//    }
 
     @Basic
     @Column(name = "job_name")

@@ -32,10 +32,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     @ApiOperation(value = "用户登录", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<UserForm.User> login(@RequestParam UserForm.UserLogin userLogin){
+    public ResponseResult<UserForm.User> login(@RequestBody UserForm.UserLogin userLogin){
         User user = userService.login(userLogin);
         UserForm.User owner = BeanPropertyCopyUtils.copy(user,UserForm.User.class);
         return new ResponseResult(true,"请求成功",owner);

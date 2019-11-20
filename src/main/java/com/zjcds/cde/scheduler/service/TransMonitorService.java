@@ -3,7 +3,9 @@ package com.zjcds.cde.scheduler.service;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.common.base.domain.page.Paging;
 import com.zjcds.common.jpa.PageResult;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,4 +58,13 @@ public interface TransMonitorService {
      * @Description 获取7天内转换的折线图
      */
     public Map<String, Object> getTransLine(Integer uId);
+
+    /**
+     * @param userId  用户ID
+     * @param transId 转换ID
+     * @return void
+     * @Title addMonitor
+     * @Description 添加监控
+     */
+    public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime);
 }

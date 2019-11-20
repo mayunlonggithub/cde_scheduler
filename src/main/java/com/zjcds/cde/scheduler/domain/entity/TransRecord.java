@@ -28,6 +28,8 @@ public class TransRecord {
 
     @Id
     @Column(name = "record_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "transRecord", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getRecordId() {
         return recordId;
     }

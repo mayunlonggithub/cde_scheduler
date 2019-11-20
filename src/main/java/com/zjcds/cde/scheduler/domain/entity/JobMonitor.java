@@ -32,6 +32,8 @@ public class JobMonitor {
 
     @Id
     @Column(name = "monitor_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "jobMonitor", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getMonitorId() {
         return monitorId;
     }

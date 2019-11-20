@@ -10,11 +10,9 @@ import com.zjcds.common.jpa.PageResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * jackson 相关配置
@@ -52,7 +50,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Integer getAllMonitorTrans(Integer uId) {
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndAndMonitorStatus(uId,1);
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         return transMonitorList.size();
     }
 
@@ -64,7 +62,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Integer getAllSuccess(Integer uId) {
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndAndMonitorStatus(uId,1);
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
         for (TransMonitor transMonitor : transMonitorList) {
             allSuccess += transMonitor.getMonitorSuccess();
@@ -80,7 +78,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Integer getAllFail(Integer uId) {
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndAndMonitorStatus(uId,1);
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
         for (TransMonitor transMonitor : transMonitorList) {
             allSuccess += transMonitor.getMonitorFail();
@@ -122,6 +120,41 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         resultMap.put("name", "转换");
         resultMap.put("data", resultList);
         return resultMap;
+    }
+
+    /**
+     * @param userId  用户ID
+     * @param transId 转换ID
+     * @return void
+     * @Title addMonitor
+     * @Description 添加监控
+     */
+    @Override
+    @Transactional
+    public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime) {
+
+        TransMonitor templateOne = transMonitorDao.findByCreateUserAndMonitorTrans(userId,transId);
+        if (null != templateOne) {
+            templateOne.setMonitorStatus(1);
+            StringBuilder runStatusBuilder = new StringBuilder();
+            runStatusBuilder.append(templateOne.getRunStatus())
+                    .append(",").append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
+            templateOne.setRunStatus(runStatusBuilder.toString());
+            templateOne.setNextExecuteTime(nextExecuteTime);
+            transMonitorDao.save(templateOne);
+        } else {
+            TransMonitor kTransMonitor = new TransMonitor();
+            kTransMonitor.setMonitorTrans(transId);
+            kTransMonitor.setCreateUser(userId);
+            kTransMonitor.setMonitorSuccess(0);
+            kTransMonitor.setMonitorFail(0);
+            StringBuilder runStatusBuilder = new StringBuilder();
+            runStatusBuilder.append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
+            kTransMonitor.setRunStatus(runStatusBuilder.toString());
+            kTransMonitor.setMonitorStatus(1);
+            kTransMonitor.setNextExecuteTime(nextExecuteTime);
+            transMonitorDao.save(kTransMonitor);
+        }
     }
 
 

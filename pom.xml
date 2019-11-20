@@ -72,7 +72,12 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
+            <version>5.1.38</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -97,6 +102,33 @@
             <groupId>pentaho-kettle</groupId>
             <artifactId>kettle-core</artifactId>
             <version>8.3.0.4-538</version>
+        </dependency>
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-engine</artifactId>
+            <version>8.3.0.4-538</version>
+        </dependency>
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-dbdialog</artifactId>
+            <version>8.3.0.4-538</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pentaho.di.plugins</groupId>
+            <artifactId>kettle-sap-plugin-core</artifactId>
+            <version>8.3.0.4-538</version>
+        </dependency>
+        <dependency>
+            <groupId>pentaho-kettle</groupId>
+            <artifactId>kettle-ui-swt</artifactId>
+            <version>8.3.0.4-538</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.ibeetl</groupId>
+            <artifactId>beetlsql</artifactId>
+            <version>2.10.18</version>
         </dependency>
         <dependency> <!--quartz依赖-->
             <groupId>org.quartz-scheduler</groupId>

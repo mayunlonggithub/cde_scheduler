@@ -44,6 +44,8 @@ public class Repository extends CreateModifyTime {
 
     @Id
     @Column(name = "repository_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "repository", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getRepositoryId() {
         return repositoryId;
     }

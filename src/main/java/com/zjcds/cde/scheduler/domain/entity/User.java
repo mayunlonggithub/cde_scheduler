@@ -34,6 +34,8 @@ public class User extends CreateModifyTime {
 
     @Id
     @Column(name = "id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "user", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getId() {
         return id;
     }

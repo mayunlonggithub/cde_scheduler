@@ -10,8 +10,12 @@ import java.util.List;
  */
 public interface TransMonitorDao extends CustomRepostory<TransMonitor,Integer> {
 
-    public List<TransMonitor> findByCreateUserAndAndMonitorStatus(Integer createUser,Integer monitorStatus);
+    public List<TransMonitor> findByCreateUserAndMonitorStatus(Integer createUser,Integer monitorStatus);
 
     public List<TransMonitor> findByCreateUser(Integer createUser);
+
+    public TransMonitor findByCreateUserAndMonitorTrans(Integer createUser,Integer monitorTrans);
+
+    public TransMonitor findByMonitorTrans(Integer monitorTrans);
 
 }

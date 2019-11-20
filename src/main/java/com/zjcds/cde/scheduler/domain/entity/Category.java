@@ -29,6 +29,8 @@ public class Category extends CreateModifyTime {
 
     @Id
     @Column(name = "category_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "category", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getCategoryId() {
         return categoryId;
     }

@@ -44,6 +44,8 @@ public class Trans extends CreateModifyTime {
 
     @Id
     @Column(name = "trans_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "trans", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getTransId() {
         return transId;
     }

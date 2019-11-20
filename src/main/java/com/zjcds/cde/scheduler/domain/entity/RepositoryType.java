@@ -15,9 +15,13 @@ public class RepositoryType {
     private String repositoryTypeCode;
     //资源库类型描述
     private String repositoryTypeDes;
+    //是否显示
+    private Integer isShow;
 
     @Id
     @Column(name = "repository_type_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "repositoryType", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getRepositoryTypeId() {
         return repositoryTypeId;
     }
@@ -46,5 +50,13 @@ public class RepositoryType {
         this.repositoryTypeDes = repositoryTypeDes;
     }
 
+    @Basic
+    @Column(name = "is_show")
+    public Integer getIsShow() {
+        return isShow;
+    }
 
+    public void setIsShow(Integer isShow) {
+        this.isShow = isShow;
+    }
 }

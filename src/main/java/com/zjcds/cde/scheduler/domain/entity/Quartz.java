@@ -4,11 +4,13 @@ import com.zjcds.common.jpa.domain.CreateModifyTime;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
+
 @Entity
 @Table(name = "t_quartz")
 public class Quartz extends CreateModifyTime{
-        //调度策略ID
-    private int quartzId;
+    //调度策略ID
+    private Integer quartzId;
     //策略描述
     private String quartzDescription;
     //策略Corn表达式
@@ -20,17 +22,17 @@ public class Quartz extends CreateModifyTime{
     //是否删除
     private Integer delFlag;
     //策略开始时间
-    private Timestamp startTime;
+    private Date startTime;
     //策略结束时间
-    private Timestamp endTime;
+    private Date endTime;
     //策略生成方式选择
     private Integer quartzFlag;
     //单元选择
     private String unitType;
     //秒间隔
-    private int secInterval;
+    private Integer secInterval;
     //分间隔
-    private int minInterval;
+    private Integer minInterval;
     //时间隔
     private Integer hourInterval;
     //执行秒
@@ -51,11 +53,11 @@ public class Quartz extends CreateModifyTime{
     @Column(name = "quartz_id")
     @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "t_quartz", valueColumnName = "id_value")
     @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
-    public int getQuartzId() {
+    public Integer getQuartzId() {
         return quartzId;
     }
 
-    public void setQuartzId(int quartzId) {
+    public void setQuartzId(Integer quartzId) {
         this.quartzId = quartzId;
     }
 
@@ -111,21 +113,21 @@ public class Quartz extends CreateModifyTime{
 
     @Basic
     @Column(name = "start_time")
-    public Timestamp getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
     @Basic
     @Column(name = "end_time")
-    public Timestamp getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 

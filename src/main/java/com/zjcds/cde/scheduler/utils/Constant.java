@@ -4,6 +4,7 @@ import org.pentaho.di.core.Const;
 import org.pentaho.di.core.logging.LogLevel;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -18,7 +19,7 @@ public class Constant extends Const {
 	public static final String VERSION = "7.0.0.0-25";
 	public static final String DEFAULT_ENCODING = "UTF-8";
 	public static final String DEFAULT_TIMEZONE = "GMT+8";
-	public static final String UKETTLE = "resource/cde.properties";
+	public static final String UKETTLE = "cde.properties";
 	public static final String SESSION_ID = "SESSION_ID";
 	
 	public static final String STATUS_ENABLED = "ENABLED";
@@ -107,9 +108,13 @@ public class Constant extends Const {
 	public static Properties readProperties() {
 		Properties p = new Properties();
 		try {
-			p.load(new FileInputStream(Constant.class.getResource("/")
-					.getPath().replace("%20", " ")
-					+ UKETTLE));
+//			p.load(new FileInputStream(Constant.class.getClassLoader().getResource("/")
+//					.getPath().replace("%20", " ")
+//					+ UKETTLE));
+			InputStream inputStream = Constant.class.getClassLoader().getResourceAsStream(UKETTLE);
+			System.out.println(inputStream);
+
+			p.load(inputStream);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -32,6 +32,8 @@ public class TransMonitor {
 
     @Id
     @Column(name = "monitor_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "transMonitor", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
     public Integer getMonitorId() {
         return monitorId;
     }
