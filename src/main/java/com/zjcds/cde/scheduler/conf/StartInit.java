@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author J on 20191111
+ */
 @Configuration
 public class StartInit implements InitializingBean {
 

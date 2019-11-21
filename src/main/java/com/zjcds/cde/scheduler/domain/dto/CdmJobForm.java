@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.Map;
 
+/**
+ * @author J on 20191121
+ */
 @Getter
 @Setter
 public class CdmJobForm {
