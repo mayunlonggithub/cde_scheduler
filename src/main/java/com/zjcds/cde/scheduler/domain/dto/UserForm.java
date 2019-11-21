@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 /**
  * @author J on 20191107
  */
@@ -46,6 +48,10 @@ public class UserForm {
         private Integer modifyUser;
         @ApiModelProperty(value = "是否删除")
         private Integer delFlag;
+        @ApiModelProperty(value = "创建时间")
+        private Date createTime;
+        @ApiModelProperty(value = "修改时间")
+        private Date modifyTime;
     }
 
     @Getter

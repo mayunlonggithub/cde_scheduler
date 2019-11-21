@@ -46,7 +46,7 @@ import static org.eclipse.jetty.util.component.LifeCycle.stop;
  * @author J on 20191112
  */
 @Service
-public class JobServiceimpl implements JobService {
+public class JobServiceImpl implements JobService {
 
 
     @Autowired
