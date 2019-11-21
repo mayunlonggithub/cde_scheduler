@@ -1,17 +1,29 @@
 package com.zjcds.cde.scheduler.controller;
 
-import com.zjcds.cde.scheduler.domain.entity.User;
+import com.zjcds.cde.scheduler.domain.dto.JobForm;
+import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
+import com.zjcds.cde.scheduler.domain.dto.TransForm;
+import com.zjcds.cde.scheduler.domain.dto.TransMonitorForm;
+import com.zjcds.cde.scheduler.domain.entity.*;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
+import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
+import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.common.dozer.BeanPropertyCopyUtils;
 import com.zjcds.common.jsonview.annotations.JsonViewException;
 import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author J on 20191121
@@ -26,13 +38,91 @@ public class IndexController {
     private TransMonitorService transMonitorService;
     @Autowired
     private JobMonitorService jobMonitorService;
+    @Autowired
+    private TransService transService;
+    @Autowired
+    private JobService jobService;
 
+    @GetMapping("/allRuning")
+    @ApiOperation(value = "总监控任务数", produces = "application/json;charset=utf-8")
+    @JsonViewException
     public ResponseResult<Integer> allRuning(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         Integer allMonitorTrans = transMonitorService.getAllMonitorTrans(kUser.getId());
         Integer allMonitorJob = jobMonitorService.getAllMonitorJob(kUser.getId());
         Integer allRuning = allMonitorTrans + allMonitorJob;
         return new ResponseResult(true,"请求成功",allRuning);
+    }
+
+    @GetMapping("/allMonitorJob")
+    @ApiOperation(value = "监控作业数", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<Integer> allMonitorJob(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer allMonitorJob = jobMonitorService.getAllMonitorJob(kUser.getId());
+        return new ResponseResult(true,"请求成功",allMonitorJob);
+    }
+
+    @GetMapping("/allMonitorTrans")
+    @ApiOperation(value = "监控转换数", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<Integer> allMonitorTrans(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer allMonitorTrans = transMonitorService.getAllMonitorTrans(kUser.getId());
+        return new ResponseResult(true,"请求成功",allMonitorTrans);
+    }
+
+    @GetMapping("/getTrans")
+    @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<TransMonitorForm.TransMonitor> getTrans(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        List<TransMonitor> transMonitorList = transMonitorService.getList(kUser.getId());
+        if(transMonitorList.size()>5){
+            transMonitorList = transMonitorList.subList(1,5);
+        }
+        List<TransMonitorForm.TransMonitor> owner = BeanPropertyCopyUtils.copy(transMonitorList,TransMonitorForm.TransMonitor.class);
+        return new ResponseResult(true,"请求成功",owner);
+    }
+
+    @GetMapping("/getJob")
+    @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<JobMonitorForm.JobMonitor> getJob(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        List<JobMonitor> jobMonitorList = jobMonitorService.getList(kUser.getId());
+        if(jobMonitorList.size()>5){
+            jobMonitorList = jobMonitorList.subList(1,5);
+        }
+        List<JobMonitorForm.JobMonitor> owner = BeanPropertyCopyUtils.copy(jobMonitorList,JobMonitorForm.JobMonitor.class);
+        return new ResponseResult(true,"请求成功",owner);
+    }
+
+    @GetMapping("/getKettleLine")
+    @ApiOperation(value = "转换监控记录", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<Map<String, Object>> getKettleLine(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Map<String,Object> resultMap = new HashMap<String, Object>();
+        List<String> dateList = new ArrayList<String>();
+        for (int i = -6; i <= 0; i++){
+            Calendar instance = Calendar.getInstance();
+            instance.add(Calendar.DATE, i);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateFormat = simpleDateFormat.format(instance.getTime());
+            dateList.add(dateFormat);
+        }
+        resultMap.put("legend", dateList);
+        Map<String, Object> transLine = transMonitorService.getTransLine(kUser.getId());
+        resultMap.put("trans", transLine);
+        Map<String, Object> jobLine = jobMonitorService.getJobLine(kUser.getId());
+        resultMap.put("job", jobLine);
+        return new ResponseResult<>(true,"请求成功",resultMap);
     }
 
 }

@@ -72,6 +72,7 @@ public class UserController {
     @JsonViewException
     public ResponseResult<Void> isAdmin(HttpServletRequest request){
         User user = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(user,"未登录或登录已失效，请重新登录");
         boolean isAdmin = userService.isAdmin(user.getId());
         return new ResponseResult(true,"请求成功",isAdmin);
     }
@@ -105,39 +106,75 @@ public class UserController {
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<UserForm.User> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys){
+    public ResponseResult<UserForm.User> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
         }
-        PageResult<User> user = userService.getList(paging,queryString,orderBys);
+        PageResult<User> user = userService.getList(paging,queryString,orderBys,kUser.getId());
         PageResult<UserForm.User> owner = PageUtils.copyPageResult(user,UserForm.User.class);
         return new ResponseResult(true,"请求成功",owner);
     }
 
-    @DeleteMapping("delete/{uId}")
+    @DeleteMapping("delete/{id}")
     @ApiOperation(value = "删除用户", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> delete(@PathVariable("uId") Integer uId){
-        Assert.notNull(uId,"要删除的用户id不能为空");
-        userService.delete(uId);
+    @JsonViewException
+    public ResponseResult<Void> delete(HttpServletRequest request,@PathVariable(required = true ,name = "id") Integer id){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Assert.notNull(id,"要删除的用户id不能为空");
+        userService.delete(id,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
-    @PostMapping("addTUser/{uId}")
+    @PostMapping("addTUser")
     @ApiOperation(value = "插入一个用户", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> addTUser(@RequestBody UserForm.AddUser addTUser,@PathVariable(required = true ,name = "uId") Integer uId){
-        userService.addUser(addTUser,uId);
+    @JsonViewException
+    public ResponseResult<Void> addTUser(@RequestBody UserForm.AddUser addTUser, HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        userService.addUser(addTUser,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
 
-    @PutMapping("/updateUser/{uId}")
+    @PutMapping("/updateUser/{id}")
     @ApiOperation(value = "修改用户信息", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> updateUser(@PathVariable(required = true ,name = "uId") Integer uId,@RequestBody UserForm.UpdateUser updateUser){
-        userService.updateUser(updateUser,uId);
+    @JsonViewException
+    public ResponseResult<Void> updateUser(@PathVariable(required = true ,name = "id") Integer id,@RequestBody UserForm.UpdateUser updateUser, HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        userService.updateUser(updateUser,id,kUser.getId());
         return new ResponseResult(true,"请求成功");
+    }
+
+    @PostMapping("/isAccountExist/{account}")
+    @ApiOperation(value = "判断账号是否存在", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<Void> isAccountExist(@PathVariable(required = true ,name = "account") String account, HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        boolean isAccountExist = userService.isAccountExist(account);
+        if(isAccountExist){
+            return new ResponseResult(true,"请求成功");
+        }else {
+            return new ResponseResult(false,"账号已存在");
+        }
+    }
+
+    @PostMapping("/isAccountExist/{id}")
+    @ApiOperation(value = "判断账号是否存在", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<Void> isAccountExist(@PathVariable(required = true ,name = "id") Integer id, HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        User user = userService.getUser(id);
+        UserForm.User owner = BeanPropertyCopyUtils.copy(user,UserForm.User.class);
+        return new ResponseResult(true,"请求成功",owner);
     }
 
 }

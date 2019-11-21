@@ -29,6 +29,8 @@ public class TransMonitor {
     private Date lastExecuteTime;
     //下次执行时间
     private Date nextExecuteTime;
+    //转换名称
+    private String monitorTransName;
 
     @Id
     @Column(name = "monitor_id")
@@ -122,5 +124,12 @@ public class TransMonitor {
         this.nextExecuteTime = nextExecuteTime;
     }
 
+    @Transient
+    public String getMonitorTransName() {
+        return monitorTransName;
+    }
 
+    public void setMonitorTransName(String monitorTransName) {
+        this.monitorTransName = monitorTransName;
+    }
 }

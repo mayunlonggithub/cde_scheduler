@@ -32,5 +32,5 @@ public interface TransRecordService {
      * @throws IOException
      * @return String
      */
-    public String getLogContent(Integer recordId) throws IOException;
+    public String getLogContent(Integer recordId, Integer uId) throws IOException;
 }

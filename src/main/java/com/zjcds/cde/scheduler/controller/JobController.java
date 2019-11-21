@@ -73,8 +73,12 @@ public class JobController {
     )})
     public ResponseResult<JobForm.Job> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
+        }
+        if (CollectionUtils.isEmpty((Collection) orderBys)) {
+            orderBys = new ArrayList();
         }
         PageResult<Job> job = jobService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<JobForm.Job>  owner = PageUtils.copyPageResult(job,JobForm.Job.class);
@@ -94,25 +98,31 @@ public class JobController {
     @PutMapping("/update/{jobId}")
     @ApiOperation(value = "修改作业信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> update(@RequestBody JobForm.UpdateJob updateJob, @PathVariable(required = true ,name = "jobId") Integer jobId){
-        jobService.update(updateJob,jobId);
+    public ResponseResult<Void> update(@RequestBody JobForm.UpdateJob updateJob, @PathVariable(required = true ,name = "jobId") Integer jobId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        jobService.update(updateJob,jobId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
     @DeleteMapping("/delete/{jobId}")
     @ApiOperation(value = "删除作业信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> delete(@PathVariable(required = true ,name ="jobId") Integer jobId){
+    public ResponseResult<Void> delete(@PathVariable(required = true ,name ="jobId") Integer jobId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         Assert.notNull(jobId,"要删除的作业id不能为空");
-        jobService.delete(jobId);
+        jobService.delete(jobId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
     @GetMapping("/getJob/{jobId}")
     @ApiOperation(value = "获取作业信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<JobForm.Job> getJob(@PathVariable(required = true ,name = "jobId") Integer jobId){
-        Job job = jobService.getJob(jobId);
+    public ResponseResult<JobForm.Job> getJob(@PathVariable(required = true ,name = "jobId") Integer jobId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Job job = jobService.getJob(jobId,kUser.getId());
         JobForm.Job owner = BeanPropertyCopyUtils.copy(job,JobForm.Job.class);
         return new ResponseResult(false,"请求成功",owner);
     }
@@ -122,7 +132,8 @@ public class JobController {
     @JsonViewException
     public ResponseResult<Void> start(@RequestBody JobForm.JobParam jobParam, @PathVariable(required = true ,name = "jobId") Integer jobId, HttpServletRequest request)throws KettleException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        jobService.start(jobId,1,jobParam.getParam());
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        jobService.start(jobId,kUser.getId(),jobParam.getParam());
         return new ResponseResult(true,"请求成功");
     }
     

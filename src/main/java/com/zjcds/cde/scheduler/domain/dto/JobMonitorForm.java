@@ -23,6 +23,8 @@ public class JobMonitorForm {
         private Integer monitorId;
         @ApiModelProperty(value = "监控的作业ID")
         private Integer monitorJob;
+        @ApiModelProperty(value = "监控的作业名称")
+        private String monitorJobName;
         @ApiModelProperty(value = "成功次数")
         private Integer monitorSuccess;
         @ApiModelProperty(value = "失败次数")

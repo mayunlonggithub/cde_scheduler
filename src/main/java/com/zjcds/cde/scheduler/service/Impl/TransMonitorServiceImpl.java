@@ -1,8 +1,10 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
 import com.zjcds.cde.scheduler.dao.jpa.TransMonitorDao;
+import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
+import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.common.base.domain.page.Paging;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -24,6 +27,8 @@ public class TransMonitorServiceImpl implements TransMonitorService {
 
     @Autowired
     private TransMonitorDao transMonitorDao;
+    @Autowired
+    private TransService transService;
 
     /**
      *
@@ -36,11 +41,34 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public PageResult<TransMonitor> getList(Paging  paging, List<String> queryString, List<String> orderBys, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         PageResult<TransMonitor> transMonitorPageResult = transMonitorDao.findAll(paging,queryString,orderBys);
+        List<TransMonitor> transMonitorList = transMonitorPageResult.getContent();
+        transName(transMonitorList);
         return transMonitorPageResult;
     }
 
+    @Override
+    public List<TransMonitor> getList(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        transName(transMonitorList);
+        return transMonitorList;
+    }
+
+    /**
+     * 加载作业名称
+     * @param transMonitorList
+     */
+    public void transName(List<TransMonitor> transMonitorList){
+        Map<Integer,String> map = transService.transNameMap();
+        if(transMonitorList.size()>0&&transMonitorList!=null){
+            for (TransMonitor t:transMonitorList){
+                t.setMonitorTransName(map.get(t.getMonitorTrans()));
+            }
+        }
+    }
 
     /**
      * @param uId 用户ID
@@ -50,6 +78,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Integer getAllMonitorTrans(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         return transMonitorList.size();
     }
@@ -62,6 +91,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Integer getAllSuccess(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
         for (TransMonitor transMonitor : transMonitorList) {
@@ -78,6 +108,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Integer getAllFail(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
         for (TransMonitor transMonitor : transMonitorList) {
@@ -95,7 +126,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     public Map<String, Object> getTransLine(Integer uId) {
-
+        Assert.notNull(uId,"未登录,请重新登录");
         List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUser(uId);
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
@@ -132,7 +163,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Override
     @Transactional
     public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime) {
-
+        Assert.notNull(userId,"未登录,请重新登录");
         TransMonitor templateOne = transMonitorDao.findByCreateUserAndMonitorTrans(userId,transId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);

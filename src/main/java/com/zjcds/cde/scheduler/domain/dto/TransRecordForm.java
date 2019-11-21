@@ -22,6 +22,8 @@ public class TransRecordForm {
         private Integer recordId;
         @ApiModelProperty(value = "转换ID")
         private Integer recordTrans;
+        @ApiModelProperty(value = "转换名称")
+        private String recordTransName;
         @ApiModelProperty(value = "启动时间")
         private Date startTime;
         @ApiModelProperty(value = "停止时间")

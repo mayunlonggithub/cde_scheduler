@@ -73,9 +73,14 @@ public class UserForm {
     @Getter
     @Setter
     @ApiModel(value = "user.update",description = "修改用户信息")
-    public static class UpdateUser extends UserForm.AddUser {
+    public static class UpdateUser extends BaseBean {
         @ApiModelProperty(value = "用户ID")
         private Integer id;
-
+        @ApiModelProperty(value = "用户昵称")
+        private String nickname;
+        @ApiModelProperty(value = "用户邮箱")
+        private String email;
+        @ApiModelProperty(value = "用户电话")
+        private String phone;
     }
 }

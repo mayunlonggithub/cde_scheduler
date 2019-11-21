@@ -25,6 +25,8 @@ public class TransRecord {
     private String logFilePath;
     //添加者
     private Integer createUser;
+    //转换名称
+    private String recordTransName;
 
     @Id
     @Column(name = "record_id")
@@ -98,4 +100,12 @@ public class TransRecord {
         this.createUser = createUser;
     }
 
+    @Transient
+    public String getRecordTransName() {
+        return recordTransName;
+    }
+
+    public void setRecordTransName(String recordTransName) {
+        this.recordTransName = recordTransName;
+    }
 }

@@ -66,6 +66,7 @@ public class TransController {
     )})
     public ResponseResult<TransForm.Trans> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -90,25 +91,31 @@ public class TransController {
     @PutMapping("/update/{transId}")
     @ApiOperation(value = "修改转换信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> update(@RequestBody TransForm.UpdateTrans updateTrans, @PathVariable(required = true ,name = "transId") Integer transId){
-        transService.update(updateTrans,transId);
+    public ResponseResult<Void> update(@RequestBody TransForm.UpdateTrans updateTrans, @PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        transService.update(updateTrans,transId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
     @DeleteMapping("/delete/{transId}")
     @ApiOperation(value = "删除转换信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> delete(@PathVariable(required = true ,name ="transId") Integer transId){
+    public ResponseResult<Void> delete(@PathVariable(required = true ,name ="transId") Integer transId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         Assert.notNull(transId,"要删除的转换id不能为空");
-        transService.delete(transId);
+        transService.delete(transId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
     @GetMapping("/getTrans/{transId}")
     @ApiOperation(value = "获取转换信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<TransForm.Trans> getTrans(@PathVariable(required = true ,name = "transId") Integer transId){
-        Trans trans = transService.getTrans(transId);
+    public ResponseResult<TransForm.Trans> getTrans(@PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Trans trans = transService.getTrans(transId,kUser.getId());
         TransForm.Trans owner = BeanPropertyCopyUtils.copy(trans,TransForm.Trans.class);
         return new ResponseResult(false,"请求成功",owner);
     }
@@ -118,7 +125,8 @@ public class TransController {
     @JsonViewException
     public ResponseResult<Void> start(@RequestBody TransForm.TransParam transParam, @PathVariable(required = true ,name = "transId") Integer transId, HttpServletRequest request)throws KettleException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        transService.start(transId,1,transParam.getParam());
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        transService.start(transId,kUser.getId(),transParam.getParam());
         return new ResponseResult(true,"请求成功");
     }
 }

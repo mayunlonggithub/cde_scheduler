@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
+import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.common.base.domain.page.Paging;
@@ -11,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -23,6 +25,8 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Autowired
     private JobMonitorDao jobMonitorDao;
 
+    @Autowired
+    private JobService jobService;
 
     /**
      *
@@ -35,33 +39,34 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      */
     @Override
     public PageResult<JobMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         PageResult<JobMonitor> jobMonitorPageResult = jobMonitorDao.findAll(paging, queryString, orderBys);
-
+        List<JobMonitor> jobMonitorList = jobMonitorPageResult.getContent();
+        jobName(jobMonitorList);
         return jobMonitorPageResult;
     }
 
-//    /**
-//     * @param uId   用户ID
-//     * @return BootTablePage
-//     * @Title getList
-//     * @Description 获取作业监控不分页列表
-//     */
-//    public PageResult<JobMonitor> getList(Integer uId) {
-//
-//        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
-////        Collections.sort(jobMonitorList);
-//        List<JobMonitor> newKJobMonitorList = new ArrayList<JobMonitor>();
-//        if (jobMonitorList.size() >= 5) {
-//            newKJobMonitorList = jobMonitorList.subList(0, 5);
-//        } else {
-//            newKJobMonitorList = jobMonitorList;
-//        }
-//        BootTablePage bootTablePage = new BootTablePage();
-//        bootTablePage.setRows(newKJobMonitorList);
-//        bootTablePage.setTotal(5);
-//        return bootTablePage;
-//    }
+    @Override
+    public List<JobMonitor> getList(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        jobName(jobMonitorList);
+        return jobMonitorList;
+    }
+
+    /**
+     * 加载转换名称
+     * @param jobMonitorList
+     */
+    public void jobName(List<JobMonitor> jobMonitorList){
+        Map<Integer,String> map = jobService.jobNameMap();
+        if(jobMonitorList.size()>0&&jobMonitorList!=null){
+            for (JobMonitor j:jobMonitorList){
+                j.setMonitorJobName(map.get(j.getMonitorJob()));
+            }
+        }
+    }
 
     /**
      * @param uId 用户ID
@@ -71,6 +76,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      */
     @Override
     public Integer getAllMonitorJob(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         return jobMonitorList.size();
     }
@@ -83,6 +89,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      */
     @Override
     public Integer getAllSuccess(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
         for (JobMonitor jobMonitor : jobMonitorList) {
@@ -99,6 +106,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      */
     @Override
     public Integer getAllFail(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
         for (JobMonitor jobMonitor : jobMonitorList) {
@@ -113,8 +121,9 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Title getTransLine
      * @Description 获取7天内作业的折线图
      */
+    @Override
     public Map<String, Object> getJobLine(Integer uId) {
-
+        Assert.notNull(uId,"未登录,请重新登录");
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUser(uId);
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
@@ -151,6 +160,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Override
     @Transactional
     public void addMonitor(Integer userId, Integer jobId, Date nextExecuteTime) {
+        Assert.notNull(userId,"未登录,请重新登录");
         JobMonitor templateOne = jobMonitorDao.findByMonitorJob(jobId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);

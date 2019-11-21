@@ -74,6 +74,7 @@ public class RepositoryController {
     )})
     public ResponseResult<RepositoryForm.Repository> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -89,8 +90,10 @@ public class RepositoryController {
     @GetMapping("/getTreeList/{repositoryId}")
     @ApiOperation(value = "获取资源库树信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<List<RepositoryTreeForm>> getTreeList(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId) throws KettleException{
-        List<RepositoryTreeForm> repositoryTreeFormList = repositoryService.getTreeList(repositoryId);
+    public ResponseResult<List<RepositoryTreeForm>> getTreeList(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request) throws KettleException{
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        List<RepositoryTreeForm> repositoryTreeFormList = repositoryService.getTreeList(repositoryId,kUser.getId());
         return new ResponseResult<>(true,"请求成功",repositoryTreeFormList);
     }
 
@@ -106,31 +109,33 @@ public class RepositoryController {
     }
 
 
-    @PutMapping("/update")
+    @PutMapping("/update/{repositoryId}")
     @ApiOperation(value = "修改资源库信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> update(@RequestBody RepositoryForm.UpdateRepository updateRepository, HttpServletRequest request){
+    public ResponseResult<Void> update(@RequestBody RepositoryForm.UpdateRepository updateRepository,@PathVariable(required = true ,name = "repositoryId") Integer repositoryId, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        repositoryService.update(updateRepository,kUser.getId());
+        repositoryService.update(updateRepository,repositoryId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
-    @DeleteMapping("/delete}")
+    @DeleteMapping("/delete/{repositoryId}")
     @ApiOperation(value = "删除资源库信息", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> delete(HttpServletRequest request){
+    public ResponseResult<Void> delete(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        repositoryService.delete(kUser.getId());
+        repositoryService.delete(repositoryId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
     @PostMapping("/check")
     @ApiOperation(value = "检查资源库连接", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> check(@RequestBody RepositoryForm.AddRepository addRepository)throws KettleException{
-        boolean check = repositoryService.check(addRepository);
+    public ResponseResult<Void> check(@RequestBody RepositoryForm.AddRepository addRepository,HttpServletRequest request)throws KettleException{
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        boolean check = repositoryService.check(addRepository,kUser.getId());
         if(check){
             return new ResponseResult(true,"资源库连接成功");
         }else {
@@ -141,7 +146,9 @@ public class RepositoryController {
     @GetMapping("/getType")
     @ApiOperation(value = "获取资源库类别列表", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<RepositoryTypeForm.RepositoryType> getType(){
+    public ResponseResult<RepositoryTypeForm.RepositoryType> getType(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         List<RepositoryType> repositoryTypes = repositoryService.getRepositoryTypeList();
         List<RepositoryTypeForm.RepositoryType> owner = BeanPropertyCopyUtils.copy(repositoryTypes,RepositoryTypeForm.RepositoryType.class);
         return new ResponseResult(true,"请求成功",owner);
@@ -151,7 +158,9 @@ public class RepositoryController {
     @GetMapping("/getAccess")
     @ApiOperation(value = "获取资源库访问类型", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<List<String>> getAccess(){
+    public ResponseResult<List<String>> getAccess(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         List<String> access = repositoryService.getAccess();
         return new ResponseResult(true,"请求成功",access);
 
@@ -161,8 +170,10 @@ public class RepositoryController {
     @GetMapping("/getRepository/{repositoryId}")
     @ApiOperation(value = "获取资源库对象", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<List<String>> getRepository(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId){
-        Repository repository = repositoryService.getRepository(repositoryId);
+    public ResponseResult<List<String>> getRepository(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Repository repository = repositoryService.getRepository(repositoryId,kUser.getId());
         RepositoryForm.Repository owner = BeanPropertyCopyUtils.copy(repository,RepositoryForm.Repository.class);
         return new ResponseResult(false,"请求成功",owner);
 

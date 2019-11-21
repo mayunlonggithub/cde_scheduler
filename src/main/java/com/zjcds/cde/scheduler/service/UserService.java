@@ -37,7 +37,7 @@ public interface UserService {
      * @Description 获取用户分页列表
      * @return
      */
-    public PageResult<User> getList(Paging paging, List<String> queryString, List<String> orderBys);
+    public PageResult<User> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId);
 
     /**
      * @Title delete
@@ -45,7 +45,7 @@ public interface UserService {
      * @param uId 用户ID
      * @return void
      */
-    public void delete(Integer uId);
+    public void delete(Integer id,Integer uId);
 
     /**
      * @Title addUser
@@ -58,10 +58,10 @@ public interface UserService {
     /**
      * @Title IsAccountExist
      * @Description 判断账号是否存在
-     * @param uAccount
+     * @param account
      * @return void
      */
-    public boolean IsAccountExist(String uAccount);
+    public boolean isAccountExist(String account);
 
     /**
      * @Title getUser
@@ -79,5 +79,5 @@ public interface UserService {
      * @param uId 用户ID
      * @return void
      */
-    public void updateUser(UserForm.UpdateUser updateUser, Integer uId);
+    public void updateUser(UserForm.UpdateUser updateUser, Integer id,Integer uId);
 }

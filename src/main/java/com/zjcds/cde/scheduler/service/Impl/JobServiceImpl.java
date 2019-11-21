@@ -51,38 +51,19 @@ public class JobServiceImpl implements JobService {
 
     @Autowired
     private JobDao jobDao;
-
     @Autowired
     private JobMonitorService jobMonitorService;
-
     @Autowired
     private RepositoryDao repositoryDao;
-
     @Autowired
     private JobMonitorDao jobMonitorDao;
-
     @Autowired
     private JobRecordDao jobRecordDao;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
-
     @Value("${cde.file.repository}")
     private String cdeFileRepository;
-
-    @Value("${com.zjcds.dataSources.druids.dataSource.driverClassName}")
-    private String jdbcDriver;
-
-    @Value("${com.zjcds.dataSources.druids.dataSource.url}")
-    private String jdbcUrl;
-
-    @Value("${com.zjcds.dataSources.druids.dataSource.username}")
-    private String jdbcUsername;
-
-    @Value("${com.zjcds.dataSources.druids.dataSource.password}")
-    private String jdbcPassword;
-
-
 
     private org.pentaho.di.job.Job job;
 
@@ -94,10 +75,17 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public PageResult<Job> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         queryString.add("delFlag~Eq~1");
         PageResult<Job> jobList = jobDao.findAll(paging, queryString, orderBys);
-        
+        return jobList;
+    }
+
+    @Override
+    public List<Job> getList(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        List<Job> jobList = jobDao.findByCreateUserAndDelFlag(uId,1);
         return jobList;
     }
 
@@ -109,8 +97,11 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     @Transactional
-    public void delete(Integer jobId) {
-        Job job = jobDao.findOne(jobId);
+    public void delete(Integer jobId,Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(jobId,"要删除的作业ID不能为空");
+        Job job = jobDao.findByJobIdAndDelFlag(jobId,uId);
+        Assert.notNull(job,"要删除的任务不存在或已删除");
         job.setDelFlag(0);
         jobDao.save(job);
     }
@@ -125,6 +116,9 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public boolean check(Integer repositoryId, String jobPath, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(repositoryId,"资源库ID不能为空");
+        Assert.hasText(jobPath,"作业路径不能为空");
         List<Job> jobList = jobDao.findByCreateUserAndDelFlagAndJobRepositoryIdAndJobPath(uId,1,repositoryId,jobPath);
         if (null != jobList && jobList.size() > 0) {
             return false;
@@ -145,13 +139,18 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public void insert(JobForm.AddJob addJob, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         //补充添加作业信息
         //作业基础信息
         Job job = BeanPropertyCopyUtils.copy(addJob,Job.class);
+        boolean status = check(job.getJobRepositoryId(),job.getJobPath(),uId);
+        Assert.isTrue(status,"该作业已存在");
         //作业是否被删除
         job.setDelFlag(1);
         //作业是否启动
         job.setJobStatus(2);
+        job.setCreateUser(uId);
+        job.setModifyUser(uId);
         jobDao.save(job);
     }
 
@@ -162,7 +161,8 @@ public class JobServiceImpl implements JobService {
      * @Description 获取作业信息
      */
     @Override
-    public Job getJob(Integer jobId) {
+    public Job getJob(Integer jobId,Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(jobId,"要查询的jobId不能为空");
         return jobDao.findOne(jobId);
     }
@@ -176,9 +176,16 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     @Transactional
-    public void update(JobForm.UpdateJob updateJob, Integer jobId) {
+    public void update(JobForm.UpdateJob updateJob, Integer jobId,Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(jobId,"要更新的jobId不能为空");
+        Job j = jobDao.findByJobIdAndDelFlag(jobId,1);
+        Assert.notNull(j,"要修改的作业不存在或已删除");
         Job job = BeanPropertyCopyUtils.copy(updateJob,Job.class);
+        job.setModifyUser(uId);
+        job.setDelFlag(j.getDelFlag());
+        job.setCreateUser(j.getCreateUser());
+        job.setCreateTime(j.getCreateTime());
         jobDao.save(job);
     }
 
@@ -192,6 +199,7 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public void start(Integer jobId,Integer uId,Map<String,String> param)throws KettleException {
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(jobId,"要启动的作业id不能为空");
         Job job = jobDao.findOne(jobId);
         Repository repository = repositoryDao.findOne(job.getJobRepositoryId());
@@ -221,6 +229,7 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException {
+        Assert.notNull(userId,"未登录,请重新登录");
         KettleDatabaseRepository kettleDatabaseRepository  = init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(jobPath);
@@ -342,5 +351,23 @@ public class JobServiceImpl implements JobService {
             templateOne.setMonitorFail(templateOne.getMonitorFail() + 1);
             jobMonitorDao.save(templateOne);
         }
+    }
+
+    /**
+     * 查询所有作业名称Map
+     * @return
+     */
+    @Override
+    public Map<Integer,String> jobNameMap(){
+        List<Job> jobList = jobDao.findByDelFlag(1);
+        Map<Integer,String> jobNameMap = new HashMap<>();
+        if(jobList.size()>0&&jobList!=null){
+            for (Job j:jobList){
+                Map<Integer,String> map = new HashMap<>();
+                map.put(j.getJobId(),j.getJobName());
+                jobNameMap.putAll(map);
+            }
+        }
+        return jobNameMap;
     }
 }

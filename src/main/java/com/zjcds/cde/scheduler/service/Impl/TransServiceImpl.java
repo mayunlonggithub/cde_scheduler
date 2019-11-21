@@ -81,10 +81,18 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     public PageResult<Trans> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         queryString.add("delFlag~Eq~1");
         PageResult<Trans> transPageResult = transDao.findAll(paging,queryString,orderBys);
         return transPageResult;
+    }
+
+    @Override
+    public List<Trans> getList(Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        List<Trans> transList = transDao.findByCreateUserAndDelFlag(uId,1);
+        return transList;
     }
 
     /**
@@ -95,8 +103,11 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     @Transactional
-    public void delete(Integer transId) {
-        Trans trans = transDao.findOne(transId);
+    public void delete(Integer transId,Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(transId,"要删除的转换id不能为空");
+        Trans trans = transDao.findByTransIdAndDelFlag(transId,uId);
+        Assert.notNull(trans,"要删除的转换不存在或已删除");
         trans.setDelFlag(0);
         transDao.save(trans);
     }
@@ -111,6 +122,9 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     public boolean check(Integer repositoryId, String kTransPath, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(repositoryId,"资源库id不能为空");
+        Assert.hasText(kTransPath,"转换路径信息不能为空");
         List<Trans> kTransList = transDao.findByCreateUserAndDelFlagAndTransRepositoryIdAndTransPath(uId,1,repositoryId,kTransPath);
         if (null != kTransList && kTransList.size() > 0) {
             return false;
@@ -131,13 +145,18 @@ public class TransServiceImpl implements TransService {
     @Override
     @Transactional
     public void insert(TransForm.AddTrans addTrans, Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         //补充添加作业信息
         //作业基础信息
         Trans trans = BeanPropertyCopyUtils.copy(addTrans,Trans.class);
+        boolean status = check(trans.getTransRepositoryId(),trans.getTransPath(),uId);
+        Assert.isTrue(status,"该转换已存在");
         //作业是否被删除
         trans.setDelFlag(1);
         //作业是否启动
         trans.setTransStatus(2);
+        trans.setCreateUser(uId);
+        trans.setModifyUser(uId);
         transDao.save(trans);
     }
 
@@ -148,7 +167,8 @@ public class TransServiceImpl implements TransService {
      * @Description 获取转换对象
      */
     @Override
-    public Trans getTrans(Integer transId) {
+    public Trans getTrans(Integer transId,Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要查询的transId不能为空");
         return transDao.findOne(transId);
     }
@@ -162,9 +182,16 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     @Transactional
-    public void update(TransForm.UpdateTrans updateTrans, Integer transId) {
-        Assert.notNull(transId,"要更新的transId不能为空");
+    public void update(TransForm.UpdateTrans updateTrans, Integer transId,Integer uId) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(transId,"要更新的jobId不能为空");
+        Trans t = transDao.findByTransIdAndDelFlag(transId,1);
+        Assert.notNull(t,"要修改的作业不存在或已删除");
         Trans trans = BeanPropertyCopyUtils.copy(updateTrans,Trans.class);
+        trans.setModifyUser(uId);
+        trans.setDelFlag(t.getDelFlag());
+        trans.setCreateUser(t.getCreateUser());
+        trans.setCreateTime(t.getCreateTime());
         transDao.save(trans);
     }
 
@@ -178,6 +205,7 @@ public class TransServiceImpl implements TransService {
     @Override
     @Transactional
     public void start(Integer transId,Integer uId,Map<String,String> param)throws KettleException {
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要启动的作业id不能为空");
         Trans trans = transDao.findOne(transId);
         Repository repository = repositoryDao.findOne(trans.getTransRepositoryId());
@@ -206,6 +234,7 @@ public class TransServiceImpl implements TransService {
     @Override
     @Transactional
     public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException {
+        Assert.notNull(userId,"未登录,请重新登录");
         KettleDatabaseRepository kettleDatabaseRepository  = init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(transPath);
@@ -327,4 +356,22 @@ public class TransServiceImpl implements TransService {
         }
     }
 
+
+    /**
+     * 查询所有转换名称Map
+     * @return
+     */
+    @Override
+    public Map<Integer,String> transNameMap(){
+        List<Trans> transList = transDao.findByDelFlag(1);
+        Map<Integer,String> transNameMap = new HashMap<>();
+        if(transList.size()>0&&transList!=null){
+            for (Trans t:transList){
+                Map<Integer,String> map = new HashMap<>();
+                map.put(t.getTransId(),t.getTransName());
+                transNameMap.putAll(map);
+            }
+        }
+        return transNameMap;
+    }
 }

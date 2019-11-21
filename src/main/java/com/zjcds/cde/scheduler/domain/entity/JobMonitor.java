@@ -29,6 +29,8 @@ public class JobMonitor {
     private Date lastExecuteTime;
     //下次执行时间
     private Date nextExecuteTime;
+    //作业名称
+    private String monitorJobName;
 
     @Id
     @Column(name = "monitor_id")
@@ -122,5 +124,12 @@ public class JobMonitor {
         this.nextExecuteTime = nextExecuteTime;
     }
 
+    @Transient
+    public String getMonitorJobName() {
+        return monitorJobName;
+    }
 
+    public void setMonitorJobName(String monitorJobName) {
+        this.monitorJobName = monitorJobName;
+    }
 }

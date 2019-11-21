@@ -37,11 +37,6 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Autowired
     private RepositoryTypeDao repositoryTypeDao;
-    @Autowired
-    private RepositoryTreeDao repositoryTreeDao;
-
-    @Autowired
-    private RepositoryJobViewDao repositoryJobViewDao;
 
     @Autowired
     private JobDao jobDao;
@@ -58,7 +53,8 @@ public class RepositoryServiceImpl implements RepositoryService {
      * @return List<RepositoryTree>
      */
     @Override
-    public List<RepositoryTreeForm> getTreeList(Integer repositoryId) throws KettleException{
+    public List<RepositoryTreeForm> getTreeList(Integer repositoryId,Integer uId) throws KettleException{
+        Assert.notNull(uId,"未登录,请重新登录");
         KettleDatabaseRepository kettleDatabaseRepository = null;
         List<RepositoryTreeForm> allRepositoryTreeList = new ArrayList<>();
         if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
@@ -83,7 +79,8 @@ public class RepositoryServiceImpl implements RepositoryService {
      * @return boolean
      */
     @Override
-    public boolean check(RepositoryForm.AddRepository addRepository) throws KettleException{
+    public boolean check(RepositoryForm.AddRepository addRepository,Integer uId) throws KettleException{
+        Assert.notNull(uId,"未登录,请重新登录");
         Repository repository = BeanPropertyCopyUtils.copy(addRepository,Repository.class);
         KettleDatabaseRepository kettleDatabaseRepository = RepositoryUtil.connectionRepository(repository);
         if (kettleDatabaseRepository != null){
@@ -97,18 +94,6 @@ public class RepositoryServiceImpl implements RepositoryService {
         }
     }
 
-    /**
-     * @Title getList
-     * @Description 获取列表，不分页
-     * @param uId 用户ID
-     * @return
-     * @throws KettleException
-     * @return List<KRepository>
-     */
-//    @Override
-//    public List<Repository> getList(Integer uId){
-//        return repositoryDao.findByCreateUserAndDelFlag(uId,1);
-//    }
 
     /**
      * @Title getList
@@ -119,6 +104,7 @@ public class RepositoryServiceImpl implements RepositoryService {
      */
     @Override
     public PageResult<Repository> getList(Paging paging, List<String> queryString,List<String> orderBys, Integer uId){
+        Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         queryString.add("delFlag~Eq~1");
         PageResult<Repository> repositoryList = repositoryDao.findAll(paging,queryString,orderBys);
@@ -144,7 +130,8 @@ public class RepositoryServiceImpl implements RepositoryService {
      * @return KRepository
      */
     @Override
-    public Repository getRepository(Integer repositoryId){
+    public Repository getRepository(Integer repositoryId,Integer uId){
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(repositoryId,"要查询的资源库id不能为空");
         //如果根据主键没有获取到对象，返回null
         return repositoryDao.findOne(repositoryId);
@@ -172,8 +159,10 @@ public class RepositoryServiceImpl implements RepositoryService {
     @Override
     @Transactional
     public void insert(RepositoryForm.AddRepository addRepository, Integer uId) throws KettleException{
-        Assert.notNull(uId,"要添加的用户ID不能为空！");
-        Repository repository = BeanPropertyCopyUtils.copy(addRepository,Repository.class);
+        Assert.notNull(uId,"未登录,请重新登录！");
+        Repository repository = repositoryDao.findByDatabaseHostAndDatabaseNameAndDelFlag(addRepository.getDatabaseHost(),addRepository.getDatabaseName(),1);
+        Assert.isNull(repository,"该资源库信息已存在，请重新输入");
+        repository = BeanPropertyCopyUtils.copy(addRepository,Repository.class);
         repository.setCreateUser(uId);
         repository.setModifyUser(uId);
         repository.setDelFlag(1);
@@ -190,12 +179,18 @@ public class RepositoryServiceImpl implements RepositoryService {
      */
     @Override
     @Transactional
-    public void update(RepositoryForm.UpdateRepository updateRepository, Integer uId){
-        Assert.notNull(uId,"要修改的用户ID不能为空！");
-        Repository repository = BeanPropertyCopyUtils.copy(updateRepository,Repository.class);
-        repository.setModifyUser(uId);
+    public void update(RepositoryForm.UpdateRepository updateRepository,Integer repositoryId, Integer uId){
+        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(repositoryId,"要修改的资源库ID不能为空");
+        Repository repository = repositoryDao.findByRepositoryIdAndDelFlag(repositoryId,1);
+        Assert.notNull(repository,"要修改的资源库不存在或已删除");
+        Repository rep = BeanPropertyCopyUtils.copy(updateRepository,Repository.class);
+        rep.setModifyUser(uId);
+        rep.setDelFlag(repository.getDelFlag());
+        rep.setCreateUser(repository.getCreateUser());
+        rep.setCreateTime(repository.getCreateTime());
         //只有不为null的字段才参与更新
-        repositoryDao.save(repository);
+        repositoryDao.save(rep);
     }
 
     /**
@@ -206,11 +201,13 @@ public class RepositoryServiceImpl implements RepositoryService {
      */
     @Override
     @Transactional
-    public void delete(Integer repositoryId){
+    public void delete(Integer repositoryId,Integer uId){
+        Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(repositoryId,"要删除的资源库ID不能为空！");
-        Repository kRepository = repositoryDao.findOne(repositoryId);
-        kRepository.setDelFlag(0);
-        repositoryDao.save(kRepository);
+        Repository repository = repositoryDao.findByRepositoryIdAndDelFlag(repositoryId,1);
+        Assert.notNull(repository,"要修改的资源库不存在或已删除");
+        repository.setDelFlag(0);
+        repositoryDao.save(repository);
     }
 
     /**
@@ -309,7 +306,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         return transList;
     }
 
-    //作业转换家在路径信息
+    //作业转换加载路径信息
     private List<RepositoryTree> stream(List<RepositoryTree> path,List<RepositoryTree> repositoryTrees){
         for(RepositoryTree t : repositoryTrees){
             RepositoryTree pathTrans = path.stream().filter(e->e.getId().toString().equals(t.getParent())).findFirst().orElse(new RepositoryTree());
@@ -325,7 +322,4 @@ public class RepositoryServiceImpl implements RepositoryService {
         return repositoryTrees;
     }
 
-//    public void saveJob(Integer repositoryId){
-//        List<RepositoryJobView> repositoryJobViews = repositoryJobViewDao.findByRepositoryId(repositoryId);
-//    }
 }

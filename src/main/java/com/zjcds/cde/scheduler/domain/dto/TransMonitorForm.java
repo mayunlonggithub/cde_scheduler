@@ -22,6 +22,8 @@ public class TransMonitorForm {
         private Integer monitorId;
         @ApiModelProperty(value = "监控的转换的ID")
         private Integer monitorTrans;
+        @ApiModelProperty(value = "监控的转换的名称")
+        private String monitorTransName;
         @ApiModelProperty(value = "成功次数")
         private Integer monitorSuccess;
         @ApiModelProperty(value = "失败次数")

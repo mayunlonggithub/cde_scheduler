@@ -23,6 +23,8 @@ public class JobRecordForm {
         private Integer recordId;
         @ApiModelProperty(value = "作业ID")
         private Integer recordJob;
+        @ApiModelProperty(value = "作业名称")
+        private String recordJobName;
         @ApiModelProperty(value = "启动时间")
         private Date startTime;
         @ApiModelProperty(value = "停止时间")

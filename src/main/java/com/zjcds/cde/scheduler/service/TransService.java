@@ -26,13 +26,17 @@ public interface TransService {
      */
     public PageResult<Trans> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
+
+    public List<Trans> getList(Integer uId);
+
+
     /**
      * @param transId 转换ID
      * @return void
      * @Title delete
      * @Description 删除转换
      */
-    public void delete(Integer transId);
+    public void delete(Integer transId, Integer uId);
 
     /**
      * @param repositoryId 资源库ID
@@ -61,7 +65,7 @@ public interface TransService {
      * @Title getTrans
      * @Description 获取转换信息
      */
-    public Trans getTrans(Integer transId);
+    public Trans getTrans(Integer transId, Integer uId);
 
     /**
      * @param updateTrans          转换对象
@@ -70,7 +74,7 @@ public interface TransService {
      * @Title update
      * @Description 更新转换信息
      */
-    public void update(TransForm.UpdateTrans updateTrans, Integer transId);
+    public void update(TransForm.UpdateTrans updateTrans, Integer transId, Integer uId);
 
 
     /**
@@ -97,4 +101,12 @@ public interface TransService {
      * @throws KettleException
      */
     public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException;
+
+
+    /**
+     * 查询所有转换名称Map
+     * @return
+     */
+    public Map<Integer,String> transNameMap();
+
 }

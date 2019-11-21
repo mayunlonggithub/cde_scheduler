@@ -27,6 +27,8 @@ public interface TransMonitorService {
      */
     public PageResult<TransMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
+    public List<TransMonitor> getList(Integer uId);
+
     /**
      * @param uId 用户ID
      * @return Integer

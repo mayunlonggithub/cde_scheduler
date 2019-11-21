@@ -26,13 +26,16 @@ public interface JobService {
      */
     public PageResult<Job> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
+    public List<Job> getList(Integer uId);
+
+
     /**
      * @param jobId 作业ID
      * @return void
      * @Title delete
      * @Description 删除作业
      */
-    public void delete(Integer jobId);
+    public void delete(Integer jobId,Integer uId);
 
     /**
      * @param repositoryId 资源库ID
@@ -61,7 +64,7 @@ public interface JobService {
      * @Title getJob
      * @Description 获取作业信息
      */
-    public Job getJob(Integer jobId);
+    public Job getJob(Integer jobId,Integer uId);
 
     /**
      * @param updateJob          作业对象
@@ -70,7 +73,7 @@ public interface JobService {
      * @Title update
      * @Description 更新作业信息
      */
-    public void update(JobForm.UpdateJob updateJob, Integer jobId);
+    public void update(JobForm.UpdateJob updateJob, Integer jobId,Integer uId);
 
     /**
      * @param jobId 作业ID
@@ -96,4 +99,10 @@ public interface JobService {
      */
     public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException;
 
+
+    /**
+     * 查询所有作业名称Map
+     * @return
+     */
+    public Map<Integer,String> jobNameMap();
 }

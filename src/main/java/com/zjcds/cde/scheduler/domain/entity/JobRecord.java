@@ -25,6 +25,8 @@ public class JobRecord {
     private String logFilePath;
     //添加者
     private Integer createUser;
+    //作业名称
+    private String recordJobName;
 
     @Id
     @Column(name = "record_id")
@@ -96,5 +98,14 @@ public class JobRecord {
 
     public void setCreateUser(Integer createUser) {
         this.createUser = createUser;
+    }
+
+    @Transient
+    public String getRecordJobName() {
+        return recordJobName;
+    }
+
+    public void setRecordJobName(String recordJobName) {
+        this.recordJobName = recordJobName;
     }
 }

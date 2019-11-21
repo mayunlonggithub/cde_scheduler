@@ -71,6 +71,7 @@ public class JobMonitorController {
     )})
     public ResponseResult<JobForm.Job> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -161,7 +162,7 @@ public class JobMonitorController {
     public ResponseResult<String> getAllFail(@PathVariable(required = true ,name = "recordId") Integer recordId,HttpServletRequest request)throws IOException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        String logContent= jobRecordService.getLogContent(recordId);
+        String logContent= jobRecordService.getLogContent(recordId,kUser.getId());
         return new ResponseResult(true,"请求成功",logContent);
     }
 

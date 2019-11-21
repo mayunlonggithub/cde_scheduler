@@ -21,7 +21,7 @@ public interface RepositoryService {
      * @return
      * @throws KettleException
      */
-    public List<RepositoryTreeForm> getTreeList(Integer repositoryId) throws KettleException;
+    public List<RepositoryTreeForm> getTreeList(Integer repositoryId, Integer uId) throws KettleException;
 
     /**
      * 判断是否可以连接上资源库
@@ -29,7 +29,7 @@ public interface RepositoryService {
      * @return
      * @throws KettleException
      */
-    public boolean check(RepositoryForm.AddRepository addRepository) throws KettleException;
+    public boolean check(RepositoryForm.AddRepository addRepository,Integer uId) throws KettleException;
 
 
     /**
@@ -56,7 +56,7 @@ public interface RepositoryService {
      * @return
      * @return KRepository
      */
-    public Repository getRepository(Integer repositoryId);
+    public Repository getRepository(Integer repositoryId,Integer uId);
 
     /**
      * @Title getAccess
@@ -82,7 +82,7 @@ public interface RepositoryService {
      * @param uId 用户ID
      * @return void
      */
-    public void update(RepositoryForm.UpdateRepository updateRepository, Integer uId);
+    public void update(RepositoryForm.UpdateRepository updateRepository,Integer repositoryId, Integer uId);
 
     /**
      * @Title delete
@@ -90,7 +90,7 @@ public interface RepositoryService {
      * @param repositoryId 资源库ID
      * @return void
      */
-    public void delete(Integer repositoryId);
+    public void delete(Integer repositoryId,Integer uId);
 
     /**
      * 获取资源库的所有作业和转换任务进行保存

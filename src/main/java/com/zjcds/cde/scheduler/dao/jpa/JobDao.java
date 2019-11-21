@@ -15,4 +15,8 @@ public interface JobDao extends CustomRepostory<Job,Integer> {
     public List<Job> findByCreateUserAndDelFlagAndJobRepositoryIdAndJobPath(Integer createUser,Integer delFlag,Integer jobRepositoryId,String jobPath);
 
     public List<Job> findByJobRepositoryId(Integer repositoryId);
+
+    public Job findByJobIdAndDelFlag(Integer jobId,Integer delFlag);
+
+    public List<Job> findByDelFlag(Integer delFlag);
 }
