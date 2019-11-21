@@ -27,13 +27,12 @@ public class JobRecordServiceImpl implements JobRecordService {
     /**
      * @Title getList
      * @Description 获取带分页的列表
-     * @param start 起始行数
-     * @param size 每页行数
      * @param uId 用户ID
      * @param jobId 作业ID
      * @return
      * @return BootTablePage
      */
+    @Override
     public PageResult<JobRecord> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId, Integer jobId){
 
         queryString.add("createUser~Eq~"+uId);
@@ -53,8 +52,9 @@ public class JobRecordServiceImpl implements JobRecordService {
      * @throws IOException
      * @return String
      */
-    public String getLogContent(Integer jobId) throws IOException{
-        JobRecord kJobRecord = jobRecordDao.findOne(jobId);
+    @Override
+    public String getLogContent(Integer recordId) throws IOException{
+        JobRecord kJobRecord = jobRecordDao.findOne(recordId);
         String logFilePath = kJobRecord.getLogFilePath();
         return FileUtils.readFileToString(new File(logFilePath), Constant.DEFAULT_ENCODING);
     }

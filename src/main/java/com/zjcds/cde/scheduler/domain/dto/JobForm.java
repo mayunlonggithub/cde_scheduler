@@ -30,8 +30,8 @@ public class JobForm {
     public static class Job extends BaseBean {
         @ApiModelProperty(value = "作业ID")
         private Integer jobId;
-        @ApiModelProperty(value = "类别ID")
-        private Integer categoryId;
+//        @ApiModelProperty(value = "类别ID")
+//        private Integer categoryId;
         @ApiModelProperty(value = "作业名称")
         private String jobName;
         @ApiModelProperty(value = "任务描述")
@@ -67,8 +67,8 @@ public class JobForm {
     @Setter
     @ApiModel(value = "job.add",description = "新增作业信息")
     public static class AddJob extends BaseBean{
-        @ApiModelProperty(value = "类别ID")
-        private Integer categoryId;
+//        @ApiModelProperty(value = "类别ID")
+//        private Integer categoryId;
         @ApiModelProperty(value = "作业名称")
         private String jobName;
         @ApiModelProperty(value = "任务描述")

@@ -16,7 +16,7 @@ public class Trans extends CreateModifyTime {
     //转换ID
     private Integer transId;
     //类别ID
-    private Integer categoryId;
+//    private Integer categoryId;
     //转换名称
     private String transName;
     //转换描述
@@ -54,15 +54,15 @@ public class Trans extends CreateModifyTime {
         this.transId = transId;
     }
 
-    @Basic
-    @Column(name = "category_id")
-    public Integer getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
+//    @Basic
+//    @Column(name = "category_id")
+//    public Integer getCategoryId() {
+//        return categoryId;
+//    }
+//
+//    public void setCategoryId(Integer categoryId) {
+//        this.categoryId = categoryId;
+//    }
 
     @Basic
     @Column(name = "trans_name")

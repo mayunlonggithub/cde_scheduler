@@ -18,12 +18,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,6 +73,9 @@ public class JobController {
     )})
     public ResponseResult<JobForm.Job> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        if (CollectionUtils.isEmpty((Collection) queryString)) {
+            queryString = new ArrayList();
+        }
         PageResult<Job> job = jobService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<JobForm.Job>  owner = PageUtils.copyPageResult(job,JobForm.Job.class);
         return new ResponseResult(true,"请求成功",owner);

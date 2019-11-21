@@ -119,7 +119,6 @@ public class RepositoryServiceImpl implements RepositoryService {
      */
     @Override
     public PageResult<Repository> getList(Paging paging, List<String> queryString,List<String> orderBys, Integer uId){
-
         queryString.add("createUser~Eq~"+uId);
         queryString.add("delFlag~Eq~1");
         PageResult<Repository> repositoryList = repositoryDao.findAll(paging,queryString,orderBys);

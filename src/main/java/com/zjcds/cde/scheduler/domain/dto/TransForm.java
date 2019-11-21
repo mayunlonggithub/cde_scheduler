@@ -30,8 +30,8 @@ public class TransForm {
     public static class Trans extends BaseBean {
         @ApiModelProperty(value = "转换ID")
         private Integer transId;
-        @ApiModelProperty(value = "类别ID")
-        private Integer categoryId;
+//        @ApiModelProperty(value = "类别ID")
+//        private Integer categoryId;
         @ApiModelProperty(value = "转换名称")
         private String transName;
         @ApiModelProperty(value = "任务描述")
@@ -66,8 +66,8 @@ public class TransForm {
     @Setter
     @ApiModel(value = "trans.add",description = "新增转换信息")
     public static class AddTrans extends BaseBean{
-        @ApiModelProperty(value = "类别ID")
-        private Integer categoryId;
+//        @ApiModelProperty(value = "类别ID")
+//        private Integer categoryId;
         @ApiModelProperty(value = "转换名称")
         private String transName;
         @ApiModelProperty(value = "任务描述")

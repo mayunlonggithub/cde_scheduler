@@ -29,22 +29,13 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @param paging
      * @param queryString
      * @param orderBys
-     * @param monitorStatus
-     * @param categoryId
-     * @param jobName
      * @param uId
      * @return
      * @Description 获取作业监控分页列表
      */
-    public PageResult<JobMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer monitorStatus, Integer categoryId, String jobName, Integer uId) {
+    @Override
+    public PageResult<JobMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
         queryString.add("createUser~Eq~"+uId);
-        queryString.add("monitorStatus~Eq~"+monitorStatus);
-        if(StringUtils.isNotEmpty(jobName)){
-            queryString.add("jobName~Eq~"+jobName);
-        }
-        if (categoryId != null) {
-            queryString.add("categoryId~Eq~"+categoryId);
-        }
         PageResult<JobMonitor> jobMonitorPageResult = jobMonitorDao.findAll(paging, queryString, orderBys);
 
         return jobMonitorPageResult;
@@ -78,6 +69,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Title getAllMonitorJob
      * @Description 获取所有的监控作业
      */
+    @Override
     public Integer getAllMonitorJob(Integer uId) {
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         return jobMonitorList.size();
@@ -89,6 +81,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Title getAllSuccess
      * @Description 获取执行成功的数
      */
+    @Override
     public Integer getAllSuccess(Integer uId) {
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;
@@ -104,6 +97,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Title getAllFail
      * @Description 获取执行失败的数
      */
+    @Override
     public Integer getAllFail(Integer uId) {
         List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
         Integer allSuccess = 0;

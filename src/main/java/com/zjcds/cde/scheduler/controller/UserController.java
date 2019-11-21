@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.controller;
 import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.UserService;
+import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.common.base.domain.page.Paging;
 import com.zjcds.common.dozer.BeanPropertyCopyUtils;
 import com.zjcds.common.jpa.PageResult;
@@ -13,10 +14,17 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -35,18 +43,36 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation(value = "用户登录", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<UserForm.User> login(@RequestBody UserForm.UserLogin userLogin){
-        User user = userService.login(userLogin);
-        UserForm.User owner = BeanPropertyCopyUtils.copy(user,UserForm.User.class);
-        return new ResponseResult(true,"请求成功",owner);
+    public ResponseResult<UserForm.User> login(@RequestBody UserForm.UserLogin userLogin, RedirectAttributes attr, HttpServletRequest request){
+        if (null != userLogin && StringUtils.isNotBlank(userLogin.getAccount()) &&
+                StringUtils.isNotBlank(userLogin.getPassword())){
+            User user = userService.login(userLogin);
+            UserForm.User owner = BeanPropertyCopyUtils.copy(user,UserForm.User.class);
+            if (null != user){
+                request.getSession().setAttribute(Constant.SESSION_ID, user);
+                return new ResponseResult<>(true,"登录成功",owner);
+            }
+            return new ResponseResult<>(false,"登录失败,账号或密码不正确");
+        }
+        return new ResponseResult<>(false,"登录失败,账号或密码不能为空");
+    }
+
+    @PostMapping("/logout")
+    @ApiOperation(value = "用户注销", produces = "application/json;charset=utf-8")
+    @JsonViewException
+    public ResponseResult<Void> logout(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        session.removeAttribute(Constant.SESSION_ID);
+        return new ResponseResult<>(true,"注销成功");
     }
 
 
-    @GetMapping("/isAdmin/{uId}")
+    @GetMapping("/isAdmin")
     @ApiOperation(value = "是否管理员", produces = "application/json;charset=utf-8")
     @JsonViewException
-    public ResponseResult<Void> isAdmin(@PathVariable(required = true ,name = "uId") Integer uId){
-        boolean isAdmin = userService.isAdmin(uId);
+    public ResponseResult<Void> isAdmin(HttpServletRequest request){
+        User user = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        boolean isAdmin = userService.isAdmin(user.getId());
         return new ResponseResult(true,"请求成功",isAdmin);
     }
 
@@ -80,6 +106,12 @@ public class UserController {
             allowMultiple = true
     )})
     public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys){
+        if (CollectionUtils.isEmpty((Collection) queryString)) {
+            queryString = new ArrayList();
+        }
+        if (CollectionUtils.isEmpty((Collection) orderBys)) {
+            orderBys = new ArrayList();
+        }
         PageResult<User> user = userService.getList(paging,queryString,orderBys);
         PageResult<UserForm.User> owner = PageUtils.copyPageResult(user,UserForm.User.class);
         return new ResponseResult(true,"请求成功",owner);

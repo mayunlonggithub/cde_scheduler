@@ -15,12 +15,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -63,6 +66,12 @@ public class TransController {
     )})
     public ResponseResult<TransForm.Trans> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        if (CollectionUtils.isEmpty((Collection) queryString)) {
+            queryString = new ArrayList();
+        }
+        if (CollectionUtils.isEmpty((Collection) orderBys)) {
+            orderBys = new ArrayList();
+        }
         PageResult<Trans> trans = transService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<TransForm.Trans>  owner = PageUtils.copyPageResult(trans,TransForm.Trans.class);
         return new ResponseResult(true,"请求成功",owner);
