@@ -1,0 +1,178 @@
+package com.zjcds.cde.scheduler.domain.entity;
+
+import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Objects;
+
+@Entity
+@Table(name = "t_task", schema = "cde_scheduler", catalog = "")
+public class Task {
+    //任务ID
+    private int taskId;
+    //作业ID
+    private Integer jobId;
+    //调度策略ID
+    private Integer quartzId;
+    //调度策略描述
+    private String quartzDesc;
+    //任务名称
+    private String taskName;
+    //任务组别
+    private String taskGroup;
+    //任务描述
+    private String taskDesc;
+    //任务开始时间
+    private Date startTime;
+    //任务结束时间
+    private Date endTime;
+    //任务状态
+    private Integer status;
+    //用户ID
+    private Integer userId;
+    //参数
+    private String param;
+    //任务创建者
+    private Integer createUser;
+    //任务修改者
+    private Integer modifyUser;
+    @Id
+    @Column(name = "task_id")
+    @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "t_task", valueColumnName = "id_value")
+    @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
+    @Basic
+    @Column(name = "job_id")
+    public Integer getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(Integer jobId) {
+        this.jobId = jobId;
+    }
+
+    @Basic
+    @Column(name = "quartz_id")
+    public Integer getQuartzId() {
+        return quartzId;
+    }
+
+    public void setQuartzId(Integer quartzId) {
+        this.quartzId = quartzId;
+    }
+
+    @Basic
+    @Column(name = "task_name")
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    @Basic
+    @Column(name = "task_group")
+    public String getTaskGroup() {
+        return taskGroup;
+    }
+
+    public void setTaskGroup(String taskGroup) {
+        this.taskGroup = taskGroup;
+    }
+
+    @Basic
+    @Column(name = "task_desc")
+    public String getTaskDescription() {
+        return taskDesc;
+    }
+
+    public void setTaskDescription(String taskDesc) {
+        this.taskDesc = taskDesc;
+    }
+
+    @Basic
+    @Column(name = "start_time")
+    public Date getStartTime() { return startTime;}
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    @Basic
+    @Column(name = "end_time")
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    @Basic
+    @Column(name = "status")
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    @Basic
+    @Column(name = "user_id")
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    @Basic
+    @Column(name = "param")
+    public String getParam() {
+        return param;
+    }
+
+    public void setParam(String param) {
+        this.param = param;
+    }
+
+    @Basic
+    @Column(name = "create_user")
+    public Integer getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(Integer createUser) {
+        this.createUser = createUser;
+    }
+
+    @Basic
+    @Column(name = "modify_user")
+    public Integer getModifyUser() {
+        return modifyUser;
+    }
+
+    public void setModifyUser(Integer modifyUser) {
+        this.modifyUser = modifyUser;
+    }
+
+    @Basic
+    @Column(name = "quartz_desc")
+    public String getQuartzDesc() {
+        return quartzDesc;
+    }
+
+    public void setQuartzDesc(String quartzDesc) {
+        this.quartzDesc = quartzDesc;
+    }
+}
