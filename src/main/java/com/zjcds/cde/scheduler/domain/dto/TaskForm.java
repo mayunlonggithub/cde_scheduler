@@ -9,7 +9,8 @@ import lombok.Setter;
 import java.util.Date;
 
 /**
- * @author J on 20191107
+ * @author J on 20191024
+ * 转换执行监控
  */
 @Getter
 @Setter

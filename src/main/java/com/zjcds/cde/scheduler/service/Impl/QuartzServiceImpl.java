@@ -8,11 +8,18 @@ import com.zjcds.cde.scheduler.utils.CronUtils;
 import com.zjcds.common.base.domain.page.Paging;
 import com.zjcds.common.dozer.BeanPropertyCopyUtils;
 import com.zjcds.common.jpa.PageResult;
+import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
+/**
+ * @author Ma on 20191122
+ */
 @Service
 @Transactional
 public class QuartzServiceImpl implements QuartzService {
@@ -21,20 +28,20 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     @Transactional
-    public void addQuartz(QuartzForm.AddQuartz addQuartz){
-        if(addQuartz.getQuartzCron()==null) {
+    public void addQuartz(QuartzForm.AddQuartz addQuartz) {
+        if (addQuartz.getQuartzCron() == null) {
             List<String> cron = CronUtils.createQuartzCronressionAndDescription(addQuartz);
             addQuartz.setQuartzCron(cron.get(0));
             addQuartz.setQuartzDescription(cron.get(1));
         }
-        Quartz quartz=BeanPropertyCopyUtils.copy(addQuartz,Quartz.class);
+        Quartz quartz = BeanPropertyCopyUtils.copy(addQuartz, Quartz.class);
         quartz.setDelFlag(1);
         quartzDao.save(quartz);
     }
 
     @Override
     @Transactional
-    public void deleteQuartz(Integer quartzId){
+    public void deleteQuartz(Integer quartzId) {
         Quartz quartz = quartzDao.findOne(quartzId);
         quartz.setDelFlag(0);
         quartzDao.save(quartz);
@@ -53,11 +60,16 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     @Override
-    @Transactional
-    public PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys){
+    public PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys) {
         queryString.add("delFlag~eq~1");
-        PageResult<Quartz> quartz = quartzDao.findAll(paging,queryString,orderBys);
+        PageResult<Quartz> quartz = quartzDao.findAll(paging, queryString, orderBys);
         return quartz;
     }
-
+    @Override
+    //根据当前时间和Cron表达式获取下次执行时间
+    public Date getNextValidTime(Date date, Integer quartzId) throws ParseException {
+        String cron = quartzDao.findOne(quartzId).getQuartzCron();
+        CronExpression cronExpression = new CronExpression(cron);
+        return cronExpression.getNextValidTimeAfter(date);
+    }
 }

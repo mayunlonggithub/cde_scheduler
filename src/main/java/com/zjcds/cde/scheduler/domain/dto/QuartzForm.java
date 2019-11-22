@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-
+/**
+ * @author Ma on 20191122
+ */
 @Data
 public class QuartzForm {
         @Data

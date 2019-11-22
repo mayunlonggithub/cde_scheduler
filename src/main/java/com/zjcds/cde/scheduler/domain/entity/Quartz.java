@@ -3,9 +3,10 @@ package com.zjcds.cde.scheduler.domain.entity;
 import com.zjcds.common.jpa.domain.CreateModifyTime;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
-
+/**
+ * @author Ma on 20191122
+ */
 @Entity
 @Table(name = "t_quartz")
 public class Quartz extends CreateModifyTime{
@@ -47,7 +48,6 @@ public class Quartz extends CreateModifyTime{
     private Integer execWeek;
     //执行月
     private Integer execMonth;
-
 
     @Id
     @Column(name = "quartz_id")

@@ -1,24 +1,26 @@
 package com.zjcds.cde.scheduler.domain.entity;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+
 import java.util.Date;
-import java.util.Objects;
+
+/**
+ * @author Ma on 20191122
+ * 任务调度
+ */
 
 @Entity
 @Table(name = "t_task", schema = "cde_scheduler", catalog = "")
 public class Task {
     //任务ID
-    private int taskId;
+    private Integer taskId;
     //作业ID
     private Integer jobId;
     //调度策略ID
     private Integer quartzId;
-    //调度策略描述
-    private String quartzDesc;
     //任务名称
     private String taskName;
-    //任务组别
+    //任务分组
     private String taskGroup;
     //任务描述
     private String taskDesc;
@@ -32,19 +34,22 @@ public class Task {
     private Integer userId;
     //参数
     private String param;
-    //任务创建者
+    //创建者
     private Integer createUser;
-    //任务修改者
+    //编辑者
     private Integer modifyUser;
+    //调度策略描述
+    private String quartzDesc;
+
     @Id
     @Column(name = "task_id")
     @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "t_task", valueColumnName = "id_value")
     @GeneratedValue(generator = "idGenerator", strategy = GenerationType.TABLE)
-    public int getTaskId() {
+    public Integer getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(int taskId) {
+    public void setTaskId(Integer taskId) {
         this.taskId = taskId;
     }
 
@@ -90,17 +95,19 @@ public class Task {
 
     @Basic
     @Column(name = "task_desc")
-    public String getTaskDescription() {
+    public String getTaskDesc() {
         return taskDesc;
     }
 
-    public void setTaskDescription(String taskDesc) {
+    public void setTaskDesc(String taskDesc) {
         this.taskDesc = taskDesc;
     }
 
     @Basic
     @Column(name = "start_time")
-    public Date getStartTime() { return startTime;}
+    public Date getStartTime() {
+        return startTime;
+    }
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
@@ -175,4 +182,5 @@ public class Task {
     public void setQuartzDesc(String quartzDesc) {
         this.quartzDesc = quartzDesc;
     }
+
 }

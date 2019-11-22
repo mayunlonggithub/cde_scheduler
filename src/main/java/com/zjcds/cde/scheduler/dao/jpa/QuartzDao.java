@@ -1,11 +1,14 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
+import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.common.jpa.CustomRepostory;
 
+import java.util.List;
+
 /**
- * @author J on 20191024
+ * @author Ma on 20191122
  */
 public interface QuartzDao extends CustomRepostory<Quartz,Integer> {
-       void  deleteByQuartzId(Integer id);
+     List<Quartz> findByDelFlag(Integer delflag);
 }
 

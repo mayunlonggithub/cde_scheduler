@@ -13,17 +13,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-
+/**
+ * @author Ma on 20191122
+ */
 @RestController
 @JsonViewException
 @Api(description = "任务调度信息")
@@ -31,18 +29,8 @@ import java.util.List;
 public class TaskController {
     @Autowired
     private TaskService taskService;
-    private static Logger logger = LoggerFactory.getLogger(TaskController.class);
-    //初始化启动所有的Job
-    @PostConstruct
-    public void initialize() {
-        try {
-            taskService.restartAllJobs();
-            logger.info("INIT SUCCESS");
-        } catch (SchedulerException e) {
-            logger.info("INIT EXCEPTION : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+
+
     @PostMapping("/addTask")
     @ApiOperation(value = "添加任务", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> addTask(@RequestBody TaskForm.AddTask addTask, HttpServletRequest request){
@@ -90,7 +78,7 @@ public class TaskController {
     )})
     public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        PageResult<Task> task= taskService.getList(paging,queryString,orderBys,kUser.getId());
+        PageResult<Task> task= taskService.getList(paging,queryString,orderBys,1);
         PageResult<TaskForm.Task> owner = PageUtils.copyPageResult(task, TaskForm.Task.class);
         return new ResponseResult(true,"请求成功",owner);
     }
