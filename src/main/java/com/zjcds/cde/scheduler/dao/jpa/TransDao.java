@@ -1,7 +1,7 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 
+import com.zjcds.cde.scheduler.base.CustomRepostory;
 import com.zjcds.cde.scheduler.domain.entity.Trans;
-import com.zjcds.common.jpa.CustomRepostory;
 
 import java.util.List;
 
@@ -19,4 +19,6 @@ public interface TransDao extends CustomRepostory<Trans,Integer> {
     public List<Trans> findByDelFlag(Integer delFlag);
 
     public Trans findByTransIdAndDelFlag(Integer transId,Integer delFlag);
+
+    public Trans findByTransId(Integer transId);
 }

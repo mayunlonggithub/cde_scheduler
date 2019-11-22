@@ -1,13 +1,12 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
-import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.service.JobRecordService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,16 +1,15 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransMonitorDao;
-import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -40,7 +39,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      * @Description 获取分页列表
      */
     @Override
-    public PageResult<TransMonitor> getList(Paging  paging, List<String> queryString, List<String> orderBys, Integer uId) {
+    public PageResult<TransMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         PageResult<TransMonitor> transMonitorPageResult = transMonitorDao.findAll(paging,queryString,orderBys);
@@ -188,5 +187,20 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         }
     }
 
+    /**
+     * 更新转换状态
+     * @param transId
+     * @param uId
+     */
+    @Async
+    @Override
+    @Transactional
+    public void updateRunStatusTrans(Integer transId,Integer uId,Integer runStatus) {
+        Assert.notNull(transId, "转换id不能为空");
+        Assert.notNull(uId, "用户id不能为空");
+        TransMonitor transMonitor = transMonitorDao.findByMonitorTransAndCreateUser(transId, uId);
+        transMonitor.setRunStatus(runStatus.toString());
+        transMonitorDao.save(transMonitor);
+    }
 
 }

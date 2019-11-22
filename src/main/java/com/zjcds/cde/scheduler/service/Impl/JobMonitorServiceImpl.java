@@ -1,15 +1,15 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -151,7 +151,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     }
 
     /**
-     * @param userId 用户ID
+     * @param uId 用户ID
      * @param jobId  转换ID
      * @return void
      * @Title addMonitor
@@ -159,30 +159,49 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      */
     @Override
     @Transactional
-    public void addMonitor(Integer userId, Integer jobId, Date nextExecuteTime) {
-        Assert.notNull(userId,"未登录,请重新登录");
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJob(jobId);
+    public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobId,uId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
-            StringBuilder runStatusBuilder = new StringBuilder();
-            runStatusBuilder.append(templateOne.getRunStatus())
-                    .append(",").append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
-            templateOne.setRunStatus(runStatusBuilder.toString());
+//            StringBuilder runStatusBuilder = new StringBuilder();
+//            runStatusBuilder.append(templateOne.getRunStatus())
+//                    .append(",").append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
+//            templateOne.setRunStatus(runStatusBuilder.toString());
+            templateOne.setRunStatus("0");
+            templateOne.setLastExecuteTime(templateOne.getNextExecuteTime());
             templateOne.setNextExecuteTime(nextExecuteTime);
             jobMonitorDao.save(templateOne);
         } else {
             JobMonitor jobMonitor = new JobMonitor();
             jobMonitor.setMonitorJob(jobId);
-            jobMonitor.setCreateUser(userId);
+            jobMonitor.setCreateUser(uId);
             jobMonitor.setMonitorSuccess(0);
             jobMonitor.setMonitorFail(0);
-            StringBuilder runStatusBuilder = new StringBuilder();
-            runStatusBuilder.append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
-            jobMonitor.setRunStatus(runStatusBuilder.toString());
+//            StringBuilder runStatusBuilder = new StringBuilder();
+//            runStatusBuilder.append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
+//            jobMonitor.setRunStatus(runStatusBuilder.toString());
             jobMonitor.setMonitorStatus(1);
+            jobMonitor.setRunStatus("0");
             jobMonitor.setNextExecuteTime(nextExecuteTime);
             jobMonitorDao.save(jobMonitor);
         }
+    }
+
+    /**
+     * 更新作业状态
+     * @param jobId
+     * @param uId
+     */
+    @Async
+    @Override
+    @Transactional
+    public void updateRunStatusJob(Integer jobId,Integer uId,Integer runStatus) {
+        Assert.notNull(jobId, "作业id不能为空");
+        Assert.notNull(uId, "用户id不能为空");
+        JobMonitor jobMonitor = jobMonitorDao.findByMonitorJobAndCreateUser(jobId, uId);
+        jobMonitor.setRunStatus(runStatus.toString());
+        jobMonitorDao.save(jobMonitor);
     }
 
 }

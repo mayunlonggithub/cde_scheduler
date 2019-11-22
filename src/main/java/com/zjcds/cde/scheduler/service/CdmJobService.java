@@ -2,11 +2,9 @@ package com.zjcds.cde.scheduler.service;
 
 import com.zjcds.cde.scheduler.domain.dto.CdmJobForm;
 import com.zjcds.cde.scheduler.domain.entity.CdmJob;
-import com.zjcds.common.jpa.PageResult;
 import org.pentaho.di.core.exception.KettleException;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author J on 20191118

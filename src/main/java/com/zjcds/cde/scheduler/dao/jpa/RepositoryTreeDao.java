@@ -1,7 +1,7 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 
+import com.zjcds.cde.scheduler.base.CustomRepostory;
 import com.zjcds.cde.scheduler.domain.entity.RepositoryTree;
-import com.zjcds.common.jpa.CustomRepostory;
 import org.springframework.data.jpa.repository.Modifying;
 
 /**

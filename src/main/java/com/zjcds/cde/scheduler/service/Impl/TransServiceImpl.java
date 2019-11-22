@@ -1,20 +1,17 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.*;
-import com.zjcds.cde.scheduler.domain.dto.JobForm;
+import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
-import com.zjcds.cde.scheduler.quartz.DBConnectionModel;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
-import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.beetl.sql.core.DSTransactionManager;
 import org.pentaho.di.core.KettleEnvironment;
 import org.pentaho.di.core.ProgressNullMonitorListener;
 import org.pentaho.di.core.database.DatabaseMeta;
@@ -31,12 +28,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author J on 20191111
@@ -57,19 +56,14 @@ public class TransServiceImpl implements TransService {
     private TransRecordDao transRecordDao;
     @Autowired
     private TransMonitorService transMonitorService;
+//    @Autowired
+//    private TaskService taskService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
     @Value("${cde.file.repository}")
     private String cdeFileRepository;
-    @Value("${com.zjcds.dataSources.druids.dataSource.driverClassName}")
-    private String jdbcDriver;
-    @Value("${com.zjcds.dataSources.druids.dataSource.url}")
-    private String jdbcUrl;
-    @Value("${com.zjcds.dataSources.druids.dataSource.username}")
-    private String jdbcUsername;
-    @Value("${com.zjcds.dataSources.druids.dataSource.password}")
-    private String jdbcPassword;
+
 
 
 
@@ -170,7 +164,7 @@ public class TransServiceImpl implements TransService {
     public Trans getTrans(Integer transId,Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要查询的transId不能为空");
-        return transDao.findOne(transId);
+        return transDao.findByTransId(transId);
     }
 
     /**
@@ -193,6 +187,15 @@ public class TransServiceImpl implements TransService {
         trans.setCreateUser(t.getCreateUser());
         trans.setCreateTime(t.getCreateTime());
         transDao.save(trans);
+        if(trans.getTransQuartz()!=null){
+            TaskForm.AddTask addTask = new TaskForm.AddTask();
+            addTask.setJobId(trans.getTransId());
+            addTask.setQuartzId(trans.getTransQuartz());
+            addTask.setTaskName(trans.getTransName());
+            addTask.setTaskGroup("trans");
+            addTask.setTaskDescription(trans.getTransDescription());
+//            taskService.addTask(addTask,uId);
+        }
     }
 
 
@@ -207,8 +210,8 @@ public class TransServiceImpl implements TransService {
     public void start(Integer transId,Integer uId,Map<String,String> param)throws KettleException {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要启动的作业id不能为空");
-        Trans trans = transDao.findOne(transId);
-        Repository repository = repositoryDao.findOne(trans.getTransRepositoryId());
+        Trans trans = transDao.findByTransId(transId);
+        Repository repository = repositoryDao.findByRepositoryId(trans.getTransRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime = null;
@@ -250,7 +253,7 @@ public class TransServiceImpl implements TransService {
             trans.setLogLevel(Constant.logger(logLevel));
         }
         String exception = null;
-        Integer recordStatus = 1;
+        Integer recordStatus = 2;
 //            Date jobStartDate = null;
         Date transStopDate = null;
         String logText = null;
@@ -260,11 +263,11 @@ public class TransServiceImpl implements TransService {
             transStopDate = new Date();
         } catch (Exception e) {
             exception = e.getMessage();
-            recordStatus = 2;
+            recordStatus = 3;
         } finally {
             if (trans.isFinished()) {
                 if (trans.getErrors() > 0) {
-                    recordStatus = 2;
+                    recordStatus = 3;
                     if(null == trans.getResult().getLogText() || "".equals(trans.getResult().getLogText())){
                         logText = exception;
                     }

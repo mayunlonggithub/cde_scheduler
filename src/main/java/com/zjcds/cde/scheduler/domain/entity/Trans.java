@@ -1,10 +1,8 @@
 package com.zjcds.cde.scheduler.domain.entity;
 
-import com.zjcds.common.jpa.domain.CreateModifyTime;
+import com.zjcds.cde.scheduler.base.CreateModifyTime;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Date;
 
 /**
  * @author J on 20191024

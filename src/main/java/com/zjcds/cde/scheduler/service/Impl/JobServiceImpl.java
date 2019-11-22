@@ -1,22 +1,23 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
-import com.zjcds.cde.scheduler.dao.jpa.*;
-import com.zjcds.cde.scheduler.dao.jpa.view.RepositoryJobViewDao;
+import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.dao.jpa.JobDao;
+import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
+import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
+import com.zjcds.cde.scheduler.dao.jpa.RepositoryDao;
 import com.zjcds.cde.scheduler.domain.dto.JobForm;
-import com.zjcds.cde.scheduler.domain.entity.*;
-import com.zjcds.cde.scheduler.domain.entity.view.RepositoryJobView;
-import com.zjcds.cde.scheduler.quartz.DBConnectionModel;
+import com.zjcds.cde.scheduler.domain.dto.TaskForm;
+import com.zjcds.cde.scheduler.domain.entity.Job;
+import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
+import com.zjcds.cde.scheduler.domain.entity.JobRecord;
+import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
-import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.beetl.sql.core.DSTransactionManager;
-import org.beetl.sql.core.db.KeyHolder;
 import org.pentaho.di.core.KettleEnvironment;
 import org.pentaho.di.core.ProgressNullMonitorListener;
 import org.pentaho.di.core.database.DatabaseMeta;
@@ -33,14 +34,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
-
-import static org.eclipse.jetty.util.component.LifeCycle.stop;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author J on 20191112
@@ -59,6 +60,8 @@ public class JobServiceImpl implements JobService {
     private JobMonitorDao jobMonitorDao;
     @Autowired
     private JobRecordDao jobRecordDao;
+//    @Autowired
+//    private TaskService taskService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -164,7 +167,7 @@ public class JobServiceImpl implements JobService {
     public Job getJob(Integer jobId,Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(jobId,"要查询的jobId不能为空");
-        return jobDao.findOne(jobId);
+        return jobDao.findByJobId(jobId);
     }
 
     /**
@@ -186,7 +189,16 @@ public class JobServiceImpl implements JobService {
         job.setDelFlag(j.getDelFlag());
         job.setCreateUser(j.getCreateUser());
         job.setCreateTime(j.getCreateTime());
-        jobDao.save(job);
+        job = jobDao.save(job);
+        if(job.getJobQuartz()!=null){
+            TaskForm.AddTask addTask = new TaskForm.AddTask();
+            addTask.setJobId(job.getJobId());
+            addTask.setQuartzId(job.getJobQuartz());
+            addTask.setTaskName(job.getJobName());
+            addTask.setTaskGroup("job");
+            addTask.setTaskDescription(job.getJobDescription());
+//            taskService.addTask(addTask,uId);
+        }
     }
 
 
@@ -201,8 +213,8 @@ public class JobServiceImpl implements JobService {
     public void start(Integer jobId,Integer uId,Map<String,String> param)throws KettleException {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(jobId,"要启动的作业id不能为空");
-        Job job = jobDao.findOne(jobId);
-        Repository repository = repositoryDao.findOne(job.getJobRepositoryId());
+        Job job = jobDao.findByJobId(jobId);
+        Repository repository = repositoryDao.findByRepositoryId(job.getJobRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime = null;
@@ -241,27 +253,32 @@ public class JobServiceImpl implements JobService {
         }
         job = new org.pentaho.di.job.Job(kettleDatabaseRepository, jobMeta);
         job.setDaemon(true);
-        job.setLogLevel(LogLevel.DEBUG);
+        job.setLogLevel(LogLevel.BASIC);
         if (StringUtils.isNotEmpty(logLevel)) {
             job.setLogLevel(Constant.logger(logLevel));
         }
         String exception = null;
-        Integer recordStatus = 1;
+        Integer recordStatus = 2;
 //            Date jobStartDate = null;
         Date jobStopDate = null;
         String logText = null;
+        Integer runStatus = 2;
         try {
 //                jobStartDate = new Date();
+            //更改监控状态为执行中
+            jobMonitorService.updateRunStatusJob(Integer.parseInt(jobId),Integer.parseInt(userId),1);
             job.run();
             job.waitUntilFinished();
             jobStopDate = new Date();
         } catch (Exception e) {
             exception = e.getMessage();
-            recordStatus = 2;
+            recordStatus = 3;
+            runStatus=3;
         } finally {
             if (job.isFinished()) {
                 if (job.getErrors() > 0) {
-                    recordStatus = 2;
+                    recordStatus = 3;
+                    runStatus=3;
                     if(null == job.getResult().getLogText() || "".equals(job.getResult().getLogText())){
                         logText = exception;
                     }
@@ -282,7 +299,7 @@ public class JobServiceImpl implements JobService {
                     jobRecord.setRecordStatus(recordStatus);
                     jobRecord.setStartTime(executeTime);
                     jobRecord.setStopTime(jobStopDate);
-                    writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime);
+                    writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime,runStatus);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -328,7 +345,7 @@ public class JobServiceImpl implements JobService {
      * @Title writeToDBAndFile
      * @Description 保存作业运行日志信息到文件和数据库
      */
-    public void writeToDBAndFile(JobRecord jobRecord, String logText, Date lastExecuteTime, Date nextExecuteTime)
+    public void writeToDBAndFile(JobRecord jobRecord, String logText, Date lastExecuteTime, Date nextExecuteTime,Integer runStatus)
             throws IOException {
         // 将日志信息写入文件
         FileUtils.writeStringToFile(new File(jobRecord.getLogFilePath()), logText, Constant.DEFAULT_ENCODING, false);
@@ -340,6 +357,7 @@ public class JobServiceImpl implements JobService {
 //        JobMonitor templateOne = sqlManager.templateOne(template);
         JobMonitor templateOne = jobMonitorDao.findByMonitorJob(jobRecord.getRecordJob());
         templateOne.setLastExecuteTime(lastExecuteTime);
+        templateOne.setRunStatus(runStatus.toString());
         //在监控表中增加下一次执行时间
         templateOne.setNextExecuteTime(nextExecuteTime);
         if (jobRecord.getRecordStatus() == 1) {// 证明成功

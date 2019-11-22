@@ -1,9 +1,8 @@
 package com.zjcds.cde.scheduler.service;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -68,4 +67,11 @@ public interface JobMonitorService {
      * @Description 获取7天内作业的折线图
      */
     public Map<String, Object> getJobLine(Integer uId);
+
+    /**
+     * 更新作业状态
+     * @param jobId
+     * @param uId
+     */
+    public void updateRunStatusJob(Integer jobId,Integer uId,Integer runStatus);
 }

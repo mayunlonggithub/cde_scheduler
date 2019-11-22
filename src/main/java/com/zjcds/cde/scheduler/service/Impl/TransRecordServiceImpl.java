@@ -1,13 +1,12 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransRecordDao;
-import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.service.TransRecordService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,7 @@ public class TransRecordServiceImpl implements TransRecordService {
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         if (transId != null){
-            queryString.add("transId~Eq~"+transId);
+            queryString.add("recordTrans~Eq~"+transId);
         }
         PageResult<TransRecord> transRecordPageResult = transRecordDao.findAll(paging, queryString, orderBys);
         List<TransRecord> transRecordList = transRecordPageResult.getContent();

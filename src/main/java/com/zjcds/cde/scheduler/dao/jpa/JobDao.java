@@ -1,7 +1,7 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 
+import com.zjcds.cde.scheduler.base.CustomRepostory;
 import com.zjcds.cde.scheduler.domain.entity.Job;
-import com.zjcds.common.jpa.CustomRepostory;
 
 import java.util.List;
 
@@ -19,4 +19,6 @@ public interface JobDao extends CustomRepostory<Job,Integer> {
     public Job findByJobIdAndDelFlag(Integer jobId,Integer delFlag);
 
     public List<Job> findByDelFlag(Integer delFlag);
+
+    public Job findByJobId(Integer jobId);
 }

@@ -1,9 +1,9 @@
 package com.zjcds.cde.scheduler.service;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.User;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public interface UserService {
      * @Description 获取用户分页列表
      * @return
      */
-    public PageResult<User> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId);
+    public PageResult<User> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
     /**
      * @Title delete

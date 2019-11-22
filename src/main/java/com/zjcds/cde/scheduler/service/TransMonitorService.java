@@ -1,9 +1,8 @@
 package com.zjcds.cde.scheduler.service;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -69,4 +68,11 @@ public interface TransMonitorService {
      * @Description 添加监控
      */
     public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime);
+
+    /**
+     * 更新转换状态
+     * @param transId
+     * @param uId
+     */
+    public void updateRunStatusTrans(Integer transId,Integer uId,Integer runStatus);
 }

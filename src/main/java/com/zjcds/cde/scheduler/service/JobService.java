@@ -1,12 +1,11 @@
 package com.zjcds.cde.scheduler.service;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.dto.JobForm;
 import com.zjcds.cde.scheduler.domain.entity.Job;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
 import org.pentaho.di.core.exception.KettleException;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Date;

@@ -45,7 +45,7 @@ public class CdmJobServiceImpl implements CdmJobService {
     @Override
     @Transactional
     public void cdmJobExecute(CdmJobForm.CdmJobParam cdmJobParam,Integer uId) throws KettleException {
-        Repository repository = repositoryDao.findOne(1);
+        Repository repository = repositoryDao.findByRepositoryId(1);
 //        DBConnectionModel dBConnectionModel = new DBConnectionModel(driverClassName,url,username,password);
         CdmJob cdmJob = cdmJobDao.findByJobName(cdmJobParam.getJobName());
         String logLevel = "5";

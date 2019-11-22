@@ -1,19 +1,20 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.UserDao;
 import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.UserService;
 import com.zjcds.cde.scheduler.utils.MD5Utils;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * jackson 相关配置
@@ -55,7 +56,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isAdmin(Integer uId){
         Assert.notNull(uId,"未登录,请重新登录");
-        User user = userDao.findOne(uId);
+        Optional<User> userOptional = userDao.findById(uId);
+        User user = new User();
+        if(userOptional.isPresent()){
+            user=userOptional.get();
+        }
         Assert.notNull(user,"管理员不存在或已删除");
         if ("admin".equals(user.getAccount())){
             return true;
@@ -70,7 +75,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public PageResult<User> getList(Paging  paging, List<String> queryString, List<String> orderBys,Integer uId){
+    public PageResult<User> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId){
         //未删除
         queryString.add("delFlag~Eq~1");
         //根据用户查询
@@ -91,7 +96,11 @@ public class UserServiceImpl implements UserService {
     public void delete(Integer id,Integer uId){
         Assert.notNull(id,"要删除的用户id不能为空");
         Assert.notNull(uId,"未登录,请重新登录");
-        User user = userDao.findOne(id);
+        Optional<User> userOptional = userDao.findById(uId);
+        User user = new User();
+        if(userOptional.isPresent()){
+            user=userOptional.get();
+        }
         Assert.notNull(user,"该用户不存在或已删除");
         user.setDelFlag(0);
         user.setModifyUser(uId);
@@ -145,7 +154,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Integer uId){
         Assert.notNull(uId,"未登录,请重新登录");
-        return userDao.findOne(uId);
+        Optional<User> userOptional = userDao.findById(uId);
+        User user = new User();
+        if(userOptional.isPresent()){
+            user=userOptional.get();
+        }
+        return user;
     }
 
     /**
@@ -160,7 +174,11 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserForm.UpdateUser updateUser, Integer id,Integer uId){
         Assert.notNull(id,"要修改的用户id不能为空");
         Assert.notNull(uId,"未登录,请重新登录");
-        User u = userDao.findOne(id);
+        Optional<User> userOptional = userDao.findById(uId);
+        User u = new User();
+        if(userOptional.isPresent()){
+            u=userOptional.get();
+        }
         Assert.notNull(u,"该用户不存在或已删除");
         User user = BeanPropertyCopyUtils.copy(updateUser,User.class);
         user.setPassword(MD5Utils.Encrypt(u.getPassword(), true));

@@ -1,19 +1,11 @@
 package com.zjcds.cde.scheduler.controller;
 
-import com.zjcds.cde.scheduler.domain.dto.CdmJobForm;
+import com.zjcds.cde.scheduler.base.*;
 import com.zjcds.cde.scheduler.domain.dto.JobForm;
-import com.zjcds.cde.scheduler.domain.dto.RepositoryForm;
 import com.zjcds.cde.scheduler.domain.entity.Job;
-import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,7 +25,7 @@ import java.util.List;
  * @author J on 20191120
  */
 @RestController
-@JsonViewException
+
 @Api(description = "作业管理")
 @RequestMapping("/job")
 public class JobController {
@@ -88,7 +80,7 @@ public class JobController {
 
 //    @PostMapping("/insert/{uId}")
 //    @ApiOperation(value = "插入作业信息", produces = "application/json;charset=utf-8")
-//    @JsonViewException
+//
 //    public ResponseResult<Void> insert(@RequestBody JobForm.AddJob addJob, @PathVariable(required = true ,name = "uId") Integer uId){
 //        jobService.insert(addJob,uId);
 //        return new ResponseResult(true,"请求成功");
@@ -97,7 +89,7 @@ public class JobController {
 
     @PutMapping("/update/{jobId}")
     @ApiOperation(value = "修改作业信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> update(@RequestBody JobForm.UpdateJob updateJob, @PathVariable(required = true ,name = "jobId") Integer jobId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -107,7 +99,7 @@ public class JobController {
 
     @DeleteMapping("/delete/{jobId}")
     @ApiOperation(value = "删除作业信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> delete(@PathVariable(required = true ,name ="jobId") Integer jobId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -118,7 +110,7 @@ public class JobController {
 
     @GetMapping("/getJob/{jobId}")
     @ApiOperation(value = "获取作业信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<JobForm.Job> getJob(@PathVariable(required = true ,name = "jobId") Integer jobId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -129,7 +121,7 @@ public class JobController {
 
     @PutMapping("/start/{jobId}")
     @ApiOperation(value = "开始作业", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> start(@RequestBody JobForm.JobParam jobParam, @PathVariable(required = true ,name = "jobId") Integer jobId, HttpServletRequest request)throws KettleException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");

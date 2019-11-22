@@ -1,14 +1,14 @@
 package com.zjcds.cde.scheduler.controller;
+
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.PageUtils;
+import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,7 +23,6 @@ import java.util.List;
  * @author Ma on 20191122
  */
 @RestController
-@JsonViewException
 @Api(description = "任务调度信息")
 @RequestMapping("/Task")
 public class TaskController {
@@ -76,7 +75,7 @@ public class TaskController {
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,HttpServletRequest request){
+    public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         PageResult<Task> task= taskService.getList(paging,queryString,orderBys,1);
         PageResult<TaskForm.Task> owner = PageUtils.copyPageResult(task, TaskForm.Task.class);

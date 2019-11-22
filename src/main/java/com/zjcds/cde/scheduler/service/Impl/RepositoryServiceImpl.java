@@ -1,17 +1,17 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
-import com.zjcds.cde.scheduler.dao.jpa.*;
-import com.zjcds.cde.scheduler.dao.jpa.view.RepositoryJobViewDao;
+import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.dao.jpa.JobDao;
+import com.zjcds.cde.scheduler.dao.jpa.RepositoryDao;
+import com.zjcds.cde.scheduler.dao.jpa.RepositoryTypeDao;
+import com.zjcds.cde.scheduler.dao.jpa.TransDao;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryForm;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTreeForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
-import com.zjcds.cde.scheduler.domain.entity.view.RepositoryJobView;
-import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.RepositoryService;
 import com.zjcds.cde.scheduler.utils.RepositoryUtil;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +59,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
             kettleDatabaseRepository = RepositoryUtil.KettleDatabaseRepositoryCatch.get(repositoryId);
         }else {
-            Repository kRepository = repositoryDao.findOne(repositoryId);
+            Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
             kettleDatabaseRepository = RepositoryUtil.connectionRepository(kRepository);
         }
         if (null != kettleDatabaseRepository){
@@ -103,7 +102,7 @@ public class RepositoryServiceImpl implements RepositoryService {
      * @return BootTablePage
      */
     @Override
-    public PageResult<Repository> getList(Paging paging, List<String> queryString,List<String> orderBys, Integer uId){
+    public PageResult<Repository> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId){
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
         queryString.add("delFlag~Eq~1");
@@ -134,7 +133,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(repositoryId,"要查询的资源库id不能为空");
         //如果根据主键没有获取到对象，返回null
-        return repositoryDao.findOne(repositoryId);
+        return repositoryDao.findByRepositoryId(repositoryId);
     }
 
     /**
@@ -224,7 +223,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
             kettleDatabaseRepository = RepositoryUtil.KettleDatabaseRepositoryCatch.get(repositoryId);
         }else {
-            Repository kRepository = repositoryDao.findOne(repositoryId);
+            Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
             kettleDatabaseRepository = RepositoryUtil.connectionRepository(kRepository);
         }
         if (null != kettleDatabaseRepository){
@@ -257,10 +256,10 @@ public class RepositoryServiceImpl implements RepositoryService {
 //        repositoryTreeDao.save(repositoryTrees);
         //保存作业信息
         List<Job> jobList = addJob(repositoryJob,repositoryId);
-        jobDao.save(jobList);
+        jobDao.saveAll(jobList);
         //保存转换信息
         List<Trans> transList = addTrans(repositoryTrans,repositoryId);
-        transDao.save(transList);
+        transDao.saveAll(transList);
 
     }
 

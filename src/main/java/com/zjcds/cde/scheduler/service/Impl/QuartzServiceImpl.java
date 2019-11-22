@@ -1,13 +1,13 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
+import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.service.QuartzService;
 import com.zjcds.cde.scheduler.utils.CronUtils;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     @Transactional
     public void deleteQuartz(Integer quartzId) {
-        Quartz quartz = quartzDao.findOne(quartzId);
+        Quartz quartz = quartzDao.findByQuartzId(quartzId);
         quartz.setDelFlag(0);
         quartzDao.save(quartz);
     }
@@ -68,7 +68,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     //根据当前时间和Cron表达式获取下次执行时间
     public Date getNextValidTime(Date date, Integer quartzId) throws ParseException {
-        String cron = quartzDao.findOne(quartzId).getQuartzCron();
+        String cron = quartzDao.findByQuartzId(quartzId).getQuartzCron();
         CronExpression cronExpression = new CronExpression(cron);
         return cronExpression.getNextValidTimeAfter(date);
     }

@@ -1,7 +1,7 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 
+import com.zjcds.cde.scheduler.base.CustomRepostory;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
-import com.zjcds.common.jpa.CustomRepostory;
 
 import java.util.List;
 
@@ -17,4 +17,5 @@ public interface RepositoryDao extends CustomRepostory<Repository,Integer> {
     public Repository findByDatabaseHostAndDatabaseNameAndDelFlag(String databaseHost,String databaseName,Integer delFlag);
 
     public Repository findByRepositoryIdAndDelFlag(Integer repositoryId,Integer delFlag);
+
 }

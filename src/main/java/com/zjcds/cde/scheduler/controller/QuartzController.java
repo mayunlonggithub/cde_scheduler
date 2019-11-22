@@ -1,13 +1,12 @@
 package com.zjcds.cde.scheduler.controller;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.PageUtils;
+import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.service.QuartzService;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -22,7 +21,7 @@ import java.util.List;
  * @author Ma on 20191122
  */
 @RestController
-@JsonViewException
+
 @Api(description = "调度策略信息")
 @RequestMapping("/quartz")
 public class QuartzController {
@@ -31,7 +30,7 @@ public class QuartzController {
 
     @PostMapping("/addQuartz")
     @ApiOperation(value = "添加策略", produces = "application/json;charset=utf-8")
-    public  ResponseResult<Void> addQuartz(@RequestBody QuartzForm.AddQuartz addQuartz){
+    public ResponseResult<Void> addQuartz(@RequestBody QuartzForm.AddQuartz addQuartz){
         if (addQuartz.getQuartzCron()!=null) {
             if (!CronExpression.isValidExpression(addQuartz.getQuartzCron())) {
                 return new ResponseResult(false, "Cron表达式不正确");

@@ -1,16 +1,11 @@
 package com.zjcds.cde.scheduler.controller;
 
+import com.zjcds.cde.scheduler.base.*;
 import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.entity.Trans;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,7 +25,7 @@ import java.util.List;
  * @author J on 20191121
  */
 @RestController
-@JsonViewException
+
 @Api(description = "转换管理")
 @RequestMapping("/trans")
 public class TransController {
@@ -84,7 +79,7 @@ public class TransController {
 
 //    @PostMapping("/insert/{uId}")
 //    @ApiOperation(value = "插入转换信息", produces = "application/json;charset=utf-8")
-//    @JsonViewException
+//
 //    public ResponseResult<Void> insert(@RequestBody TransForm.AddTrans addTrans, @PathVariable(required = true ,name = "uId") Integer uId){
 //        transService.insert(addTrans,uId);
 //        return new ResponseResult(true,"请求成功");
@@ -93,7 +88,7 @@ public class TransController {
 
     @PutMapping("/update/{transId}")
     @ApiOperation(value = "修改转换信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> update(@RequestBody TransForm.UpdateTrans updateTrans, @PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -103,7 +98,7 @@ public class TransController {
 
     @DeleteMapping("/delete/{transId}")
     @ApiOperation(value = "删除转换信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> delete(@PathVariable(required = true ,name ="transId") Integer transId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -114,7 +109,7 @@ public class TransController {
 
     @GetMapping("/getTrans/{transId}")
     @ApiOperation(value = "获取转换信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<TransForm.Trans> getTrans(@PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -125,7 +120,7 @@ public class TransController {
 
     @PutMapping("/start/{transId}")
     @ApiOperation(value = "开始转换", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> start(@RequestBody TransForm.TransParam transParam, @PathVariable(required = true ,name = "transId") Integer transId, HttpServletRequest request)throws KettleException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");

@@ -1,15 +1,10 @@
 package com.zjcds.cde.scheduler.controller;
 
+import com.zjcds.cde.scheduler.base.*;
 import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.UserService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,7 +26,7 @@ import java.util.List;
  * @author J on 20191105
  */
 @RestController
-@JsonViewException
+
 @Api(description = "用户信息")
 @RequestMapping("/user")
 public class UserController {
@@ -42,7 +37,7 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation(value = "用户登录", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<UserForm.User> login(@RequestBody UserForm.UserLogin userLogin, RedirectAttributes attr, HttpServletRequest request){
         if (null != userLogin && StringUtils.isNotBlank(userLogin.getAccount()) &&
                 StringUtils.isNotBlank(userLogin.getPassword())){
@@ -59,7 +54,7 @@ public class UserController {
 
     @PostMapping("/logout")
     @ApiOperation(value = "用户注销", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> logout(HttpServletRequest request){
         HttpSession session = request.getSession();
         session.removeAttribute(Constant.SESSION_ID);
@@ -69,7 +64,7 @@ public class UserController {
 
     @GetMapping("/isAdmin")
     @ApiOperation(value = "是否管理员", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> isAdmin(HttpServletRequest request){
         User user = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(user,"未登录或登录已失效，请重新登录");
@@ -122,7 +117,7 @@ public class UserController {
 
     @DeleteMapping("delete/{id}")
     @ApiOperation(value = "删除用户", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> delete(HttpServletRequest request,@PathVariable(required = true ,name = "id") Integer id){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -133,7 +128,7 @@ public class UserController {
 
     @PostMapping("addTUser")
     @ApiOperation(value = "插入一个用户", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> addTUser(@RequestBody UserForm.AddUser addTUser, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -144,7 +139,7 @@ public class UserController {
 
     @PutMapping("/updateUser/{id}")
     @ApiOperation(value = "修改用户信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> updateUser(@PathVariable(required = true ,name = "id") Integer id,@RequestBody UserForm.UpdateUser updateUser, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -154,7 +149,7 @@ public class UserController {
 
     @PostMapping("/isAccountExist/{account}")
     @ApiOperation(value = "判断账号是否存在", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> isAccountExist(@PathVariable(required = true ,name = "account") String account, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -168,7 +163,7 @@ public class UserController {
 
     @PostMapping("/isAccountExist/{id}")
     @ApiOperation(value = "判断账号是否存在", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> isAccountExist(@PathVariable(required = true ,name = "id") Integer id, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");

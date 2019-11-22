@@ -1,6 +1,6 @@
 package com.zjcds.cde.scheduler.domain.dto;
 
-import com.zjcds.common.base.domain.BaseBean;
+import com.zjcds.cde.scheduler.base.BaseBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

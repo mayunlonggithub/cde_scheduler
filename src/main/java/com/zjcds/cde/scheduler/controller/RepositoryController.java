@@ -1,20 +1,14 @@
 package com.zjcds.cde.scheduler.controller;
 
+import com.zjcds.cde.scheduler.base.*;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryForm;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTreeForm;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTypeForm;
-import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.domain.entity.RepositoryType;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.RepositoryService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -34,7 +28,7 @@ import java.util.List;
  * @author J on 20191113
  */
 @RestController
-@JsonViewException
+
 @Api(description = "资源库管理")
 @RequestMapping("/repository")
 public class RepositoryController {
@@ -89,7 +83,7 @@ public class RepositoryController {
 
     @GetMapping("/getTreeList/{repositoryId}")
     @ApiOperation(value = "获取资源库树信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<List<RepositoryTreeForm>> getTreeList(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request) throws KettleException{
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -100,7 +94,7 @@ public class RepositoryController {
 
     @PostMapping("/insert")
     @ApiOperation(value = "插入资源库信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> insert(@RequestBody RepositoryForm.AddRepository addRepository, HttpServletRequest request)throws KettleException{
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -111,7 +105,7 @@ public class RepositoryController {
 
     @PutMapping("/update/{repositoryId}")
     @ApiOperation(value = "修改资源库信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> update(@RequestBody RepositoryForm.UpdateRepository updateRepository,@PathVariable(required = true ,name = "repositoryId") Integer repositoryId, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -121,7 +115,7 @@ public class RepositoryController {
 
     @DeleteMapping("/delete/{repositoryId}")
     @ApiOperation(value = "删除资源库信息", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> delete(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -131,7 +125,7 @@ public class RepositoryController {
 
     @PostMapping("/check")
     @ApiOperation(value = "检查资源库连接", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Void> check(@RequestBody RepositoryForm.AddRepository addRepository,HttpServletRequest request)throws KettleException{
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -145,7 +139,7 @@ public class RepositoryController {
 
     @GetMapping("/getType")
     @ApiOperation(value = "获取资源库类别列表", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<RepositoryTypeForm.RepositoryType> getType(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -157,7 +151,7 @@ public class RepositoryController {
 
     @GetMapping("/getAccess")
     @ApiOperation(value = "获取资源库访问类型", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<List<String>> getAccess(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -169,7 +163,7 @@ public class RepositoryController {
 
     @GetMapping("/getRepository/{repositoryId}")
     @ApiOperation(value = "获取资源库对象", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<List<String>> getRepository(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");

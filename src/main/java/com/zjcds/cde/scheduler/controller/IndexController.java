@@ -1,18 +1,17 @@
 package com.zjcds.cde.scheduler.controller;
 
-import com.zjcds.cde.scheduler.domain.dto.JobForm;
+import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
+import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
-import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.dto.TransMonitorForm;
-import com.zjcds.cde.scheduler.domain.entity.*;
+import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
+import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
+import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.dozer.BeanPropertyCopyUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ import java.util.*;
  * @author J on 20191121
  */
 @RestController
-@JsonViewException
+
 @Api(description = "首页")
 @RequestMapping("/index")
 public class IndexController {
@@ -45,7 +44,7 @@ public class IndexController {
 
     @GetMapping("/allRuning")
     @ApiOperation(value = "总监控任务数", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Integer> allRuning(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -57,7 +56,7 @@ public class IndexController {
 
     @GetMapping("/allMonitorJob")
     @ApiOperation(value = "监控作业数", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Integer> allMonitorJob(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -67,7 +66,7 @@ public class IndexController {
 
     @GetMapping("/allMonitorTrans")
     @ApiOperation(value = "监控转换数", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Integer> allMonitorTrans(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -77,7 +76,7 @@ public class IndexController {
 
     @GetMapping("/getTrans")
     @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<TransMonitorForm.TransMonitor> getTrans(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -91,7 +90,7 @@ public class IndexController {
 
     @GetMapping("/getJob")
     @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<JobMonitorForm.JobMonitor> getJob(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -105,7 +104,7 @@ public class IndexController {
 
     @GetMapping("/getKettleLine")
     @ApiOperation(value = "转换监控记录", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Map<String, Object>> getKettleLine(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Map<String,Object> resultMap = new HashMap<String, Object>();

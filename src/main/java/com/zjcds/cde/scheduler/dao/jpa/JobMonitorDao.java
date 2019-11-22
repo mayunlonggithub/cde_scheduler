@@ -1,7 +1,7 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 
+import com.zjcds.cde.scheduler.base.CustomRepostory;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
-import com.zjcds.common.jpa.CustomRepostory;
 
 import java.util.List;
 
@@ -15,4 +15,6 @@ public interface JobMonitorDao extends CustomRepostory<JobMonitor,Integer> {
     public List<JobMonitor> findByCreateUser(Integer createUser);
 
     public JobMonitor findByMonitorJob(Integer monitorJob);
+
+    public JobMonitor findByMonitorJobAndCreateUser(Integer monitorJob,Integer createUser);
 }

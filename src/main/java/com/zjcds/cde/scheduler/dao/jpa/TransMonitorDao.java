@@ -1,7 +1,7 @@
 package com.zjcds.cde.scheduler.dao.jpa;
 
+import com.zjcds.cde.scheduler.base.CustomRepostory;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
-import com.zjcds.common.jpa.CustomRepostory;
 
 import java.util.List;
 
@@ -17,5 +17,7 @@ public interface TransMonitorDao extends CustomRepostory<TransMonitor,Integer> {
     public TransMonitor findByCreateUserAndMonitorTrans(Integer createUser,Integer monitorTrans);
 
     public TransMonitor findByMonitorTrans(Integer monitorTrans);
+
+    public TransMonitor findByMonitorTransAndCreateUser(Integer monitorTrans,Integer createUser);
 
 }

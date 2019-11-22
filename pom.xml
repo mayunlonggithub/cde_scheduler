@@ -13,10 +13,16 @@
     <description>cde-scheduler project for Spring Boot</description>
 
 
+    <!--<parent>-->
+        <!--<groupId>com.zjcds.common</groupId>-->
+        <!--<artifactId>cds-common-parent</artifactId>-->
+        <!--<version>2.1</version>-->
+    <!--</parent>-->
     <parent>
-        <groupId>com.zjcds.common</groupId>
-        <artifactId>cds-common-parent</artifactId>
-        <version>2.1</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.5.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <scm>
         <connection>scm:git:http://115.236.161.138/template/simple-web.git</connection>
@@ -25,42 +31,78 @@
     </scm>
 
     <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-common-base</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-jsonview</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-datasource</artifactId>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-common-base</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!--JPA-->
         <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-jsonview</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-datasource</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-actuator-ext</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
         </dependency>
         <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-swagger</artifactId>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+            <version>5.5.1</version>
         </dependency>
         <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-dozer</artifactId>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer-spring</artifactId>
+            <version>5.5.1</version>
+        </dependency>
+
+        <!-- swagger-ui -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
         </dependency>
         <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-jpa</artifactId>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.zjcds.common</groupId>
-            <artifactId>cds-starter-db-auto-update</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-actuator-ext</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-swagger</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-dozer</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-jpa</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.zjcds.common</groupId>-->
+            <!--<artifactId>cds-starter-db-auto-update</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>

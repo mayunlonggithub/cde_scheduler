@@ -1,5 +1,9 @@
 package com.zjcds.cde.scheduler.controller;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.PageUtils;
+import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.dto.TransMonitorForm;
 import com.zjcds.cde.scheduler.domain.dto.TransRecordForm;
@@ -9,11 +13,6 @@ import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransRecordService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
-import com.zjcds.common.jpa.utils.PageUtils;
-import com.zjcds.common.jsonview.annotations.JsonViewException;
-import com.zjcds.common.jsonview.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,7 +32,7 @@ import java.util.List;
  * @author J on 20191121
  */
 @RestController
-@JsonViewException
+
 @Api(description = "转换监控管理")
 @RequestMapping("/TransMonitor")
 public class TransMonitorController {
@@ -88,7 +87,7 @@ public class TransMonitorController {
 
     @GetMapping("/getAllMonitorTrans}")
     @ApiOperation(value = "获取所有的监控转换数", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Integer> getAllMonitorTrans(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -98,7 +97,7 @@ public class TransMonitorController {
 
     @GetMapping("/getAllSuccess}")
     @ApiOperation(value = "获取执行成功的数", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Integer> getAllSuccess(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -108,7 +107,7 @@ public class TransMonitorController {
 
     @GetMapping("/getAllFail}")
     @ApiOperation(value = "获取执行失败的数", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<Integer> getAllFail(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -161,7 +160,7 @@ public class TransMonitorController {
 
     @GetMapping("/getLogContent/{recordId}")
     @ApiOperation(value = "日志详情", produces = "application/json;charset=utf-8")
-    @JsonViewException
+
     public ResponseResult<String> getAllFail(@PathVariable(required = true ,name = "recordId") Integer recordId,HttpServletRequest request)throws IOException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");

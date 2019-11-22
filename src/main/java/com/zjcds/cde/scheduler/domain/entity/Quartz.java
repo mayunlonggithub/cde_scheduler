@@ -1,6 +1,6 @@
 package com.zjcds.cde.scheduler.domain.entity;
 
-import com.zjcds.common.jpa.domain.CreateModifyTime;
+import com.zjcds.cde.scheduler.base.CreateModifyTime;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,7 +9,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "t_quartz")
-public class Quartz extends CreateModifyTime{
+public class Quartz extends CreateModifyTime {
     //调度策略ID
     private Integer quartzId;
     //策略描述

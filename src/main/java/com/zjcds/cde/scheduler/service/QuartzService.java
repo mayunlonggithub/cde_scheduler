@@ -1,9 +1,9 @@
 package com.zjcds.cde.scheduler.service;
 
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
-import com.zjcds.common.base.domain.page.Paging;
-import com.zjcds.common.jpa.PageResult;
 
 import java.text.ParseException;
 import java.util.Date;
