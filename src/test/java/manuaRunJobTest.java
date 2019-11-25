@@ -34,7 +34,7 @@ public class manuaRunJobTest {
     @Test
     public void manuaRunJobTest() throws KettleException {
         KettleEnvironment.init();
-        Repository repository = repositoryDao.findOne(1);
+        Repository repository = repositoryDao.findByRepositoryId(1);
         String jobPath ="/a";
 //        String jobName = "数据服务连接测试";
         String jobName = "啊";

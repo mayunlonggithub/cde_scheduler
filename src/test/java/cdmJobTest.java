@@ -41,7 +41,7 @@ public class cdmJobTest {
     @Test
     public void cdmJobInfo() throws KettleException{
         KettleEnvironment.init();
-        Repository repository = repositoryDao.findOne(1);
+        Repository repository = repositoryDao.findByRepositoryId(1);
         KettleDatabaseRepository kettleDatabaseRepository = RepositoryUtil.connectionRepository(repository);
         //获取当前的路径信息
         RepositoryDirectoryInterface rDirectory = kettleDatabaseRepository.loadRepositoryDirectoryTree().findDirectory("/");
