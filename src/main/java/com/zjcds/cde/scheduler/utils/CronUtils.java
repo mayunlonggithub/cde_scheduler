@@ -23,23 +23,27 @@ public class CronUtils {
         quartzCron.append(addQuartz.getExecMin()).append(" ");
         //小时
         quartzCron.append(addQuartz.getExecHour()).append(" ");
-        switch(addQuartz.getUnitType()){
-            case "day":
-                createDayQuartzCronression(addQuartz);
-                break;
-            case "week":
-                createWeekQuartzCronression(addQuartz);
-                break;
-            case "month":
-                createMonthQuartzCronression(addQuartz);
-                break;
-            case "year":
-                createYearQuartzCronression(addQuartz);
-                break;
-            case "interval":
-                createIntervalQuartzCronression(addQuartz);
-                break;
-    }
+        if(addQuartz.getQuartzFlag()==Constant.Single){
+               createSingleQuartzCronression(addQuartz);
+        }else {
+            switch (addQuartz.getUnitType()) {
+                case "day":
+                    createDayQuartzCronression(addQuartz);
+                    break;
+                case "week":
+                    createWeekQuartzCronression(addQuartz);
+                    break;
+                case "month":
+                    createMonthQuartzCronression(addQuartz);
+                    break;
+                case "year":
+                    createYearQuartzCronression(addQuartz);
+                    break;
+                case "interval":
+                    createIntervalQuartzCronression(addQuartz);
+                    break;
+            }
+        }
         Cron.add(quartzCron.toString());
         Cron.add(quartzDescription.toString());
         return  Cron;
@@ -138,4 +142,32 @@ public class CronUtils {
         quartzDescription.append(addQuartz.getSecInterval()).append("秒");
         quartzDescription.append("执行");
     }
+
+    public static void createSingleQuartzCronression(QuartzForm.AddQuartz addQuartz) {
+
+        //一年中的哪一个月
+        Integer month = addQuartz.getExecMonth();
+        //月中的哪一天
+        Integer day = addQuartz.getExecDay();
+        //年份
+        Integer year=addQuartz.getExecYear();
+        //天
+        quartzCron.append(day).append(" ");
+        //月份
+        quartzCron.append(month).append(" ");
+        //周
+        quartzCron.append("?").append(" ");
+        //年
+        quartzCron.append(year);
+        String Month=addQuartz.getExecMonth()+"月";
+        String Day = addQuartz.getExecDay() + "号";
+        quartzDescription.append(addQuartz.getExecYear()+"年").append(Month).append(Day);
+        quartzDescription.append(addQuartz.getExecHour()).append("时");
+        quartzDescription.append(addQuartz.getExecMin()).append("分");
+        quartzDescription.append(addQuartz.getExecSec()).append("秒");
+        quartzDescription.append("执行一次");
+    }
+
+
+
     }

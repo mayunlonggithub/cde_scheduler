@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.util.Date;
 /**
  * @author Ma on 20191122
  */
@@ -29,9 +29,9 @@ public class QuartzForm {
                 @ApiModelProperty(value = "是否删除")
                 private Integer delFlag;
                 @ApiModelProperty(value = "策略开始时间")
-                private Timestamp startTime;
+                private Date startTime;
                 @ApiModelProperty(value = "策略结束时间")
-                private Timestamp endTime;
+                private Date endTime;
                 @ApiModelProperty(value = "策略生成选择")
                 private Integer quartzFlag;
                 @ApiModelProperty(value = "单元选择")
@@ -54,6 +54,8 @@ public class QuartzForm {
                 private Integer execWeek;
                 @ApiModelProperty(value = "执行月份")
                 private Integer execMonth;
+                @ApiModelProperty(value = "执行年份")
+                private Integer execYear;
         }
 
         @Getter
@@ -64,6 +66,10 @@ public class QuartzForm {
                 private String unitType;
                 @ApiModelProperty(value = "策略生成选择")
                 private Integer quartzFlag;
+                @ApiModelProperty(value = "策略开始时间")
+                private Date startTime;
+                @ApiModelProperty(value = "策略结束时间")
+                private Date endTime;
                 @ApiModelProperty(value = "秒间隔")
                 private int secInterval;
                 @ApiModelProperty(value = "分间隔")
@@ -82,13 +88,13 @@ public class QuartzForm {
                 private Integer execWeek;
                 @ApiModelProperty(value = "执行月份")
                 private Integer execMonth;
+                @ApiModelProperty(value = "执行月份")
+                private Integer execYear;
                 @ApiModelProperty(value = "策略描述")
                 private String quartzDescription;
                 @ApiModelProperty(value = "策略Corn表达式")
                 private String quartzCron;
-
         }
-
         @Getter
         @Setter
         @ApiModel(value = "quartz.update", description = "修改策略")

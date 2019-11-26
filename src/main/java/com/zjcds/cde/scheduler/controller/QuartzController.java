@@ -11,11 +11,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.CollectionUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 /**
  * @author Ma on 20191122
@@ -90,6 +93,12 @@ public class QuartzController {
             allowMultiple = true
     )})
     public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys){
+        if (CollectionUtils.isEmpty((Collection) queryString)) {
+            queryString = new ArrayList();
+        }
+        if (CollectionUtils.isEmpty((Collection) orderBys)) {
+            orderBys = new ArrayList();
+        }
         PageResult<Quartz> quartz = quartzService.getList(paging,queryString,orderBys);
         PageResult<QuartzForm.Quartz> owner = PageUtils.copyPageResult(quartz, QuartzForm.Quartz.class);
         return new ResponseResult(true,"请求成功",owner);

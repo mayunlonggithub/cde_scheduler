@@ -18,4 +18,5 @@ public interface QuartzService
     void updateQuartz(QuartzForm.UpdateQuartz updateQuartz);
     PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys);
     Date getNextValidTime(Date date, Integer quartzId) throws ParseException;
+    List<Quartz> getQuartzByDelFlag(Integer flag);
 }

@@ -48,6 +48,8 @@ public class Quartz extends CreateModifyTime {
     private Integer execWeek;
     //执行月
     private Integer execMonth;
+    //执行年份
+    private Integer execYear;
 
     @Id
     @Column(name = "quartz_id")
@@ -239,6 +241,15 @@ public class Quartz extends CreateModifyTime {
 
     public void setExecMonth(Integer execMonth) {
         this.execMonth = execMonth;
+    }
+
+    @Basic
+    @Column(name = "exec_year")
+    public Integer getExecYear() {
+        return execYear;
+    }
+    public void setExecYear(Integer execYear) {
+        this.execYear = execYear;
     }
 
 }

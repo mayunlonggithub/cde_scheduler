@@ -11,5 +11,5 @@ import java.util.List;
 public interface TaskDao extends CustomRepostory<Task,Integer> {
          List<Task> findByStatus(Integer status);
 
-         public Task findByQuartzId(Integer quartzId);
+         public Task findByTaskId(Integer TaskId);
 }

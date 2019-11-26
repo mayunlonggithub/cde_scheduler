@@ -90,6 +90,10 @@ public class Constant extends Const {
 	public static final Integer COMPLETION=3;
 	public static final Integer INVALID=4;
 
+	/**quartz flag**/
+	public static final Integer Period=1;
+	public static final Integer Custom=2;
+	public static final Integer Single=3;
 
 
 	static {
