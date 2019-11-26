@@ -56,6 +56,7 @@ public class QuartzServiceImpl implements QuartzService {
             updateQuartz.setQuartzDescription(cron.get(1));
         }
         Quartz quartz = BeanPropertyCopyUtils.copy(updateQuartz, Quartz.class);
+        quartz.setDelFlag(1);
         quartzDao.save(quartz);
     }
 
