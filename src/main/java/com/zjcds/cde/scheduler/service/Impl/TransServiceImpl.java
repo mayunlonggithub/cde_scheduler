@@ -242,7 +242,7 @@ public class TransServiceImpl implements TransService {
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(transPath);
         TransMeta transMeta = kettleDatabaseRepository.loadTransformation(transName,directory,new ProgressNullMonitorListener(),true,null);
-        if(param.size()>0){
+        if(param!=null&&param.size()>0){
             for (String key : param.keySet()){
                 transMeta.setParameterValue(key,param.get(key));
             }
@@ -348,11 +348,11 @@ public class TransServiceImpl implements TransService {
         templateOne.setLastExecuteTime(lastExecuteTime);
         //在监控表中增加下一次执行时间
         templateOne.setNextExecuteTime(nextExecuteTime);
-        if (transRecord.getRecordStatus() == 1) {// 证明成功
+        if (transRecord.getRecordStatus() == 2) {// 证明成功
             //成功次数加1
             templateOne.setMonitorSuccess(templateOne.getMonitorSuccess() + 1);
             transMonitorDao.save(templateOne);
-        } else if (transRecord.getRecordStatus() == 2) {// 证明失败
+        } else if (transRecord.getRecordStatus() == 3) {// 证明失败
             //失败次数加1
             templateOne.setMonitorFail(templateOne.getMonitorFail() + 1);
             transMonitorDao.save(templateOne);

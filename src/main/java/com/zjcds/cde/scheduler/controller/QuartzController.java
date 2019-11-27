@@ -80,14 +80,14 @@ public class QuartzController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
@@ -98,6 +98,7 @@ public class QuartzController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("createTimeDesc");
         }
         PageResult<Quartz> quartz = quartzService.getList(paging,queryString,orderBys);
         PageResult<QuartzForm.Quartz> owner = PageUtils.copyPageResult(quartz, QuartzForm.Quartz.class);

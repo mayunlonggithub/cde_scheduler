@@ -166,7 +166,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         repository.setModifyUser(uId);
         repository.setDelFlag(1);
         repository = repositoryDao.save(repository);
-        saveTreeList(repository.getRepositoryId());
+//        saveTreeList(repository.getRepositoryId());
     }
 
     /**
@@ -214,10 +214,9 @@ public class RepositoryServiceImpl implements RepositoryService {
      * @param repositoryId
      * @throws KettleException
      */
-    @Async
     @Override
     @Transactional
-    public void saveTreeList(Integer repositoryId) throws KettleException{
+    public void saveTreeList(Integer repositoryId,Integer uId) throws KettleException{
         KettleDatabaseRepository kettleDatabaseRepository = null;
         List<RepositoryTreeForm> allRepositoryTreeList = new ArrayList<>();
         if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
@@ -255,22 +254,22 @@ public class RepositoryServiceImpl implements RepositoryService {
 //        repositoryTreeDao.deleteByRepositoryId(repositoryId);
 //        repositoryTreeDao.save(repositoryTrees);
         //保存作业信息
-        List<Job> jobList = addJob(repositoryJob,repositoryId);
+        List<Job> jobList = addJob(repositoryJob,repositoryId,uId);
         jobDao.saveAll(jobList);
         //保存转换信息
-        List<Trans> transList = addTrans(repositoryTrans,repositoryId);
+        List<Trans> transList = addTrans(repositoryTrans,repositoryId,uId);
         transDao.saveAll(transList);
 
     }
 
     //整合新增的作业信息
-    private List<Job> addJob(List<RepositoryTree> repositoryJob,Integer repositoryId){
+    private List<Job> addJob(List<RepositoryTree> repositoryJob,Integer repositoryId,Integer uId){
         List<Job> jobs = jobDao.findByJobRepositoryId(repositoryId);
         List<Job> jobList = new ArrayList<>();
         for (RepositoryTree j:repositoryJob){
-            Job jobList1 = jobs.stream().filter(e->e.getJobName().equals(j.getText())&&e.getJobPath().equals(j.getPath())).findFirst().orElse(new Job());
+            Job jobList1 = jobs.stream().filter(e->e.getJobName().equals(j.getText())&&e.getJobPath().equals(j.getPath())&&e.getJobRepositoryId()==j.getRepositoryId()&&e.getDelFlag()==1).findFirst().orElse(new Job());
             //判断作业是否已经存在
-            if(jobList1==null){
+            if(jobList1.getJobId()==null){
                 Job job = new Job();
                 job.setJobName(j.getText());
                 job.setJobType(1);
@@ -278,6 +277,8 @@ public class RepositoryServiceImpl implements RepositoryService {
                 job.setJobRepositoryId(j.getRepositoryId());
                 job.setJobLogLevel("basic");
                 job.setDelFlag(1);
+                job.setCreateUser(uId);
+                job.setModifyUser(uId);
                 jobList.add(job);
             }
         }
@@ -285,13 +286,13 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     //整合新增的转换信息
-    private List<Trans> addTrans(List<RepositoryTree> repositoryTrans,Integer repositoryId){
+    private List<Trans> addTrans(List<RepositoryTree> repositoryTrans,Integer repositoryId,Integer uId){
         List<Trans> trans = transDao.findByTransRepositoryId(repositoryId);
         List<Trans> transList = new ArrayList<>();
         for (RepositoryTree t:repositoryTrans){
-            Trans trans1 = trans.stream().filter(e->e.getTransName().equals(t.getText())&&e.getTransPath().equals(t.getPath())).findFirst().orElse(new Trans());
+            Trans trans1 = trans.stream().filter(e->e.getTransName().equals(t.getText())&&e.getTransPath().equals(t.getPath())&&e.getTransRepositoryId()==t.getRepositoryId()&&e.getDelFlag()==1).findFirst().orElse(new Trans());
             //判断转换是否已经存在
-            if(trans1==null){
+            if(trans1.getTransId()==null){
                 Trans tran = new Trans();
                 tran.setTransName(t.getText());
                 tran.setTransType(1);
@@ -299,6 +300,8 @@ public class RepositoryServiceImpl implements RepositoryService {
                 tran.setTransRepositoryId(t.getRepositoryId());
                 tran.setTransLogLevel("basic");
                 tran.setDelFlag(1);
+                tran.setCreateUser(uId);
+                tran.setModifyUser(uId);
                 transList.add(tran);
             }
         }

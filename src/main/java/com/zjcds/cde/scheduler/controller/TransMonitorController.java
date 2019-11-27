@@ -10,6 +10,8 @@ import com.zjcds.cde.scheduler.domain.dto.TransRecordForm;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.domain.entity.User;
+import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
+import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransRecordService;
 import com.zjcds.cde.scheduler.utils.Constant;
@@ -59,19 +61,19 @@ public class TransMonitorController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<TransForm.Trans> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
+    public ResponseResult<TransMonitorForm.TransMonitor> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
@@ -80,7 +82,7 @@ public class TransMonitorController {
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
         }
-        PageResult<TransMonitor> trans = transMonitorService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<TransMonitorView> trans = transMonitorService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<TransMonitorForm.TransMonitor>  owner = PageUtils.copyPageResult(trans,TransMonitorForm.TransMonitor.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -115,7 +117,7 @@ public class TransMonitorController {
         return new ResponseResult<>(true,"请求成功",allFail);
     }
 
-    @GetMapping("/getRecordList/{transId}")
+    @GetMapping("/getRecordList")
     @ApiOperation(value = "转换执行日志记录", produces = "application/json;charset=utf-8")
     @ApiImplicitParams({@ApiImplicitParam(
             name = "pageIndex",
@@ -132,19 +134,19 @@ public class TransMonitorController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<TransForm.Trans> getRecordList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, @PathVariable(required = true ,name = "transId") Integer transId, HttpServletRequest request){
+    public ResponseResult<TransRecordForm.TransRecord> getRecordList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,  HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
@@ -152,8 +154,9 @@ public class TransMonitorController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("startTimeDesc");
         }
-        PageResult<TransRecord> trans = transRecordService.getList(paging,queryString, orderBys, kUser.getId(),transId);
+        PageResult<TransRecordView> trans = transRecordService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<TransRecordForm.TransRecord>  owner = PageUtils.copyPageResult(trans,TransRecordForm.TransRecord.class);
         return new ResponseResult(true,"请求成功",owner);
     }

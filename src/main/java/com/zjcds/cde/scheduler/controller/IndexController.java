@@ -7,6 +7,8 @@ import com.zjcds.cde.scheduler.domain.dto.TransMonitorForm;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.domain.entity.User;
+import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
+import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
@@ -80,7 +82,7 @@ public class IndexController {
     public ResponseResult<TransMonitorForm.TransMonitor> getTrans(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        List<TransMonitor> transMonitorList = transMonitorService.getList(kUser.getId());
+        List<TransMonitorView> transMonitorList = transMonitorService.getList(kUser.getId());
         if(transMonitorList.size()>5){
             transMonitorList = transMonitorList.subList(1,5);
         }
@@ -94,7 +96,7 @@ public class IndexController {
     public ResponseResult<JobMonitorForm.JobMonitor> getJob(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        List<JobMonitor> jobMonitorList = jobMonitorService.getList(kUser.getId());
+        List<JobMonitorView> jobMonitorList = jobMonitorService.getList(kUser.getId());
         if(jobMonitorList.size()>5){
             jobMonitorList = jobMonitorList.subList(1,5);
         }

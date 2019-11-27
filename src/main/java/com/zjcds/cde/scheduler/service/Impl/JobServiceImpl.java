@@ -246,7 +246,7 @@ public class JobServiceImpl implements JobService {
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(jobPath);
         JobMeta jobMeta = kettleDatabaseRepository.loadJob(jobName,directory,new ProgressNullMonitorListener(),null);
-        if(param.size()>0){
+        if(param!=null&&param.size()>0){
             for (String key : param.keySet()){
                 jobMeta.setParameterValue(key,param.get(key));
             }
@@ -299,7 +299,7 @@ public class JobServiceImpl implements JobService {
                     jobRecord.setRecordStatus(recordStatus);
                     jobRecord.setStartTime(executeTime);
                     jobRecord.setStopTime(jobStopDate);
-                    writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime,runStatus);
+                    writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime,runStatus,userId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -345,7 +345,7 @@ public class JobServiceImpl implements JobService {
      * @Title writeToDBAndFile
      * @Description 保存作业运行日志信息到文件和数据库
      */
-    public void writeToDBAndFile(JobRecord jobRecord, String logText, Date lastExecuteTime, Date nextExecuteTime,Integer runStatus)
+    public void writeToDBAndFile(JobRecord jobRecord, String logText, Date lastExecuteTime, Date nextExecuteTime,Integer runStatus,String uId)
             throws IOException {
         // 将日志信息写入文件
         FileUtils.writeStringToFile(new File(jobRecord.getLogFilePath()), logText, Constant.DEFAULT_ENCODING, false);
@@ -355,16 +355,16 @@ public class JobServiceImpl implements JobService {
         template.setCreateUser(jobRecord.getCreateUser());
         template.setMonitorJob(jobRecord.getRecordJob());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJob(jobRecord.getRecordJob());
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobRecord.getRecordJob(),Integer.parseInt(uId));
         templateOne.setLastExecuteTime(lastExecuteTime);
         templateOne.setRunStatus(runStatus.toString());
         //在监控表中增加下一次执行时间
         templateOne.setNextExecuteTime(nextExecuteTime);
-        if (jobRecord.getRecordStatus() == 1) {// 证明成功
+        if (jobRecord.getRecordStatus() == 2) {// 证明成功
             //成功次数加1
             templateOne.setMonitorSuccess(templateOne.getMonitorSuccess() + 1);
             jobMonitorDao.save(templateOne);
-        } else if (jobRecord.getRecordStatus() == 2) {// 证明失败
+        } else if (jobRecord.getRecordStatus() == 3) {// 证明失败
             //失败次数加1
             templateOne.setMonitorFail(templateOne.getMonitorFail() + 1);
             jobMonitorDao.save(templateOne);

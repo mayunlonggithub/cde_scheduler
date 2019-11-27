@@ -3,7 +3,9 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.JobMonitorViewDao;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
+import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
@@ -24,6 +26,8 @@ public class JobMonitorServiceImpl implements JobMonitorService {
 
     @Autowired
     private JobMonitorDao jobMonitorDao;
+    @Autowired
+    private JobMonitorViewDao jobMonitorViewDao;
 
     @Autowired
     private JobService jobService;
@@ -38,20 +42,20 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Description 获取作业监控分页列表
      */
     @Override
-    public PageResult<JobMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
+    public PageResult<JobMonitorView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
-        PageResult<JobMonitor> jobMonitorPageResult = jobMonitorDao.findAll(paging, queryString, orderBys);
-        List<JobMonitor> jobMonitorList = jobMonitorPageResult.getContent();
-        jobName(jobMonitorList);
+        PageResult<JobMonitorView> jobMonitorPageResult = jobMonitorViewDao.findAll(paging, queryString, orderBys);
+//        List<JobMonitor> jobMonitorList = jobMonitorPageResult.getContent();
+//        jobName(jobMonitorList);
         return jobMonitorPageResult;
     }
 
     @Override
-    public List<JobMonitor> getList(Integer uId) {
+    public List<JobMonitorView> getList(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
-        jobName(jobMonitorList);
+        List<JobMonitorView> jobMonitorList = jobMonitorViewDao.findByCreateUserAndMonitorStatus(uId,1);
+//        jobName(jobMonitorList);
         return jobMonitorList;
     }
 
@@ -164,10 +168,6 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobId,uId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
-//            StringBuilder runStatusBuilder = new StringBuilder();
-//            runStatusBuilder.append(templateOne.getRunStatus())
-//                    .append(",").append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
-//            templateOne.setRunStatus(runStatusBuilder.toString());
             templateOne.setRunStatus("0");
             templateOne.setLastExecuteTime(templateOne.getNextExecuteTime());
             templateOne.setNextExecuteTime(nextExecuteTime);
@@ -178,9 +178,6 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             jobMonitor.setCreateUser(uId);
             jobMonitor.setMonitorSuccess(0);
             jobMonitor.setMonitorFail(0);
-//            StringBuilder runStatusBuilder = new StringBuilder();
-//            runStatusBuilder.append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
-//            jobMonitor.setRunStatus(runStatusBuilder.toString());
             jobMonitor.setMonitorStatus(1);
             jobMonitor.setRunStatus("0");
             jobMonitor.setNextExecuteTime(nextExecuteTime);

@@ -89,14 +89,14 @@ public class UserController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
@@ -109,6 +109,7 @@ public class UserController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("createTimeDesc");
         }
         PageResult<User> user = userService.getList(paging,queryString,orderBys,kUser.getId());
         PageResult<UserForm.User> owner = PageUtils.copyPageResult(user,UserForm.User.class);

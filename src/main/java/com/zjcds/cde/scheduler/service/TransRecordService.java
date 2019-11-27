@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.service;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
+import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,11 +19,10 @@ public interface TransRecordService {
      * @Title getList
      * @Description 获取列表
      * @param uId 用户ID
-     * @param transId 转换ID
      * @return
      * @return BootTablePage
      */
-    public PageResult<TransRecord> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId, Integer transId);
+    public PageResult<TransRecordView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
     /**
      * @Title getLogContent

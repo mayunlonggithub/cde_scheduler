@@ -97,5 +97,5 @@ public interface RepositoryService {
      * @param repositoryId
      * @throws KettleException
      */
-    public void saveTreeList(Integer repositoryId) throws KettleException;
+    public void saveTreeList(Integer repositoryId,Integer uId) throws KettleException;
 }

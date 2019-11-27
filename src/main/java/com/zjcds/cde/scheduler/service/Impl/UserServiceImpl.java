@@ -174,7 +174,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserForm.UpdateUser updateUser, Integer id,Integer uId){
         Assert.notNull(id,"要修改的用户id不能为空");
         Assert.notNull(uId,"未登录,请重新登录");
-        Optional<User> userOptional = userDao.findById(uId);
+        Optional<User> userOptional = userDao.findById(id);
         User u = new User();
         if(userOptional.isPresent()){
             u=userOptional.get();

@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.service;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
+import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
 
 import java.util.Date;
 import java.util.List;
@@ -24,9 +25,9 @@ public interface TransMonitorService {
      * @return
      * @Description 获取分页列表
      */
-    public PageResult<TransMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
+    public PageResult<TransMonitorView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
-    public List<TransMonitor> getList(Integer uId);
+    public List<TransMonitorView> getList(Integer uId);
 
     /**
      * @param uId 用户ID

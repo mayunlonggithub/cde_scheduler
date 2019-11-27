@@ -3,7 +3,9 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransRecordDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.TransRecordViewDao;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
+import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
 import com.zjcds.cde.scheduler.service.TransRecordService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
@@ -27,6 +29,8 @@ public class TransRecordServiceImpl implements TransRecordService {
 
     @Autowired
     private TransRecordDao transRecordDao;
+    @Autowired
+    private TransRecordViewDao transRecordViewDao;
 
     @Autowired
     private TransService transService;
@@ -36,20 +40,16 @@ public class TransRecordServiceImpl implements TransRecordService {
      * @Title getList
      * @Description 获取列表
      * @param uId 用户ID
-     * @param transId 转换ID
      * @return
      * @return BootTablePage
      */
     @Override
-    public PageResult<TransRecord> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId, Integer transId){
+    public PageResult<TransRecordView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId){
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
-        if (transId != null){
-            queryString.add("recordTrans~Eq~"+transId);
-        }
-        PageResult<TransRecord> transRecordPageResult = transRecordDao.findAll(paging, queryString, orderBys);
-        List<TransRecord> transRecordList = transRecordPageResult.getContent();
-        transName(transRecordList);
+        PageResult<TransRecordView> transRecordPageResult = transRecordViewDao.findAll(paging, queryString, orderBys);
+//        List<TransRecord> transRecordList = transRecordPageResult.getContent();
+//        transName(transRecordList);
         return transRecordPageResult;
     }
 

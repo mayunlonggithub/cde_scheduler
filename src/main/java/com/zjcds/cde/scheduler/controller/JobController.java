@@ -51,14 +51,14 @@ public class JobController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
@@ -71,6 +71,7 @@ public class JobController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("createTimeDesc");
         }
         PageResult<Job> job = jobService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<JobForm.Job>  owner = PageUtils.copyPageResult(job,JobForm.Job.class);

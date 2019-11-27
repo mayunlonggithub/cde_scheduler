@@ -7,6 +7,7 @@ import com.zjcds.cde.scheduler.domain.entity.CdmJob;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.quartz.DBConnectionModel;
 import com.zjcds.cde.scheduler.service.CdmJobService;
+import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import org.pentaho.di.core.exception.KettleException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class CdmJobServiceImpl implements CdmJobService {
     private CdmJobDao cdmJobDao;
     @Autowired
     private RepositoryDao repositoryDao;
+    @Autowired
+    JobMonitorService jobMonitorService;
 
 //    @Value("${com.zjcds.dataSources.druids.dataSource.url}")
 //    private String url;
@@ -45,13 +48,15 @@ public class CdmJobServiceImpl implements CdmJobService {
     @Override
     @Transactional
     public void cdmJobExecute(CdmJobForm.CdmJobParam cdmJobParam,Integer uId) throws KettleException {
-        Repository repository = repositoryDao.findByRepositoryId(1);
+        Repository repository = repositoryDao.findByRepositoryId(6);
 //        DBConnectionModel dBConnectionModel = new DBConnectionModel(driverClassName,url,username,password);
         CdmJob cdmJob = cdmJobDao.findByJobName(cdmJobParam.getJobName());
         String logLevel = "5";
         String logFilePath = cdeLogFilePath1;
         Date executeTime = new Date();
         Date nexExecuteTime = null;
+        //添加监控
+        jobMonitorService.addMonitor(uId,cdmJob.getId(),nexExecuteTime);
         jobService.manualRunRepositoryJob(repository,cdmJob.getId().toString(),cdmJob.getJobName(),cdmJob.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam());
     }
 

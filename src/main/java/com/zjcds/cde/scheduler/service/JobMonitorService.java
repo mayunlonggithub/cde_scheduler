@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.service;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
+import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
 
 import java.util.Date;
 import java.util.List;
@@ -23,9 +24,9 @@ public interface JobMonitorService {
      * @return
      * @Description 获取作业监控分页列表
      */
-    public PageResult<JobMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
+    public PageResult<JobMonitorView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
-    public List<JobMonitor> getList(Integer uId);
+    public List<JobMonitorView> getList(Integer uId);
 
     /**
      * @param uId 用户ID

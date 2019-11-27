@@ -3,7 +3,9 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.JobRecordViewDao;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
+import com.zjcds.cde.scheduler.domain.entity.view.JobRecordView;
 import com.zjcds.cde.scheduler.service.JobRecordService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.Constant;
@@ -25,6 +27,8 @@ public class JobRecordServiceImpl implements JobRecordService {
 
     @Autowired
     private JobRecordDao jobRecordDao;
+    @Autowired
+    private JobRecordViewDao jobRecordViewDao;
 
     @Autowired
     private JobService jobService;
@@ -33,20 +37,16 @@ public class JobRecordServiceImpl implements JobRecordService {
      * @Title getList
      * @Description 获取带分页的列表
      * @param uId 用户ID
-     * @param jobId 作业ID
      * @return
      * @return BootTablePage
      */
     @Override
-    public PageResult<JobRecord> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId, Integer jobId){
+    public PageResult<JobRecordView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId){
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
-        if (jobId != null){
-            queryString.add("recordJob~Eq~"+jobId);
-        }
-        PageResult<JobRecord> jobRecordPageResult = jobRecordDao.findAll(paging, queryString, orderBys);
-        List<JobRecord> jobRecordList = jobRecordPageResult.getContent();
-        jobName(jobRecordList);
+        PageResult<JobRecordView> jobRecordPageResult = jobRecordViewDao.findAll(paging, queryString, orderBys);
+//        List<JobRecord> jobRecordList = jobRecordPageResult.getContent();
+//        jobName(jobRecordList);
         return jobRecordPageResult;
     }
 

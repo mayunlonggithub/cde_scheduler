@@ -10,6 +10,8 @@ import com.zjcds.cde.scheduler.domain.dto.JobRecordForm;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.User;
+import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
+import com.zjcds.cde.scheduler.domain.entity.view.JobRecordView;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobRecordService;
 import com.zjcds.cde.scheduler.utils.Constant;
@@ -60,19 +62,19 @@ public class JobMonitorController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<JobForm.Job> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
+    public ResponseResult<JobMonitorForm.JobMonitor> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
@@ -80,8 +82,10 @@ public class JobMonitorController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("lastExecuteTimeDesc");
+
         }
-        PageResult<JobMonitor> job = jobMonitorService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<JobMonitorView> job = jobMonitorService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<JobMonitorForm.JobMonitor>  owner = PageUtils.copyPageResult(job,JobMonitorForm.JobMonitor.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -113,7 +117,7 @@ public class JobMonitorController {
         return new ResponseResult<>(true,"请求成功",allFail);
     }
 
-    @GetMapping("/getRecordList/{jobId}")
+    @GetMapping("/getRecordList")
     @ApiOperation(value = "作业执行日志记录", produces = "application/json;charset=utf-8")
     @ApiImplicitParams({@ApiImplicitParam(
             name = "pageIndex",
@@ -130,19 +134,19 @@ public class JobMonitorController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<JobForm.Job> getRecordList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, @PathVariable(required = true ,name = "jobId") Integer jobId, HttpServletRequest request){
+    public ResponseResult<JobRecordForm.JobRecord> getRecordList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,  HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (CollectionUtils.isEmpty((Collection) queryString)) {
@@ -150,8 +154,9 @@ public class JobMonitorController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("startTimeDesc");
         }
-        PageResult<JobRecord> job = jobRecordService.getList(paging,queryString, orderBys, kUser.getId(),jobId);
+        PageResult<JobRecordView> job = jobRecordService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<JobRecordForm.JobRecord>  owner = PageUtils.copyPageResult(job,JobRecordForm.JobRecord.class);
         return new ResponseResult(true,"请求成功",owner);
     }

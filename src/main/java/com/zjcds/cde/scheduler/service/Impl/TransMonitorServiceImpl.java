@@ -3,7 +3,9 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransMonitorDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.TransMonitorViewDao;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
+import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
@@ -27,6 +29,8 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Autowired
     private TransMonitorDao transMonitorDao;
     @Autowired
+    private TransMonitorViewDao transMonitorViewDao;
+    @Autowired
     private TransService transService;
 
     /**
@@ -39,20 +43,20 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      * @Description 获取分页列表
      */
     @Override
-    public PageResult<TransMonitor> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
+    public PageResult<TransMonitorView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
         queryString.add("createUser~Eq~"+uId);
-        PageResult<TransMonitor> transMonitorPageResult = transMonitorDao.findAll(paging,queryString,orderBys);
-        List<TransMonitor> transMonitorList = transMonitorPageResult.getContent();
-        transName(transMonitorList);
+        PageResult<TransMonitorView> transMonitorPageResult = transMonitorViewDao.findAll(paging,queryString,orderBys);
+//        List<TransMonitor> transMonitorList = transMonitorPageResult.getContent();
+//        transName(transMonitorList);
         return transMonitorPageResult;
     }
 
     @Override
-    public List<TransMonitor> getList(Integer uId) {
+    public List<TransMonitorView> getList(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
-        transName(transMonitorList);
+        List<TransMonitorView> transMonitorList = transMonitorViewDao.findByCreateUserAndMonitorStatus(uId,1);
+//        transName(transMonitorList);
         return transMonitorList;
     }
 

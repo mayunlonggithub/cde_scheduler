@@ -14,8 +14,8 @@ public class RepositoryTest {
     @Autowired
     private RepositoryService repositoryService;
 
-    @Test
-    public void saveTreeList()throws KettleException {
-        repositoryService.saveTreeList(1);
-    }
+//    @Test
+//    public void saveTreeList()throws KettleException {
+//        repositoryService.saveTreeList(1);
+//    }
 }

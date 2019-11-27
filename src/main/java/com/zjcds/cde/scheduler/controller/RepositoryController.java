@@ -54,14 +54,14 @@ public class RepositoryController {
     ), @ApiImplicitParam(
             name = "queryString",
             value = "查询条件",
-            defaultValue = "field~Eq~1234",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "orderBy",
             value = "排序",
-            defaultValue = "field1Desc",
+            defaultValue = "",
             dataType = "String",
             paramType = "query",
             allowMultiple = true
@@ -74,6 +74,7 @@ public class RepositoryController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            ((List) orderBys).add("createTimeDesc");
         }
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         PageResult<Repository> repository = repositoryService.getList(paging,queryString, orderBys, kUser.getId());
@@ -171,5 +172,15 @@ public class RepositoryController {
         RepositoryForm.Repository owner = BeanPropertyCopyUtils.copy(repository,RepositoryForm.Repository.class);
         return new ResponseResult(false,"请求成功",owner);
 
+    }
+
+    @PostMapping("/saveTreeList/{repositoryId}")
+    @ApiOperation(value = "获取资源库的所有作业和转换任务进行保存", produces = "application/json;charset=utf-8")
+
+    public ResponseResult<Void> saveTreeList(@PathVariable(required = true ,name = "repositoryId") Integer repositoryId,HttpServletRequest request)throws KettleException{
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        repositoryService.saveTreeList(repositoryId,kUser.getId());
+        return new ResponseResult(true,"请求成功");
     }
 }
