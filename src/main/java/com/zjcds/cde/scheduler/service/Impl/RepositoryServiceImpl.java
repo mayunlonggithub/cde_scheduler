@@ -3,10 +3,7 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
-import com.zjcds.cde.scheduler.dao.jpa.JobDao;
-import com.zjcds.cde.scheduler.dao.jpa.RepositoryDao;
-import com.zjcds.cde.scheduler.dao.jpa.RepositoryTypeDao;
-import com.zjcds.cde.scheduler.dao.jpa.TransDao;
+import com.zjcds.cde.scheduler.dao.jpa.*;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryForm;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTreeForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
@@ -42,6 +39,9 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Autowired
     private TransDao transDao;
+
+    @Autowired
+    private CdmJobDao cdmJobDao;
 
     /**
      * @Title getRepositoryTreeList
@@ -159,7 +159,7 @@ public class RepositoryServiceImpl implements RepositoryService {
     @Transactional
     public void insert(RepositoryForm.AddRepository addRepository, Integer uId) throws KettleException{
         Assert.notNull(uId,"未登录,请重新登录！");
-        Repository repository = repositoryDao.findByDatabaseHostAndDatabaseNameAndDelFlag(addRepository.getDatabaseHost(),addRepository.getDatabaseName(),1);
+        Repository repository = repositoryDao.findByDatabaseHostAndDatabaseNameAndDelFlagAndCreateUser(addRepository.getDatabaseHost(),addRepository.getDatabaseName(),1,uId);
         Assert.isNull(repository,"该资源库信息已存在，请重新输入");
         repository = BeanPropertyCopyUtils.copy(addRepository,Repository.class);
         repository.setCreateUser(uId);
@@ -217,48 +217,69 @@ public class RepositoryServiceImpl implements RepositoryService {
     @Override
     @Transactional
     public void saveTreeList(Integer repositoryId,Integer uId) throws KettleException{
-        KettleDatabaseRepository kettleDatabaseRepository = null;
-        List<RepositoryTreeForm> allRepositoryTreeList = new ArrayList<>();
-        if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
-            kettleDatabaseRepository = RepositoryUtil.KettleDatabaseRepositoryCatch.get(repositoryId);
-        }else {
-            Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
-            kettleDatabaseRepository = RepositoryUtil.connectionRepository(kRepository);
-        }
-        if (null != kettleDatabaseRepository){
-            List<RepositoryTreeForm> repositoryTreeList = new ArrayList<>();
-            allRepositoryTreeList = RepositoryUtil.getAllDirectoryTreeList(kettleDatabaseRepository, "/", repositoryTreeList);
-        }
-        for (RepositoryTreeForm r : allRepositoryTreeList){
-            if(r.getId().contains("@")){
-                String[] str = r.getId().split("@");
-                r.setRId(Integer.parseInt(str[1]));
-                r.setId(str[1]);
+        if(uId!=2){//判断非管控用户
+            KettleDatabaseRepository kettleDatabaseRepository = null;
+            List<RepositoryTreeForm> allRepositoryTreeList = new ArrayList<>();
+            if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
+                kettleDatabaseRepository = RepositoryUtil.KettleDatabaseRepositoryCatch.get(repositoryId);
             }else {
-                r.setRId(Integer.parseInt(r.getId()));
+                Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
+                kettleDatabaseRepository = RepositoryUtil.connectionRepository(kRepository);
             }
-            r.setRepositoryId(repositoryId);
-        }
-        //资源库所有信息，作业，转换，路径
-        List<RepositoryTree> repositoryTrees = BeanPropertyCopyUtils.copy(allRepositoryTreeList,RepositoryTree.class);
-        //过滤出路径
-        List<RepositoryTree> path = repositoryTrees.stream().filter(e->e.getType() == null).collect(Collectors.toList());
-        //过滤出作业
-        List<RepositoryTree> repositoryJob = repositoryTrees.stream().filter(e->e.getType() !=null && e.getType().equals("job")).collect(Collectors.toList());
-        //取出作业路径信息
-        repositoryJob = stream(path,repositoryJob);
-        //过滤出转换
-        List<RepositoryTree> repositoryTrans = repositoryTrees.stream().filter(e->e.getType() !=null && e.getType().equals("transformation")).collect(Collectors.toList());
-        //取出转换路径信息
-        repositoryTrans = stream(path,repositoryTrans);
+            if (null != kettleDatabaseRepository){
+                List<RepositoryTreeForm> repositoryTreeList = new ArrayList<>();
+                allRepositoryTreeList = RepositoryUtil.getAllDirectoryTreeList(kettleDatabaseRepository, "/", repositoryTreeList);
+            }
+            for (RepositoryTreeForm r : allRepositoryTreeList){
+                if(r.getId().contains("@")){
+                    String[] str = r.getId().split("@");
+                    r.setRId(Integer.parseInt(str[1]));
+                    r.setId(str[1]);
+                }else {
+                    r.setRId(Integer.parseInt(r.getId()));
+                }
+                r.setRepositoryId(repositoryId);
+            }
+            //资源库所有信息，作业，转换，路径
+            List<RepositoryTree> repositoryTrees = BeanPropertyCopyUtils.copy(allRepositoryTreeList,RepositoryTree.class);
+            //过滤出路径
+            List<RepositoryTree> path = repositoryTrees.stream().filter(e->e.getType() == null).collect(Collectors.toList());
+            //过滤出作业
+            List<RepositoryTree> repositoryJob = repositoryTrees.stream().filter(e->e.getType() !=null && e.getType().equals("job")).collect(Collectors.toList());
+            //取出作业路径信息
+            repositoryJob = stream(path,repositoryJob);
+            //过滤出转换
+            List<RepositoryTree> repositoryTrans = repositoryTrees.stream().filter(e->e.getType() !=null && e.getType().equals("transformation")).collect(Collectors.toList());
+            //取出转换路径信息
+            repositoryTrans = stream(path,repositoryTrans);
 //        repositoryTreeDao.deleteByRepositoryId(repositoryId);
 //        repositoryTreeDao.save(repositoryTrees);
-        //保存作业信息
-        List<Job> jobList = addJob(repositoryJob,repositoryId,uId);
-        jobDao.saveAll(jobList);
-        //保存转换信息
-        List<Trans> transList = addTrans(repositoryTrans,repositoryId,uId);
-        transDao.saveAll(transList);
+            //保存作业信息
+            List<Job> jobList = addJob(repositoryJob,repositoryId,uId);
+            jobDao.saveAll(jobList);
+            //保存转换信息
+            List<Trans> transList = addTrans(repositoryTrans,repositoryId,uId);
+            transDao.saveAll(transList);
+        }else {//管控用户的任务从初始化表获取任务信息
+            List<CdmJob> cdmJobList = cdmJobDao.findAll();
+            List<RepositoryTree> RepositoryTree = new ArrayList<>();
+            if(cdmJobList.size()>0){
+                for (CdmJob c :cdmJobList){
+                    RepositoryTree repositoryTree = new RepositoryTree();
+                    repositoryTree.setText(c.getJobName());
+                    repositoryTree.setRepositoryId(repositoryId);
+                    if(c.getJobPath()==null){
+                        repositoryTree.setPath("/");
+                    }else {
+                        repositoryTree.setPath(c.getJobPath());
+                    }
+                    RepositoryTree.add(repositoryTree);
+                }
+            }
+            List<Job> jobList = addJob(RepositoryTree,repositoryId,uId);
+            jobDao.saveAll(jobList);
+        }
+
 
     }
 

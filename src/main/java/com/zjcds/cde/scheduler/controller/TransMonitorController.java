@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -169,5 +170,14 @@ public class TransMonitorController {
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         String logContent= transRecordService.getLogContent(recordId,kUser.getId());
         return new ResponseResult(true,"请求成功",logContent);
+    }
+
+    @GetMapping("/getLogDownload/{recordId}")
+    @ApiOperation(value = "日志下载", produces = "application/json;charset=utf-8")
+    public ResponseResult<Void> getLogDownload(@PathVariable(required = true ,name = "recordId") Integer recordId, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        transRecordService.getLogDownload(recordId,kUser.getId(),response);
+        return new ResponseResult(true,"请求成功");
     }
 }

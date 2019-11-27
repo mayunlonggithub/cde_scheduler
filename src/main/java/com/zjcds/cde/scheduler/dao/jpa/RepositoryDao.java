@@ -14,7 +14,7 @@ public interface RepositoryDao extends CustomRepostory<Repository,Integer> {
 
     public Repository findByRepositoryId(Integer repositoryId);
 
-    public Repository findByDatabaseHostAndDatabaseNameAndDelFlag(String databaseHost,String databaseName,Integer delFlag);
+    public Repository findByDatabaseHostAndDatabaseNameAndDelFlagAndCreateUser(String databaseHost,String databaseName,Integer delFlag,Integer createUser);
 
     public Repository findByRepositoryIdAndDelFlag(Integer repositoryId,Integer delFlag);
 

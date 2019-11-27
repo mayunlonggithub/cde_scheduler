@@ -19,7 +19,7 @@ public class Constant extends Const {
 	public static final String VERSION = "7.0.0.0-25";
 	public static final String DEFAULT_ENCODING = "UTF-8";
 	public static final String DEFAULT_TIMEZONE = "GMT+8";
-	public static final String UKETTLE = "cde.properties";
+	public static final String UKETTLE = "application-cde.properties";
 	public static final String SESSION_ID = "SESSION_ID";
 	
 	public static final String STATUS_ENABLED = "ENABLED";

@@ -5,6 +5,7 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -33,4 +34,12 @@ public interface TransRecordService {
      * @return String
      */
     public String getLogContent(Integer recordId, Integer uId) throws IOException;
+
+    /**
+     * 日志文件下载
+     * @param recordId
+     * @param uId
+     * @param
+     */
+    public  void getLogDownload(Integer recordId,Integer uId, HttpServletResponse response) throws Exception;
 }

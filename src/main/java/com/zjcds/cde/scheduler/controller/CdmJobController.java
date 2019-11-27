@@ -32,7 +32,7 @@ public class CdmJobController {
     public ResponseResult<Void> cdmJobExecute(@RequestBody CdmJobForm.CdmJobParam cdmJobParam, HttpServletRequest request) throws KettleException {
 //        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
 //        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        cdmJobService.cdmJobExecute(cdmJobParam,99);
+        cdmJobService.cdmJobExecute(cdmJobParam,2);
         return new ResponseResult(true,"请求成功");
     }
 

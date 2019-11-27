@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.service.Impl;
 
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.common.ErrorEnum;
 import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobRecordViewDao;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
@@ -11,11 +12,16 @@ import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +38,11 @@ public class JobRecordServiceImpl implements JobRecordService {
 
     @Autowired
     private JobService jobService;
+    @Autowired
+    private HardDiskSharedStorageFileService diskSharedStorageFileService;
+
+    @Value("${cde.file.download}")
+    private String cdeFileDownload;
 
     /**
      * @Title getList
@@ -65,18 +76,60 @@ public class JobRecordServiceImpl implements JobRecordService {
 
     /**
      * @Title getLogContent
-     * @Description 转换日志内容
+     * @Description 作业日志内容
      * @param recordId 转换记录ID
      * @return
      * @throws IOException
      * @return String
      */
     @Override
-    public String getLogContent(Integer recordId, Integer uId) throws IOException{
+    public String getLogContent(Integer recordId, Integer uId) throws IOException {
         Assert.notNull(uId,"未登录,请重新登录");
         JobRecord kJobRecord = jobRecordDao.findByRecordIdAndCreateUser(recordId,uId);
         Assert.notNull(kJobRecord,"日志不存在或已删除");
         String logFilePath = kJobRecord.getLogFilePath();
-        return FileUtils.readFileToString(new File(logFilePath), Constant.DEFAULT_ENCODING);
+
+        File file = new File(logFilePath);
+        FileReader reader = new FileReader(file);
+        BufferedReader br = new BufferedReader(reader);
+        String content = "";
+        while (br.ready()) {
+            content += br.readLine()+"</br>";
+        }
+        return content;
+    }
+
+    /**
+     * 日志文件下载
+     * @param recordId
+     * @param uId
+     * @param
+     */
+
+    @Override
+    public  void getLogDownload(Integer recordId,Integer uId, HttpServletResponse response) throws Exception {
+        Assert.notNull(uId,"未登录,请重新登录");
+        JobRecord kJobRecord = jobRecordDao.findByRecordIdAndCreateUser(recordId,uId);
+        Assert.notNull(kJobRecord,"日志不存在或已删除");
+        String logFilePath = kJobRecord.getLogFilePath();
+        String fileName = logFilePath.split("/")[logFilePath.split("/").length-1];
+        File file = new File(logFilePath);
+        InputStream inputStream = new FileInputStream(file);
+        // 配置文件下载
+        response.setContentType("application/force-download");
+        // 下载文件能正常显示中文
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+        byte[] buffer = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        bis = new BufferedInputStream(inputStream);
+        os = response.getOutputStream();
+        int i = bis.read(buffer);
+        while (i != -1) {
+            os.write(buffer, 0, i);
+            i = bis.read(buffer);
+        }
+        System.out.println("Download the file successfully!");
+
     }
 }
