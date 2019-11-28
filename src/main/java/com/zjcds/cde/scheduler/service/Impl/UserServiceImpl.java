@@ -124,6 +124,7 @@ public class UserServiceImpl implements UserService {
         user.setCreateUser(uId);
         user.setModifyUser(uId);
         user.setDelFlag(1);
+        user.setUpdateFlag(1);
         userDao.save(user);
     }
 
@@ -181,11 +182,14 @@ public class UserServiceImpl implements UserService {
         }
         Assert.notNull(u,"该用户不存在或已删除");
         User user = BeanPropertyCopyUtils.copy(updateUser,User.class);
-        user.setPassword(MD5Utils.Encrypt(u.getPassword(), true));
+        Assert.isTrue(user.getAccount().equals("admin"),"管理员admin用户不能修改");
+        Assert.isTrue(user.getAccount().equals("cdm"),"数据治理cdm用户不能修改");
+        user.setPassword(u.getPassword());
         user.setCreateUser(u.getCreateUser());
         user.setModifyUser(uId);
         user.setAccount(u.getAccount());
         user.setDelFlag(u.getDelFlag());
+        user.setUpdateFlag(u.getUpdateFlag());
         //只有不为null的字段才参与更新
         userDao.save(user);
     }

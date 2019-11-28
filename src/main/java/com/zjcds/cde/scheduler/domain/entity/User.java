@@ -29,6 +29,8 @@ public class User extends CreateModifyTime {
     private Integer modifyUser;
     //是否删除
     private Integer delFlag;
+    //能否更新
+    private Integer updateFlag;
 
     @Id
     @Column(name = "id")
@@ -122,4 +124,13 @@ public class User extends CreateModifyTime {
         this.delFlag = delFlag;
     }
 
+    @Basic
+    @Column(name = "update_flag")
+    public Integer getUpdateFlag() {
+        return updateFlag;
+    }
+
+    public void setUpdateFlag(Integer updateFlag) {
+        this.updateFlag = updateFlag;
+    }
 }

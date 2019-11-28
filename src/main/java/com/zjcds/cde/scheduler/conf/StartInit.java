@@ -15,6 +15,7 @@ public class StartInit implements InitializingBean {
 
 
 //	@Bean("KettleEnvironmentInit")
+	@Bean
 	public void afterPropertiesSet() throws Exception {
 		//初始化环境***
 //		com.zhaxd.common.kettle.environment.KettleInit.init();

@@ -48,6 +48,8 @@ public class UserForm {
         private Integer modifyUser;
         @ApiModelProperty(value = "是否删除")
         private Integer delFlag;
+        @ApiModelProperty(value = "能否更新")
+        private Integer updateFlag;
         @ApiModelProperty(value = "创建时间")
         private Date createTime;
         @ApiModelProperty(value = "修改时间")

@@ -102,8 +102,9 @@ public class Constant extends Const {
 //		KETTLE_PLUGIN = KETTLE_HOME + FILE_SEPARATOR
 //				+ props.getProperty("kettle.plugin");
 		KETTLE_PLUGIN = props.getProperty("cde.plugin");
-		KETTLE_SCRIPT = uKettle()
-				+ props.getProperty("cde.script");
+//		KETTLE_SCRIPT = uKettle()
+//				+ props.getProperty("cde.script");
+		KETTLE_SCRIPT = props.getProperty("cde.script");
 		KETTLE_LOGLEVEL = logger(props
 				.getProperty("cde.loglevel"));
 
@@ -155,25 +156,30 @@ public class Constant extends Const {
 		return logLevel;
 	}
 
-	private static String uKettle() {
-		String classPath = Constant.class.getResource("/").getPath()
-				.replace("%20", " ");
-		String iQuartz = "";
-		String index = "WEB-INF";
-		if (classPath.indexOf("target") > 0) {
-			index = "target";
-		}
-		// windows path
-		if ("\\".equals(Constant.FILE_SEPARATOR)) {
-			iQuartz = classPath.substring(1, classPath.indexOf(index));
-			iQuartz = iQuartz.replace("/", "\\");
-		}
-		// linux path
-		if ("/".equals(Constant.FILE_SEPARATOR)) {
-			iQuartz = classPath.substring(0, classPath.indexOf(index));
-			iQuartz = iQuartz.replace("\\", "/");
-		}
-		return iQuartz;
-	}
+//	private static String uKettle() {
+//		InputStream inputStream = Constant.class.getClassLoader().getResourceAsStream(UKETTLE);
+//		StringBuffer out = new StringBuffer();
+//		byte[] b = new byte[4096];
+//		for (int n; (n = inputStream.read(b)) != -1;) {
+//			out.append(new String(b, 0, n));
+//		}
+//		String classPath = out.toString();
+//		String iQuartz = "";
+//		String index = "WEB-INF";
+//		if (classPath.indexOf("target") > 0) {
+//			index = "target";
+//		}
+//		// windows path
+//		if ("\\".equals(Constant.FILE_SEPARATOR)) {
+//			iQuartz = classPath.substring(1, classPath.indexOf(index));
+//			iQuartz = iQuartz.replace("/", "\\");
+//		}
+//		// linux path
+//		if ("/".equals(Constant.FILE_SEPARATOR)) {
+//			iQuartz = classPath.substring(0, classPath.indexOf(index));
+//			iQuartz = iQuartz.replace("\\", "/");
+//		}
+//		return iQuartz;
+//	}
 
 }
