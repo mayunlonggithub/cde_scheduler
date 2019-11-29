@@ -52,6 +52,7 @@ public class TaskController {
     @ApiOperation(value = "添加任务", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> addTask(@RequestBody TaskForm.AddTask addTask, HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         taskService.addTask(addTask,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
@@ -64,7 +65,7 @@ public class TaskController {
         return new ResponseResult(true,"请求成功");
     }
 
-    @GetMapping("/getList")
+    @GetMapping("/getList/{quartzId}")
     @ApiOperation(value = "获取调度策略分页列表", produces = "application/json;charset=utf-8")
     @ApiImplicitParams({@ApiImplicitParam(
             name = "pageIndex",
@@ -93,7 +94,7 @@ public class TaskController {
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<TaskForm.Task> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
+    public ResponseResult<TaskForm.Task> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request,@PathVariable("quartzId") Integer  quartzId){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
@@ -102,7 +103,7 @@ public class TaskController {
             orderBys = new ArrayList();
             ((List) orderBys).add("startTimeDesc");
         }
-        PageResult<Task> task= taskService.getList(paging,queryString,orderBys,kUser.getId());
+        PageResult<Task> task= taskService.getList(paging,queryString,orderBys,kUser.getId(),quartzId);
         PageResult<TaskForm.Task> owner = PageUtils.copyPageResult(task, TaskForm.Task.class);
         return new ResponseResult(true,"请求成功",owner);
     }

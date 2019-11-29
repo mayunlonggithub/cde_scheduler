@@ -16,7 +16,7 @@ public interface TaskService {
 
     void deleteTask(Integer taskId);
 
-    PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
+    PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId);
 
     void restartAllTasks() throws SchedulerException;
 

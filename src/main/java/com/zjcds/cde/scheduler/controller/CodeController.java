@@ -80,7 +80,7 @@ public class CodeController {
     }
 
 
-    @GetMapping("/getList")
+    @GetMapping("/getQuartzList")
     public ResponseResult<List<BaseValue>> code() {
         List<Quartz> qList = quartzService.getQuartzByDelFlag(1);
         BaseValue baseValue = new BaseValue();
@@ -92,4 +92,30 @@ public class CodeController {
         }
         return new ResponseResult(true, "请求成功", bList);
     }
+
+
+    @GetMapping("/getTaskStatus")
+    @ApiOperation(value = "运行状态信息", produces = "application/json;charset=utf-8")
+    public ResponseResult<List<BaseValue>> getTaskStatus() {
+        List<BaseValue> tList = new ArrayList<>();
+        BaseValue baseValue = new BaseValue();
+        baseValue.setKey("1");
+        baseValue.setValue("执行");
+        BaseValue baseValue1 = new BaseValue();
+        baseValue1.setKey("2");
+        baseValue1.setValue("停止");
+        BaseValue baseValue2 = new BaseValue();
+        baseValue2.setKey("3");
+        baseValue2.setValue("完成");
+        BaseValue baseValue3 = new BaseValue();
+        baseValue3.setKey("4");
+        baseValue3.setValue("失效");
+        tList.add(baseValue);
+        tList.add(baseValue1);
+        tList.add(baseValue2);
+        tList.add(baseValue3);
+        return new ResponseResult(true, "请求成功", tList);
+    }
+
+
 }

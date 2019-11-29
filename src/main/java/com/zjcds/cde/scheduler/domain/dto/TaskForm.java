@@ -43,6 +43,7 @@ public class TaskForm {
         private Integer createUser;
         @ApiModelProperty(value = "任务修改者")
         private Integer modifyUser;
+
     }
     @Getter
     @Setter

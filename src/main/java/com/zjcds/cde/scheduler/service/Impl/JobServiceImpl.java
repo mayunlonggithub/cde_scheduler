@@ -188,6 +188,7 @@ public class JobServiceImpl implements JobService {
         Assert.notNull(uId, "未登录,请重新登录");
         Assert.notNull(jobId, "要更新的jobId不能为空");
         Job j = jobDao.findByJobIdAndDelFlag(jobId, 1);
+        Integer jobQuartz=j.getJobQuartz();
         Assert.notNull(j, "要修改的作业不存在或已删除");
         Job job = BeanPropertyCopyUtils.copy(updateJob, Job.class);
         job.setModifyUser(uId);
@@ -202,16 +203,15 @@ public class JobServiceImpl implements JobService {
             addTask.setTaskName(job.getJobName());
             addTask.setTaskGroup("job");
             addTask.setTaskDescription(job.getJobDescription());
-            if (updateJob.getJobQuartz() != j.getJobQuartz()) {
+            if (updateJob.getJobQuartz() != jobQuartz) {
                 //移除策略
                 taskService.deleteTask(updateJob.getJobQuartz());
                 //新增策略
                 taskService.addTask(addTask, uId);
+
             }
         }
     }
-
-
     /**
      * @param jobId 作业ID
      * @return void

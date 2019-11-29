@@ -8,7 +8,6 @@ import java.util.Date;
  * @author Ma on 20191122
  * 任务调度
  */
-
 @Entity
 @Table(name = "t_task", schema = "cde_scheduler", catalog = "")
 public class Task {

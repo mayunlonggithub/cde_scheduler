@@ -9,7 +9,9 @@ import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.quartz.DynamicTask;
+import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TaskService;
+import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -34,13 +36,16 @@ public class TaskServiceImpl implements TaskService {
     private QuartzDao quartzDao;
     @Autowired
     private SchedulerFactoryBean schedulerFactoryBean;
+    @Autowired
+    private JobService jobService;
+    @Autowired
+    private TransService transService;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
     @Override
     @Transactional
     public void addTask(TaskForm.AddTask addTask,Integer uId){
         Task task= BeanPropertyCopyUtils.copy(addTask,Task.class);
-        runTask(task.getTaskId());
         Quartz quartz=quartzDao.findByQuartzId(task.getQuartzId());
         task.setStartTime(quartz.getStartTime());
         task.setEndTime(quartz.getEndTime());
@@ -48,22 +53,29 @@ public class TaskServiceImpl implements TaskService {
         task.setStatus(Constant.IMPLEMENT);
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
+        runTask(task.getTaskId());
     }
 
     @Override
     @Transactional
     public void deleteTask(Integer taskId){
         Task task = taskDao.findByTaskId(taskId);
-        shutDown(taskId);
-        task.setStatus(Constant.INVALID);
-        taskDao.save(task);
-
+        if(task!=null) {
+            shutDown(taskId);
+            task.setStatus(Constant.INVALID);
+            taskDao.save(task);
+        }
+        if(task.getTaskGroup().equals("trans")){
+            transService.updateTransQuartz(task.getQuartzId(),null);
+        }else if(task.getTaskGroup().equals("job")){
+            jobService.updateJobQuartz(task.getQuartzId(),null);
+        }
     }
-
     @Override
-    public PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
+    public PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId) {
         queryString.add("createUser~Eq~"+uId);
         queryString.add("status~lt~"+Constant.INVALID);
+        queryString.add("quartzId~Eq~"+quartzId);
         PageResult<Task> task = taskDao.findAll(paging,queryString,orderBys);
         return task;
     }

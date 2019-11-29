@@ -60,9 +60,9 @@ public class DynamicTask implements Job {
                 taskDao.save(task);
                 log.info(">>>>>>>>>>>>>Trigger has been completed>>>>>>>>>>>>>");
             }
-            if(groupName.equals("job")) {
+            if("job".equals(groupName)) {
                 jobService.start(jobId, uId, paramMap);
-            }else if(groupName.equals("trans")) {
+            }else if("trans".equals(groupName)) {
                 transService.start(jobId, uId, paramMap);
             }
         } catch(Exception e){
