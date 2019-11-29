@@ -19,6 +19,8 @@ public class JobRecordGroupView {
     private Integer createUser;
     private String jobName;
     private Integer num;
+    //作业的资源库ID
+    private Integer jobRepositoryId;
 
     @Id
     @Column(name = "record_id")
@@ -110,5 +112,13 @@ public class JobRecordGroupView {
         this.num = num;
     }
 
+    @Basic
+    @Column(name = "job_repository_id")
+    public Integer getJobRepositoryId() {
+        return jobRepositoryId;
+    }
 
+    public void setJobRepositoryId(Integer jobRepositoryId) {
+        this.jobRepositoryId = jobRepositoryId;
+    }
 }

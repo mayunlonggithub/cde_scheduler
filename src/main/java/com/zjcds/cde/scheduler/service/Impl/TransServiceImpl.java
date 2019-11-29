@@ -390,4 +390,18 @@ public class TransServiceImpl implements TransService {
         }
         return transNameMap;
     }
+
+    /**
+     * 修改转换策略
+     * @param transId
+     * @param quartz
+     */
+    @Override
+    @Transactional
+    public void updateTransQuartz(Integer transId,Integer quartz){
+        Assert.notNull(transId,"转换id不能为空");
+        Trans trans = transDao.findByTransId(transId);
+        trans.setTransQuartz(quartz);
+        transDao.save(trans);
+    }
 }

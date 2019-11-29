@@ -396,4 +396,18 @@ public class JobServiceImpl implements JobService {
         }
         return jobNameMap;
     }
+
+    /**
+     * 修改作业策略
+     * @param jobId
+     * @param quartz
+     */
+    @Override
+    @Transactional
+    public void updateJobQuartz(Integer jobId,Integer quartz){
+        Assert.notNull(jobId,"作业id不能为空");
+        Job job = jobDao.findByJobId(jobId);
+        job.setJobQuartz(quartz);
+        jobDao.save(job);
+    }
 }

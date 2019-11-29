@@ -6,6 +6,7 @@ import com.zjcds.cde.scheduler.domain.dto.JobForm;
 import com.zjcds.cde.scheduler.domain.entity.Job;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import org.pentaho.di.core.exception.KettleException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -104,4 +105,12 @@ public interface JobService {
      * @return
      */
     public Map<Integer,String> jobNameMap();
+
+
+    /**
+     * 修改作业策略
+     * @param jobId
+     * @param quartz
+     */
+    public void updateJobQuartz(Integer jobId,Integer quartz);
 }

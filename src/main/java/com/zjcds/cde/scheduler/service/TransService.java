@@ -6,6 +6,7 @@ import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.domain.entity.Trans;
 import org.pentaho.di.core.exception.KettleException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -107,5 +108,12 @@ public interface TransService {
      * @return
      */
     public Map<Integer,String> transNameMap();
+
+    /**
+     * 修改转换策略
+     * @param transId
+     * @param quartz
+     */
+    public void updateTransQuartz(Integer transId,Integer quartz);
 
 }

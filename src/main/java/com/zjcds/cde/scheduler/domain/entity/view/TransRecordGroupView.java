@@ -1,16 +1,16 @@
 package com.zjcds.cde.scheduler.domain.entity.view;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+/**
+ * @author J on 20191128
+ */
 @Entity
-@Table(name = "v_trans_record_group", schema = "cde_scheduler", catalog = "")
+@Table(name = "v_trans_record_group")
 public class TransRecordGroupView {
-    private int recordId;
+    private Integer recordId;
     private Integer recordTrans;
     private Timestamp startTime;
     private Timestamp stopTime;
@@ -18,15 +18,17 @@ public class TransRecordGroupView {
     private String logFilePath;
     private Integer createUser;
     private String transName;
-    private long num;
+    private Integer num;
+    //转换的资源库ID
+    private Integer transRepositoryId;
 
-    @Basic
+    @Id
     @Column(name = "record_id")
-    public int getRecordId() {
+    public Integer getRecordId() {
         return recordId;
     }
 
-    public void setRecordId(int recordId) {
+    public void setRecordId(Integer recordId) {
         this.recordId = recordId;
     }
 
@@ -102,32 +104,21 @@ public class TransRecordGroupView {
 
     @Basic
     @Column(name = "num")
-    public long getNum() {
+    public Integer getNum() {
         return num;
     }
 
-    public void setNum(long num) {
+    public void setNum(Integer num) {
         this.num = num;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TransRecordGroupView that = (TransRecordGroupView) o;
-        return recordId == that.recordId &&
-                num == that.num &&
-                Objects.equals(recordTrans, that.recordTrans) &&
-                Objects.equals(startTime, that.startTime) &&
-                Objects.equals(stopTime, that.stopTime) &&
-                Objects.equals(recordStatus, that.recordStatus) &&
-                Objects.equals(logFilePath, that.logFilePath) &&
-                Objects.equals(createUser, that.createUser) &&
-                Objects.equals(transName, that.transName);
+    @Basic
+    @Column(name = "trans_repository_id")
+    public Integer getTransRepositoryId() {
+        return transRepositoryId;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(recordId, recordTrans, startTime, stopTime, recordStatus, logFilePath, createUser, transName, num);
+    public void setTransRepositoryId(Integer transRepositoryId) {
+        this.transRepositoryId = transRepositoryId;
     }
 }
