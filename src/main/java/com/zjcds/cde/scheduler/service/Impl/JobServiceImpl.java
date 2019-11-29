@@ -194,7 +194,7 @@ public class JobServiceImpl implements JobService {
         job.setDelFlag(j.getDelFlag());
         job.setCreateUser(j.getCreateUser());
         job.setCreateTime(j.getCreateTime());
-        job = jobDao.save(job);
+        jobDao.save(job);
         if (job.getJobQuartz() != null) {
             TaskForm.AddTask addTask = new TaskForm.AddTask();
             addTask.setJobId(job.getJobId());
@@ -231,7 +231,6 @@ public class JobServiceImpl implements JobService {
         //添加监控
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime);
         ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime, param);
-        System.out.println("sssssssssssssssssssssssssss");
 
     }
 
@@ -280,7 +279,7 @@ public class JobServiceImpl implements JobService {
         try {
 //                jobStartDate = new Date();
             //更改监控状态为执行中
-//            jobMonitorService.updateRunStatusJob(Integer.parseInt(jobId),Integer.parseInt(userId),1);
+            jobMonitorService.updateRunStatusJob(Integer.parseInt(jobId),Integer.parseInt(userId),1);
             job.run();
             job.waitUntilFinished();
             jobStopDate = new Date();

@@ -45,6 +45,8 @@ public class JobMonitorForm {
     @Setter
     @ApiModel(value = "jobMonitorStatis",description = "作业监控记录")
     public static class JobMonitorStatis extends BaseBean {
+        @ApiModelProperty(value = "资源库名称")
+        private String repositoryName;
         @ApiModelProperty(value = "监控的作业名称")
         private String monitorJobName;
         @ApiModelProperty(value = "成功次数")

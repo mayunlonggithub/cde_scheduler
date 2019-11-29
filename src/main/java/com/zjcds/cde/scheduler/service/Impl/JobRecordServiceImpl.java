@@ -165,16 +165,15 @@ public class JobRecordServiceImpl implements JobRecordService {
         List<JobRecordGroupView> mapFail = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.toList());
 
         List<JobMonitorView> jobMonitorList = jobMonitorViewDao.findByCreateUser(uId);
-        Map<String,Long> jobName = jobMonitorList.stream().collect(Collectors.groupingBy(JobMonitorView::getMonitorJobName,Collectors.counting()));
         List<JobMonitorForm.JobMonitorStatis> statis = new ArrayList<>();
-        for (String s:jobName.keySet()){
+
+        for (JobMonitorView s:jobMonitorList){
             JobMonitorForm.JobMonitorStatis j = new JobMonitorForm.JobMonitorStatis();
-            j.setMonitorJobName(s);
-//            Integer sumSuccess = jobRecords.stream().filter(e->e.getRecordJobName().equals(s)&&e.getRecordJob()==1);
+//            if(s.getMonitorJob()=)
+            j.setMonitorJobName(s.getMonitorJobName());
 
             Integer sumFail = 0;
 
-//            j.setMonitorSuccess(sumSuccess);
             j.setMonitorFail(sumFail);
             statis.add(j);
         };

@@ -19,10 +19,10 @@ public class manuaRunTrans {
     @Autowired
     private TransService transService;
 
-    @Test
-    public void runTrans() throws KettleException {
-        Map<String,String> param = new HashMap<>();
-        param.put("name","cds");
-        transService.start(204,1,param);
-    }
+//    @Test
+//    public void runTrans() throws KettleException {
+//        Map<String,String> param = new HashMap<>();
+//        param.put("name","cds");
+//        transService.start(204,1,param);
+//    }
 }
