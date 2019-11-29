@@ -7,6 +7,7 @@ import com.zjcds.cde.scheduler.dao.jpa.*;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
+import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
@@ -56,8 +57,8 @@ public class TransServiceImpl implements TransService {
     private TransRecordDao transRecordDao;
     @Autowired
     private TransMonitorService transMonitorService;
-//    @Autowired
-//    private TaskService taskService;
+    @Autowired
+    private TaskService taskService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -104,6 +105,8 @@ public class TransServiceImpl implements TransService {
         Assert.notNull(trans,"要删除的转换不存在或已删除");
         trans.setDelFlag(0);
         transDao.save(trans);
+        //移除策略
+        taskService.deleteTask(trans.getTransQuartz());
     }
 
     /**
@@ -194,7 +197,13 @@ public class TransServiceImpl implements TransService {
             addTask.setTaskName(trans.getTransName());
             addTask.setTaskGroup("trans");
             addTask.setTaskDescription(trans.getTransDescription());
-//            taskService.addTask(addTask,uId);
+            if(updateTrans.getTransQuartz()!=t.getTransQuartz()){
+                //移除策略
+                taskService.deleteTask(t.getTransQuartz());
+                //添加策略
+                taskService.addTask(addTask,uId);
+            }
+
         }
     }
 
@@ -257,6 +266,7 @@ public class TransServiceImpl implements TransService {
 //            Date jobStartDate = null;
         Date transStopDate = null;
         String logText = null;
+        Integer runStatus = 2;
         try {
             trans.execute(null);
             trans.waitUntilFinished();
@@ -264,10 +274,12 @@ public class TransServiceImpl implements TransService {
         } catch (Exception e) {
             exception = e.getMessage();
             recordStatus = 3;
+            runStatus=3;
         } finally {
             if (trans.isFinished()) {
                 if (trans.getErrors() > 0) {
                     recordStatus = 3;
+                    runStatus=3;
                     if(null == trans.getResult().getLogText() || "".equals(trans.getResult().getLogText())){
                         logText = exception;
                     }
@@ -288,7 +300,7 @@ public class TransServiceImpl implements TransService {
                     transRecord.setRecordStatus(recordStatus);
                     transRecord.setStartTime(executeTime);
                     transRecord.setStopTime(transStopDate);
-                    writeToDBAndFile(transRecord, logText, executeTime, nexExecuteTime);
+                    writeToDBAndFile(transRecord, logText, executeTime, nexExecuteTime,runStatus,userId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -334,7 +346,7 @@ public class TransServiceImpl implements TransService {
      * @Title writeToDBAndFile
      * @Description 保存转换运行日志信息到文件和数据库
      */
-    public void writeToDBAndFile(TransRecord transRecord, String logText, Date lastExecuteTime, Date nextExecuteTime)
+    public void writeToDBAndFile(TransRecord transRecord, String logText, Date lastExecuteTime, Date nextExecuteTime,Integer runStatus,String uId)
             throws IOException {
         // 将日志信息写入文件
         FileUtils.writeStringToFile(new File(transRecord.getLogFilePath()), logText, Constant.DEFAULT_ENCODING, false);
@@ -344,7 +356,8 @@ public class TransServiceImpl implements TransService {
         template.setCreateUser(transRecord.getCreateUser());
         template.setMonitorJob(transRecord.getRecordTrans());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
-        TransMonitor templateOne = transMonitorDao.findByMonitorTrans(transRecord.getRecordTrans());
+        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(transRecord.getRecordTrans(),Integer.parseInt(uId));
+        templateOne.setRunStatus(runStatus);
         templateOne.setLastExecuteTime(lastExecuteTime);
         //在监控表中增加下一次执行时间
         templateOne.setNextExecuteTime(nextExecuteTime);

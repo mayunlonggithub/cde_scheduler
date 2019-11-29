@@ -21,4 +21,6 @@ public interface JobDao extends CustomRepostory<Job,Integer> {
     public List<Job> findByDelFlag(Integer delFlag);
 
     public Job findByJobId(Integer jobId);
+
+    public Job findByJobNameAndDelFlagAndCreateUser(String jobName,Integer delFlag,Integer createUser);
 }

@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.service;
 
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.JobRecordView;
 
@@ -41,4 +42,11 @@ public interface JobRecordService {
      * @param
      */
     public void getLogDownload(Integer recordId,Integer uId,HttpServletResponse response) throws Exception;
+
+    /**
+     * 当天作业运行统计
+     * @param uId
+     * @return
+     */
+    public List<JobMonitorForm.JobMonitorStatis> getListToday(Integer uId);
 }

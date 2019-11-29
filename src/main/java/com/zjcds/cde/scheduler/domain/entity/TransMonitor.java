@@ -24,7 +24,7 @@ public class TransMonitor {
     //监控状态
     private Integer monitorStatus;
     //运行状态
-    private String runStatus;
+    private Integer runStatus;
     //最后执行时间
     private Date lastExecuteTime;
     //下次执行时间
@@ -96,11 +96,11 @@ public class TransMonitor {
 
     @Basic
     @Column(name = "run_status")
-    public String getRunStatus() {
+    public Integer getRunStatus() {
         return runStatus;
     }
 
-    public void setRunStatus(String runStatus) {
+    public void setRunStatus(Integer runStatus) {
         this.runStatus = runStatus;
     }
 

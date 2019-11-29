@@ -3,6 +3,7 @@ import com.zjcds.cde.scheduler.dao.jpa.RepositoryDao;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTreeForm;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.service.CdmJobService;
+import com.zjcds.cde.scheduler.utils.MD5Utils;
 import com.zjcds.cde.scheduler.utils.RepositoryUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,12 @@ public class cdmJobTest {
         List<RepositoryElementMetaInterface> li = kettleDatabaseRepository.getJobAndTransformationObjects(rDirectory.getObjectId(), false);
 
         System.out.println();
+    }
+
+    @Test
+    public void password(){
+        String password =  MD5Utils.Encrypt("admin", true);
+        System.out.println(password);
     }
 
 }

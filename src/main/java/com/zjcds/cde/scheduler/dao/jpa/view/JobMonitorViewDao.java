@@ -12,4 +12,6 @@ import java.util.List;
 public interface JobMonitorViewDao extends CustomRepostory<JobMonitorView,Integer> {
 
     public List<JobMonitorView> findByCreateUserAndMonitorStatus(Integer createUser, Integer monitorStatus);
+
+    public List<JobMonitorView> findByCreateUser(Integer createUser);
 }

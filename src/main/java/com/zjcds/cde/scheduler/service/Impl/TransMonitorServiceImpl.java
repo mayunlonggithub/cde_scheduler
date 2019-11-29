@@ -3,8 +3,11 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransMonitorDao;
+import com.zjcds.cde.scheduler.dao.jpa.TransRecordDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.TransMonitorViewDao;
+import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
+import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
@@ -16,7 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.sql.Date.valueOf;
 
 /**
  * jackson 相关配置
@@ -32,6 +42,8 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     private TransMonitorViewDao transMonitorViewDao;
     @Autowired
     private TransService transService;
+    @Autowired
+    private TransRecordDao transRecordDao;
 
     /**
      *
@@ -128,28 +140,36 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      * @Description 获取7天内转换的折线图
      */
     @Override
-    public Map<String, Object> getTransLine(Integer uId) {
+    public Map<String, Object> getTransLine(Integer uId,List<String> dateList) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUser(uId);
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
-        for (int i = 0; i < 7; i++) {
-            resultList.add(i, 0);
-        }
-        if (transMonitorList != null && !transMonitorList.isEmpty()) {
-            for (TransMonitor transMonitor : transMonitorList) {
-                String runStatus = transMonitor.getRunStatus();
-                if (runStatus != null && runStatus.contains(",")) {
-                    String[] startList = runStatus.split(",");
-                    for (String startOnce : startList) {
-                        String[] startAndStopTime = startOnce.split(Constant.RUNSTATUS_SEPARATE);
-                        if (startAndStopTime.length != 2)
-                            continue;
-                        //得到一次任务的起始时间和结束时间的毫秒值
-                        resultList = CommonUtils.getEveryDayData(Long.parseLong(startAndStopTime[0]), Long.parseLong(startAndStopTime[1]), resultList);
-                    }
-                }
+        //获取当前用户所有执行记录
+        List<TransRecord> transRecordList = transRecordDao.findByCreateUser(uId);
+        //截取时间日期到日
+        transRecordList.stream().forEach(e ->e.setStartTime(valueOf(e.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())));
+        //group by 根据时间日期
+        Map<Date,Long> trans = transRecordList.stream().collect(Collectors.groupingBy(TransRecord :: getStartTime,Collectors.counting()));
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Date> dates = new ArrayList<>();
+        dateList.forEach(e->{
+            try {
+                dates.add(format.parse(e));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
             }
+        });
+        Integer i=0;
+        //根据时间循环取出执行数量
+        for(Date s : dates){
+            Integer sum ;
+            if(trans.get(s)==null){
+                sum=0;
+            }else {
+                sum=trans.get(s).intValue();
+            }
+            resultList.add(i,sum);
+            i += 1;
         }
         resultMap.put("name", "转换");
         resultMap.put("data", resultList);
@@ -170,10 +190,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         TransMonitor templateOne = transMonitorDao.findByCreateUserAndMonitorTrans(userId,transId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
-            StringBuilder runStatusBuilder = new StringBuilder();
-            runStatusBuilder.append(templateOne.getRunStatus())
-                    .append(",").append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
-            templateOne.setRunStatus(runStatusBuilder.toString());
+            templateOne.setRunStatus(0);
             templateOne.setNextExecuteTime(nextExecuteTime);
             transMonitorDao.save(templateOne);
         } else {
@@ -182,9 +199,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
             kTransMonitor.setCreateUser(userId);
             kTransMonitor.setMonitorSuccess(0);
             kTransMonitor.setMonitorFail(0);
-            StringBuilder runStatusBuilder = new StringBuilder();
-            runStatusBuilder.append(new Date().getTime()).append(Constant.RUNSTATUS_SEPARATE);
-            kTransMonitor.setRunStatus(runStatusBuilder.toString());
+            kTransMonitor.setRunStatus(0);
             kTransMonitor.setMonitorStatus(1);
             kTransMonitor.setNextExecuteTime(nextExecuteTime);
             transMonitorDao.save(kTransMonitor);
@@ -203,7 +218,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         Assert.notNull(transId, "转换id不能为空");
         Assert.notNull(uId, "用户id不能为空");
         TransMonitor transMonitor = transMonitorDao.findByMonitorTransAndCreateUser(transId, uId);
-        transMonitor.setRunStatus(runStatus.toString());
+        transMonitor.setRunStatus(runStatus);
         transMonitorDao.save(transMonitor);
     }
 

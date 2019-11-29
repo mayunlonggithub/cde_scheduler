@@ -90,19 +90,19 @@ public class IndexController {
         return new ResponseResult(true,"请求成功",owner);
     }
 
-    @GetMapping("/getJob")
-    @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<JobMonitorForm.JobMonitor> getJob(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        List<JobMonitorView> jobMonitorList = jobMonitorService.getList(kUser.getId());
-        if(jobMonitorList.size()>5){
-            jobMonitorList = jobMonitorList.subList(1,5);
-        }
-        List<JobMonitorForm.JobMonitor> owner = BeanPropertyCopyUtils.copy(jobMonitorList,JobMonitorForm.JobMonitor.class);
-        return new ResponseResult(true,"请求成功",owner);
-    }
+//    @GetMapping("/getJob")
+//    @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
+//
+//    public ResponseResult<JobMonitorForm.JobMonitor> getJob(HttpServletRequest request){
+//        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+//        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+//        List<JobMonitorView> jobMonitorList = jobMonitorService.getList(kUser.getId());
+//        if(jobMonitorList.size()>5){
+//            jobMonitorList = jobMonitorList.subList(1,5);
+//        }
+//        List<JobMonitorForm.JobMonitor> owner = BeanPropertyCopyUtils.copy(jobMonitorList,JobMonitorForm.JobMonitor.class);
+//        return new ResponseResult(true,"请求成功",owner);
+//    }
 
     @GetMapping("/getKettleLine")
     @ApiOperation(value = "转换监控记录", produces = "application/json;charset=utf-8")
@@ -119,9 +119,9 @@ public class IndexController {
             dateList.add(dateFormat);
         }
         resultMap.put("legend", dateList);
-        Map<String, Object> transLine = transMonitorService.getTransLine(kUser.getId());
+        Map<String, Object> transLine = transMonitorService.getTransLine(kUser.getId(),dateList);
         resultMap.put("trans", transLine);
-        Map<String, Object> jobLine = jobMonitorService.getJobLine(kUser.getId());
+        Map<String, Object> jobLine = jobMonitorService.getJobLine(kUser.getId(),dateList);
         resultMap.put("job", jobLine);
         return new ResponseResult<>(true,"请求成功",resultMap);
     }

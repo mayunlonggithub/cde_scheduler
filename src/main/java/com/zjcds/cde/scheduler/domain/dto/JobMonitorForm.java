@@ -34,11 +34,23 @@ public class JobMonitorForm {
         @ApiModelProperty(value = "监控状态")
         private Integer monitorStatus;
         @ApiModelProperty(value = "运行状态")
-        private String runStatus;
+        private Integer runStatus;
         @ApiModelProperty(value = "最后执行时间")
         private Date lastExecuteTime;
         @ApiModelProperty(value = "下次执行时间")
         private Date nextExecuteTime;
+    }
+
+    @Getter
+    @Setter
+    @ApiModel(value = "jobMonitorStatis",description = "作业监控记录")
+    public static class JobMonitorStatis extends BaseBean {
+        @ApiModelProperty(value = "监控的作业名称")
+        private String monitorJobName;
+        @ApiModelProperty(value = "成功次数")
+        private Integer monitorSuccess;
+        @ApiModelProperty(value = "失败次数")
+        private Integer monitorFail;
     }
 
 }

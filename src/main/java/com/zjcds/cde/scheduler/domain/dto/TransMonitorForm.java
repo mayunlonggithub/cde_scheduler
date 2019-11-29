@@ -33,7 +33,7 @@ public class TransMonitorForm {
         @ApiModelProperty(value = "监控状态")
         private Integer monitorStatus;
         @ApiModelProperty(value = "运行状态")
-        private String runStatus;
+        private Integer runStatus;
         @ApiModelProperty(value = "最后执行时间")
         private Date lastExecuteTime;
         @ApiModelProperty(value = "下次执行时间")

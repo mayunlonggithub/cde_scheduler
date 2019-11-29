@@ -3,13 +3,19 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.common.ErrorEnum;
+import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
 import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.JobMonitorViewDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobRecordViewDao;
+import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
+import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
+import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
 import com.zjcds.cde.scheduler.domain.entity.view.JobRecordView;
 import com.zjcds.cde.scheduler.service.JobRecordService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +28,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author J on 20191112
@@ -39,7 +48,7 @@ public class JobRecordServiceImpl implements JobRecordService {
     @Autowired
     private JobService jobService;
     @Autowired
-    private HardDiskSharedStorageFileService diskSharedStorageFileService;
+    private JobMonitorViewDao jobMonitorViewDao;
 
     @Value("${cde.file.download}")
     private String cdeFileDownload;
@@ -131,5 +140,39 @@ public class JobRecordServiceImpl implements JobRecordService {
         }
         System.out.println("Download the file successfully!");
 
+    }
+
+    /**
+     * 当天作业运行统计
+     * @param uId
+     * @return
+     */
+    @Override
+    public List<JobMonitorForm.JobMonitorStatis> getListToday(Integer uId){
+        Date startTime = DateUtils.getStartTime(new Date());
+        Date endTime = DateUtils.getEndTime(new Date());
+        //取当天数据
+        List<JobRecordView> jobRecords = jobRecordViewDao.findByStartTime(uId,startTime,endTime);
+
+        //取成功数据
+        Map<String,Long> mapSuccess = jobRecords.stream().filter(e->e.getRecordStatus()==2).collect(Collectors.groupingBy(JobRecordView::getRecordJobName,Collectors.counting()));
+        //取失败数
+        Map<String,Long> mapFail = jobRecords.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.groupingBy(JobRecordView::getRecordJobName,Collectors.counting()));
+
+        List<JobMonitorView> jobMonitorList = jobMonitorViewDao.findByCreateUser(uId);
+        Map<String,Long> jobName = jobMonitorList.stream().collect(Collectors.groupingBy(JobMonitorView::getMonitorJobName,Collectors.counting()));
+        List<JobMonitorForm.JobMonitorStatis> statis = new ArrayList<>();
+        for (String s:jobName.keySet()){
+            JobMonitorForm.JobMonitorStatis j = new JobMonitorForm.JobMonitorStatis();
+            j.setMonitorJobName(s);
+//            Integer sumSuccess = jobRecords.stream().filter(e->e.getRecordJobName().equals(s)&&e.getRecordJob()==1);
+
+            Integer sumFail = 0;
+
+//            j.setMonitorSuccess(sumSuccess);
+            j.setMonitorFail(sumFail);
+            statis.add(j);
+        };
+        return statis;
     }
 }

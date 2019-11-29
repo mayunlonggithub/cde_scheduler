@@ -1,9 +1,11 @@
 package com.zjcds.cde.scheduler.service.Impl;
 
 import com.zjcds.cde.scheduler.dao.jpa.CdmJobDao;
+import com.zjcds.cde.scheduler.dao.jpa.JobDao;
 import com.zjcds.cde.scheduler.dao.jpa.RepositoryDao;
 import com.zjcds.cde.scheduler.domain.dto.CdmJobForm;
 import com.zjcds.cde.scheduler.domain.entity.CdmJob;
+import com.zjcds.cde.scheduler.domain.entity.Job;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.quartz.DBConnectionModel;
 import com.zjcds.cde.scheduler.service.CdmJobService;
@@ -32,15 +34,9 @@ public class CdmJobServiceImpl implements CdmJobService {
     private RepositoryDao repositoryDao;
     @Autowired
     JobMonitorService jobMonitorService;
+    @Autowired
+    private JobDao jobDao;
 
-//    @Value("${com.zjcds.dataSources.druids.dataSource.url}")
-//    private String url;
-//    @Value("${com.zjcds.dataSources.druids.dataSource.driverClassName}")
-//    private String driverClassName;
-//    @Value("${com.zjcds.dataSources.druids.dataSource.username}")
-//    private String username;
-//    @Value("${com.zjcds.dataSources.druids.dataSource.password}")
-//    private String password;
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath1;
 
@@ -50,14 +46,14 @@ public class CdmJobServiceImpl implements CdmJobService {
     public void cdmJobExecute(CdmJobForm.CdmJobParam cdmJobParam,Integer uId) throws KettleException {
         Repository repository = repositoryDao.findByCreateUserAndDelFlag(uId,1).get(0);
 //        DBConnectionModel dBConnectionModel = new DBConnectionModel(driverClassName,url,username,password);
-        CdmJob cdmJob = cdmJobDao.findByJobName(cdmJobParam.getJobName());
-        String logLevel = "5";
+        Job job = jobDao.findByJobNameAndDelFlagAndCreateUser(cdmJobParam.getJobName(),1,uId);
+        String logLevel = job.getJobLogLevel();
         String logFilePath = cdeLogFilePath1;
         Date executeTime = new Date();
         Date nexExecuteTime = null;
         //添加监控
-        jobMonitorService.addMonitor(uId,cdmJob.getId(),nexExecuteTime);
-        jobService.manualRunRepositoryJob(repository,cdmJob.getId().toString(),cdmJob.getJobName(),cdmJob.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam());
+        jobMonitorService.addMonitor(uId,job.getJobId(),nexExecuteTime);
+        jobService.manualRunRepositoryJob(repository,job.getJobId().toString(),job.getJobName(),job.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam());
     }
 
 

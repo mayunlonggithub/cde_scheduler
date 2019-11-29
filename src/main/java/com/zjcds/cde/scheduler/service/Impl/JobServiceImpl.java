@@ -15,6 +15,7 @@ import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
+import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -60,8 +61,8 @@ public class JobServiceImpl implements JobService {
     private JobMonitorDao jobMonitorDao;
     @Autowired
     private JobRecordDao jobRecordDao;
-//    @Autowired
-//    private TaskService taskService;
+    @Autowired
+    private TaskService taskService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -107,6 +108,8 @@ public class JobServiceImpl implements JobService {
         Assert.notNull(job,"要删除的任务不存在或已删除");
         job.setDelFlag(0);
         jobDao.save(job);
+        //移除策略
+        taskService.deleteTask(job.getJobQuartz());
     }
 
     /**
@@ -197,7 +200,12 @@ public class JobServiceImpl implements JobService {
             addTask.setTaskName(job.getJobName());
             addTask.setTaskGroup("job");
             addTask.setTaskDescription(job.getJobDescription());
-//            taskService.addTask(addTask,uId);
+            if(updateJob.getJobQuartz()!=j.getJobQuartz()){
+                //移除策略
+                taskService.deleteTask(updateJob.getJobQuartz());
+                //新增策略
+                taskService.addTask(addTask,uId);
+            }
         }
     }
 
@@ -357,7 +365,7 @@ public class JobServiceImpl implements JobService {
 //        JobMonitor templateOne = sqlManager.templateOne(template);
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobRecord.getRecordJob(),Integer.parseInt(uId));
         templateOne.setLastExecuteTime(lastExecuteTime);
-        templateOne.setRunStatus(runStatus.toString());
+        templateOne.setRunStatus(runStatus);
         //在监控表中增加下一次执行时间
         templateOne.setNextExecuteTime(nextExecuteTime);
         if (jobRecord.getRecordStatus() == 2) {// 证明成功

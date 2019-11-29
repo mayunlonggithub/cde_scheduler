@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
     public void delete(Integer id,Integer uId){
         Assert.notNull(id,"要删除的用户id不能为空");
         Assert.notNull(uId,"未登录,请重新登录");
-        Optional<User> userOptional = userDao.findById(uId);
+        Optional<User> userOptional = userDao.findById(id);
         User user = new User();
         if(userOptional.isPresent()){
             user=userOptional.get();

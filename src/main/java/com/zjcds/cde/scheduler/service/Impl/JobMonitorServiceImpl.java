@@ -3,8 +3,10 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
+import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobMonitorViewDao;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
+import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
@@ -16,7 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.sql.Date.valueOf;
 
 /**
  * @author J on 20191111
@@ -31,6 +40,9 @@ public class JobMonitorServiceImpl implements JobMonitorService {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private JobRecordDao jobRecordDao;
 
     /**
      *
@@ -51,13 +63,6 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         return jobMonitorPageResult;
     }
 
-    @Override
-    public List<JobMonitorView> getList(Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        List<JobMonitorView> jobMonitorList = jobMonitorViewDao.findByCreateUserAndMonitorStatus(uId,1);
-//        jobName(jobMonitorList);
-        return jobMonitorList;
-    }
 
     /**
      * 加载转换名称
@@ -126,28 +131,36 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Description 获取7天内作业的折线图
      */
     @Override
-    public Map<String, Object> getJobLine(Integer uId) {
+    public Map<String, Object> getJobLine(Integer uId,List<String> dateList) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUser(uId);
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
-        for (int i = 0; i < 7; i++) {
-            resultList.add(i, 0);
-        }
-        if (jobMonitorList != null && !jobMonitorList.isEmpty()) {
-            for (JobMonitor jobMonitor : jobMonitorList) {
-                String runStatus = jobMonitor.getRunStatus();
-                if (runStatus != null && runStatus.contains(",")) {
-                    String[] startList = runStatus.split(",");
-                    for (String startOnce : startList) {
-                        String[] startAndStopTime = startOnce.split(Constant.RUNSTATUS_SEPARATE);
-                        if (startAndStopTime.length != 2)
-                            continue;
-                        //得到一次任务的起始时间和结束时间的毫秒值
-                        resultList = CommonUtils.getEveryDayData(Long.parseLong(startAndStopTime[0]), Long.parseLong(startAndStopTime[1]), resultList);
-                    }
-                }
+        //获取当前用户所有执行记录
+        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUser(uId);
+        //截取时间日期到日
+        jobRecordList.stream().forEach(e ->e.setStartTime(valueOf(e.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())));
+        //group by 根据时间日期
+        Map<Date,Long> job = jobRecordList.stream().collect(Collectors.groupingBy(JobRecord :: getStartTime,Collectors.counting()));
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Date> dates = new ArrayList<>();
+        dateList.forEach(e->{
+            try {
+                dates.add(format.parse(e));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
             }
+        });
+        Integer i=0;
+        //根据时间循环取出执行数量
+        for(Date s : dates){
+            Integer sum ;
+            if(job.get(s)==null){
+                sum=0;
+            }else {
+                sum=job.get(s).intValue();
+            }
+            resultList.add(i,sum);
+            i += 1;
         }
         resultMap.put("name", "作业");
         resultMap.put("data", resultList);
@@ -168,7 +181,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobId,uId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
-            templateOne.setRunStatus("0");
+            templateOne.setRunStatus(0);
             templateOne.setLastExecuteTime(templateOne.getNextExecuteTime());
             templateOne.setNextExecuteTime(nextExecuteTime);
             jobMonitorDao.save(templateOne);
@@ -179,7 +192,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             jobMonitor.setMonitorSuccess(0);
             jobMonitor.setMonitorFail(0);
             jobMonitor.setMonitorStatus(1);
-            jobMonitor.setRunStatus("0");
+            jobMonitor.setRunStatus(0);
             jobMonitor.setNextExecuteTime(nextExecuteTime);
             jobMonitorDao.save(jobMonitor);
         }
@@ -197,7 +210,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         Assert.notNull(jobId, "作业id不能为空");
         Assert.notNull(uId, "用户id不能为空");
         JobMonitor jobMonitor = jobMonitorDao.findByMonitorJobAndCreateUser(jobId, uId);
-        jobMonitor.setRunStatus(runStatus.toString());
+        jobMonitor.setRunStatus(runStatus);
         jobMonitorDao.save(jobMonitor);
     }
 

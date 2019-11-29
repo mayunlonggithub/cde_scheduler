@@ -26,7 +26,6 @@ public interface JobMonitorService {
      */
     public PageResult<JobMonitorView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
-    public List<JobMonitorView> getList(Integer uId);
 
     /**
      * @param uId 用户ID
@@ -67,7 +66,7 @@ public interface JobMonitorService {
      * @Title getTransLine
      * @Description 获取7天内作业的折线图
      */
-    public Map<String, Object> getJobLine(Integer uId);
+    public Map<String, Object> getJobLine(Integer uId,List<String> dateList);
 
     /**
      * 更新作业状态

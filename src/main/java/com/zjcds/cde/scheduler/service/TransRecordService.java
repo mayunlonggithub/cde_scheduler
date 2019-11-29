@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.service;
 
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
 
@@ -42,4 +43,5 @@ public interface TransRecordService {
      * @param
      */
     public  void getLogDownload(Integer recordId,Integer uId, HttpServletResponse response) throws Exception;
+
 }

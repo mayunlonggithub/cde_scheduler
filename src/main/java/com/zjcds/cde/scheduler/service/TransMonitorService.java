@@ -59,7 +59,7 @@ public interface TransMonitorService {
      * @Title getTransLine
      * @Description 获取7天内转换的折线图
      */
-    public Map<String, Object> getTransLine(Integer uId);
+    public Map<String, Object> getTransLine(Integer uId,List<String> dateList);
 
     /**
      * @param userId  用户ID
