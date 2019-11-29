@@ -25,10 +25,14 @@ public class JobRecordForm {
         private Integer recordJob;
         @ApiModelProperty(value = "作业名称")
         private String recordJobName;
+        @ApiModelProperty(value = "计划开始时间")
+        private Date planStartTime;
         @ApiModelProperty(value = "启动时间")
         private Date startTime;
         @ApiModelProperty(value = "停止时间")
         private Date stopTime;
+        @ApiModelProperty(value = "执行时长")
+        private Date duration;
         @ApiModelProperty(value = "任务执行结果")
         private Integer recordStatus;
         @ApiModelProperty(value = "作业日志记录文件保存位置")

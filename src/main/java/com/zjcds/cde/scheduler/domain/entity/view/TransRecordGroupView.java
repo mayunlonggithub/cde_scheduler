@@ -21,6 +21,7 @@ public class TransRecordGroupView {
     private Integer num;
     //转换的资源库ID
     private Integer transRepositoryId;
+    private String repositoryName;
 
     @Id
     @Column(name = "record_id")
@@ -120,5 +121,15 @@ public class TransRecordGroupView {
 
     public void setTransRepositoryId(Integer transRepositoryId) {
         this.transRepositoryId = transRepositoryId;
+    }
+
+    @Basic
+    @Column(name = "repository_name")
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 }

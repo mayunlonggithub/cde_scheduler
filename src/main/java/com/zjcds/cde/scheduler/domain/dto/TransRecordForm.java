@@ -24,10 +24,14 @@ public class TransRecordForm {
         private Integer recordTrans;
         @ApiModelProperty(value = "转换名称")
         private String recordTransName;
+        @ApiModelProperty(value = "计划开始时间")
+        private Date planStartTime;
         @ApiModelProperty(value = "启动时间")
         private Date startTime;
         @ApiModelProperty(value = "停止时间")
         private Date stopTime;
+        @ApiModelProperty(value = "执行时长")
+        private Date duration;
         @ApiModelProperty(value = "任务执行结果")
         private Integer recordStatus;
         @ApiModelProperty(value = "转换日志记录文件保存位置")

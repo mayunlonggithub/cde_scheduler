@@ -30,8 +30,10 @@ import org.pentaho.di.job.JobMeta;
 import org.pentaho.di.repository.RepositoryDirectoryInterface;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepository;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepositoryMeta;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -72,15 +74,15 @@ public class JobServiceImpl implements JobService {
     private org.pentaho.di.job.Job job;
 
     /**
-     * @param uId   用户ID
+     * @param uId 用户ID
      * @return BootTablePage
      * @Title getList
      * @Description 获取列表
      */
     @Override
     public PageResult<Job> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        queryString.add("createUser~Eq~"+uId);
+        Assert.notNull(uId, "未登录,请重新登录");
+        queryString.add("createUser~Eq~" + uId);
         queryString.add("delFlag~Eq~1");
         PageResult<Job> jobList = jobDao.findAll(paging, queryString, orderBys);
         return jobList;
@@ -88,8 +90,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<Job> getList(Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        List<Job> jobList = jobDao.findByCreateUserAndDelFlag(uId,1);
+        Assert.notNull(uId, "未登录,请重新登录");
+        List<Job> jobList = jobDao.findByCreateUserAndDelFlag(uId, 1);
         return jobList;
     }
 
@@ -101,11 +103,11 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     @Transactional
-    public void delete(Integer jobId,Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        Assert.notNull(jobId,"要删除的作业ID不能为空");
-        Job job = jobDao.findByJobIdAndDelFlag(jobId,uId);
-        Assert.notNull(job,"要删除的任务不存在或已删除");
+    public void delete(Integer jobId, Integer uId) {
+        Assert.notNull(uId, "未登录,请重新登录");
+        Assert.notNull(jobId, "要删除的作业ID不能为空");
+        Job job = jobDao.findByJobIdAndDelFlag(jobId, uId);
+        Assert.notNull(job, "要删除的任务不存在或已删除");
         job.setDelFlag(0);
         jobDao.save(job);
         //移除策略
@@ -122,10 +124,10 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public boolean check(Integer repositoryId, String jobPath, Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        Assert.notNull(repositoryId,"资源库ID不能为空");
-        Assert.hasText(jobPath,"作业路径不能为空");
-        List<Job> jobList = jobDao.findByCreateUserAndDelFlagAndJobRepositoryIdAndJobPath(uId,1,repositoryId,jobPath);
+        Assert.notNull(uId, "未登录,请重新登录");
+        Assert.notNull(repositoryId, "资源库ID不能为空");
+        Assert.hasText(jobPath, "作业路径不能为空");
+        List<Job> jobList = jobDao.findByCreateUserAndDelFlagAndJobRepositoryIdAndJobPath(uId, 1, repositoryId, jobPath);
         if (null != jobList && jobList.size() > 0) {
             return false;
         } else {
@@ -135,8 +137,8 @@ public class JobServiceImpl implements JobService {
 
 
     /**
-     * @param addJob          作业信息
-     * @param uId           用户ID
+     * @param addJob 作业信息
+     * @param uId    用户ID
      * @return void
      * @throws SQLException
      * @Title insert
@@ -145,12 +147,12 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public void insert(JobForm.AddJob addJob, Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
+        Assert.notNull(uId, "未登录,请重新登录");
         //补充添加作业信息
         //作业基础信息
-        Job job = BeanPropertyCopyUtils.copy(addJob,Job.class);
-        boolean status = check(job.getJobRepositoryId(),job.getJobPath(),uId);
-        Assert.isTrue(status,"该作业已存在");
+        Job job = BeanPropertyCopyUtils.copy(addJob, Job.class);
+        boolean status = check(job.getJobRepositoryId(), job.getJobPath(), uId);
+        Assert.isTrue(status, "该作业已存在");
         //作业是否被删除
         job.setDelFlag(1);
         //作业是否启动
@@ -167,44 +169,44 @@ public class JobServiceImpl implements JobService {
      * @Description 获取作业信息
      */
     @Override
-    public Job getJob(Integer jobId,Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        Assert.notNull(jobId,"要查询的jobId不能为空");
+    public Job getJob(Integer jobId, Integer uId) {
+        Assert.notNull(uId, "未登录,请重新登录");
+        Assert.notNull(jobId, "要查询的jobId不能为空");
         return jobDao.findByJobId(jobId);
     }
 
     /**
-     * @param updateJob     作业对象
-     * @param jobId           用户ID
+     * @param updateJob 作业对象
+     * @param jobId     用户ID
      * @return void
      * @Title update
      * @Description 更新作业信息
      */
     @Override
     @Transactional
-    public void update(JobForm.UpdateJob updateJob, Integer jobId,Integer uId) {
-        Assert.notNull(uId,"未登录,请重新登录");
-        Assert.notNull(jobId,"要更新的jobId不能为空");
-        Job j = jobDao.findByJobIdAndDelFlag(jobId,1);
-        Assert.notNull(j,"要修改的作业不存在或已删除");
-        Job job = BeanPropertyCopyUtils.copy(updateJob,Job.class);
+    public void update(JobForm.UpdateJob updateJob, Integer jobId, Integer uId) {
+        Assert.notNull(uId, "未登录,请重新登录");
+        Assert.notNull(jobId, "要更新的jobId不能为空");
+        Job j = jobDao.findByJobIdAndDelFlag(jobId, 1);
+        Assert.notNull(j, "要修改的作业不存在或已删除");
+        Job job = BeanPropertyCopyUtils.copy(updateJob, Job.class);
         job.setModifyUser(uId);
         job.setDelFlag(j.getDelFlag());
         job.setCreateUser(j.getCreateUser());
         job.setCreateTime(j.getCreateTime());
         job = jobDao.save(job);
-        if(job.getJobQuartz()!=null){
+        if (job.getJobQuartz() != null) {
             TaskForm.AddTask addTask = new TaskForm.AddTask();
             addTask.setJobId(job.getJobId());
             addTask.setQuartzId(job.getJobQuartz());
             addTask.setTaskName(job.getJobName());
             addTask.setTaskGroup("job");
             addTask.setTaskDescription(job.getJobDescription());
-            if(updateJob.getJobQuartz()!=j.getJobQuartz()){
+            if (updateJob.getJobQuartz() != j.getJobQuartz()) {
                 //移除策略
                 taskService.deleteTask(updateJob.getJobQuartz());
                 //新增策略
-                taskService.addTask(addTask,uId);
+                taskService.addTask(addTask, uId);
             }
         }
     }
@@ -218,9 +220,9 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     @Transactional
-    public void start(Integer jobId,Integer uId,Map<String,String> param)throws KettleException {
-        Assert.notNull(uId,"未登录,请重新登录");
-        Assert.notNull(jobId,"要启动的作业id不能为空");
+    public void start(Integer jobId, Integer uId, Map<String, String> param) throws KettleException {
+        Assert.notNull(uId, "未登录,请重新登录");
+        Assert.notNull(jobId, "要启动的作业id不能为空");
         Job job = jobDao.findByJobId(jobId);
         Repository repository = repositoryDao.findByRepositoryId(job.getJobRepositoryId());
         String logFilePath = cdeLogFilePath;
@@ -228,35 +230,39 @@ public class JobServiceImpl implements JobService {
         Date nexExecuteTime = null;
         //添加监控
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime);
-        manualRunRepositoryJob(repository,jobId.toString(),job.getJobName(),job.getJobPath(),uId.toString(),job.getJobLogLevel(),logFilePath,executeTime,nexExecuteTime,param);
+        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime, param);
+        System.out.println("sssssssssssssssssssssssssss");
+
     }
 
 
     /**
      * 手动执行
-     * @param repository 资源库连接信息
-     * @param jobId 作业id
-     * @param jobName 作业名称
-     * @param jobPath 作业路径
-     * @param userId 用户id
-     * @param logLevel 日志等级
-     * @param logFilePath 日志路径
-     * @param executeTime 执行时间
+     *
+     * @param repository     资源库连接信息
+     * @param jobId          作业id
+     * @param jobName        作业名称
+     * @param jobPath        作业路径
+     * @param userId         用户id
+     * @param logLevel       日志等级
+     * @param logFilePath    日志路径
+     * @param executeTime    执行时间
      * @param nexExecuteTime 下次执行时间
-     * @param param 参数map
+     * @param param          参数map
      * @throws KettleException
      */
+    @Async
     @Override
     @Transactional
-    public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException {
-        Assert.notNull(userId,"未登录,请重新登录");
-        KettleDatabaseRepository kettleDatabaseRepository  = init(repository);
+    public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String, String> param) throws KettleException {
+        Assert.notNull(userId, "未登录,请重新登录");
+        KettleDatabaseRepository kettleDatabaseRepository = init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(jobPath);
-        JobMeta jobMeta = kettleDatabaseRepository.loadJob(jobName,directory,new ProgressNullMonitorListener(),null);
-        if(param!=null&&param.size()>0){
-            for (String key : param.keySet()){
-                jobMeta.setParameterValue(key,param.get(key));
+        JobMeta jobMeta = kettleDatabaseRepository.loadJob(jobName, directory, new ProgressNullMonitorListener(), null);
+        if (param != null && param.size() > 0) {
+            for (String key : param.keySet()) {
+                jobMeta.setParameterValue(key, param.get(key));
             }
         }
         job = new org.pentaho.di.job.Job(kettleDatabaseRepository, jobMeta);
@@ -274,20 +280,20 @@ public class JobServiceImpl implements JobService {
         try {
 //                jobStartDate = new Date();
             //更改监控状态为执行中
-            jobMonitorService.updateRunStatusJob(Integer.parseInt(jobId),Integer.parseInt(userId),1);
+//            jobMonitorService.updateRunStatusJob(Integer.parseInt(jobId),Integer.parseInt(userId),1);
             job.run();
             job.waitUntilFinished();
             jobStopDate = new Date();
         } catch (Exception e) {
             exception = e.getMessage();
             recordStatus = 3;
-            runStatus=3;
+            runStatus = 3;
         } finally {
             if (job.isFinished()) {
                 if (job.getErrors() > 0) {
                     recordStatus = 3;
-                    runStatus=3;
-                    if(null == job.getResult().getLogText() || "".equals(job.getResult().getLogText())){
+                    runStatus = 3;
+                    if (null == job.getResult().getLogText() || "".equals(job.getResult().getLogText())) {
                         logText = exception;
                     }
                 }
@@ -307,7 +313,7 @@ public class JobServiceImpl implements JobService {
                     jobRecord.setRecordStatus(recordStatus);
                     jobRecord.setStartTime(executeTime);
                     jobRecord.setStopTime(jobStopDate);
-                    writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime,runStatus,userId);
+                    writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime, runStatus, userId);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -317,11 +323,12 @@ public class JobServiceImpl implements JobService {
 
     /**
      * 资源库初始化并连接
+     *
      * @param repository
      * @return
      * @throws KettleException
      */
-    public KettleDatabaseRepository init(Repository repository)throws KettleException{
+    public KettleDatabaseRepository init(Repository repository) throws KettleException {
         KettleEnvironment.init();
         DatabaseMeta databaseMeta = new DatabaseMeta(null, repository.getRepositoryType(), repository.getDatabaseAccess(),
                 repository.getDatabaseHost(), repository.getDatabaseName(), repository.getDatabasePort(), repository.getDatabaseUsername(), repository.getDatabasePassword());
@@ -336,8 +343,8 @@ public class JobServiceImpl implements JobService {
         kettleDatabaseRepository.connect("admin", "admin");
         //判断是否连接成功
         if (kettleDatabaseRepository.isConnected()) {
-            System.out.println( "connected" );
-        }else{
+            System.out.println("connected");
+        } else {
             System.out.println("error");
         }
         return kettleDatabaseRepository;
@@ -345,15 +352,15 @@ public class JobServiceImpl implements JobService {
 
 
     /**
-     * @param jobRecord         作业记录信息
-     * @param logText            日志信息
+     * @param jobRecord 作业记录信息
+     * @param logText   日志信息
      * @return void
      * @throws IOException
      * @throws SQLException
      * @Title writeToDBAndFile
      * @Description 保存作业运行日志信息到文件和数据库
      */
-    public void writeToDBAndFile(JobRecord jobRecord, String logText, Date lastExecuteTime, Date nextExecuteTime,Integer runStatus,String uId)
+    public void writeToDBAndFile(JobRecord jobRecord, String logText, Date lastExecuteTime, Date nextExecuteTime, Integer runStatus, String uId)
             throws IOException {
         // 将日志信息写入文件
         FileUtils.writeStringToFile(new File(jobRecord.getLogFilePath()), logText, Constant.DEFAULT_ENCODING, false);
@@ -363,7 +370,7 @@ public class JobServiceImpl implements JobService {
         template.setCreateUser(jobRecord.getCreateUser());
         template.setMonitorJob(jobRecord.getRecordJob());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobRecord.getRecordJob(),Integer.parseInt(uId));
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobRecord.getRecordJob(), Integer.parseInt(uId));
         templateOne.setLastExecuteTime(lastExecuteTime);
         templateOne.setRunStatus(runStatus);
         //在监控表中增加下一次执行时间
@@ -381,16 +388,17 @@ public class JobServiceImpl implements JobService {
 
     /**
      * 查询所有作业名称Map
+     *
      * @return
      */
     @Override
-    public Map<Integer,String> jobNameMap(){
+    public Map<Integer, String> jobNameMap() {
         List<Job> jobList = jobDao.findByDelFlag(1);
-        Map<Integer,String> jobNameMap = new HashMap<>();
-        if(jobList.size()>0&&jobList!=null){
-            for (Job j:jobList){
-                Map<Integer,String> map = new HashMap<>();
-                map.put(j.getJobId(),j.getJobName());
+        Map<Integer, String> jobNameMap = new HashMap<>();
+        if (jobList.size() > 0 && jobList != null) {
+            for (Job j : jobList) {
+                Map<Integer, String> map = new HashMap<>();
+                map.put(j.getJobId(), j.getJobName());
                 jobNameMap.putAll(map);
             }
         }
@@ -399,13 +407,14 @@ public class JobServiceImpl implements JobService {
 
     /**
      * 修改作业策略
+     *
      * @param jobId
      * @param quartz
      */
     @Override
     @Transactional
-    public void updateJobQuartz(Integer jobId,Integer quartz){
-        Assert.notNull(jobId,"作业id不能为空");
+    public void updateJobQuartz(Integer jobId, Integer quartz) {
+        Assert.notNull(jobId, "作业id不能为空");
         Job job = jobDao.findByJobId(jobId);
         job.setJobQuartz(quartz);
         jobDao.save(job);

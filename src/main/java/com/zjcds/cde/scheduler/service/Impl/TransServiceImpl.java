@@ -55,8 +55,8 @@ public class TransServiceImpl implements TransService {
     private TransMonitorDao transMonitorDao;
     @Autowired
     private TransRecordDao transRecordDao;
-    @Autowired
-    private TransMonitorService transMonitorService;
+//    @Autowired
+//    private TransMonitorService transMonitorService;
     @Autowired
     private TaskService taskService;
 
@@ -225,7 +225,7 @@ public class TransServiceImpl implements TransService {
         Date executeTime = new Date();
         Date nexExecuteTime = null;
         //添加监控
-        transMonitorService.addMonitor(uId,transId,nexExecuteTime);
+//        transMonitorService.addMonitor(uId,transId,nexExecuteTime);
         manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param);
     }
 

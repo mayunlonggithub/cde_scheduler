@@ -64,18 +64,18 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     }
 
 
-    /**
-     * 加载转换名称
-     * @param jobMonitorList
-     */
-    public void jobName(List<JobMonitor> jobMonitorList){
-        Map<Integer,String> map = jobService.jobNameMap();
-        if(jobMonitorList.size()>0&&jobMonitorList!=null){
-            for (JobMonitor j:jobMonitorList){
-                j.setMonitorJobName(map.get(j.getMonitorJob()));
-            }
-        }
-    }
+//    /**
+//     * 加载转换名称
+//     * @param jobMonitorList
+//     */
+//    public void jobName(List<JobMonitor> jobMonitorList){
+//        Map<Integer,String> map = jobService.jobNameMap();
+//        if(jobMonitorList.size()>0&&jobMonitorList!=null){
+//            for (JobMonitor j:jobMonitorList){
+//                j.setMonitorJobName(map.get(j.getMonitorJob()));
+//            }
+//        }
+//    }
 
     /**
      * @param uId 用户ID

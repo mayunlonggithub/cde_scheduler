@@ -21,6 +21,7 @@ public class JobRecordGroupView {
     private Integer num;
     //作业的资源库ID
     private Integer jobRepositoryId;
+    private String repositoryName;
 
     @Id
     @Column(name = "record_id")
@@ -120,5 +121,15 @@ public class JobRecordGroupView {
 
     public void setJobRepositoryId(Integer jobRepositoryId) {
         this.jobRepositoryId = jobRepositoryId;
+    }
+
+    @Basic
+    @Column(name = "repository_name")
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 }

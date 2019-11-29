@@ -6,11 +6,13 @@ import com.zjcds.cde.scheduler.common.ErrorEnum;
 import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
 import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobMonitorViewDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.JobRecordGroupViewDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobRecordViewDao;
 import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
+import com.zjcds.cde.scheduler.domain.entity.view.JobRecordGroupView;
 import com.zjcds.cde.scheduler.domain.entity.view.JobRecordView;
 import com.zjcds.cde.scheduler.service.JobRecordService;
 import com.zjcds.cde.scheduler.service.JobService;
@@ -49,6 +51,9 @@ public class JobRecordServiceImpl implements JobRecordService {
     private JobService jobService;
     @Autowired
     private JobMonitorViewDao jobMonitorViewDao;
+
+    @Autowired
+    private JobRecordGroupViewDao jobRecordGroupViewDao;
 
     @Value("${cde.file.download}")
     private String cdeFileDownload;
@@ -152,12 +157,12 @@ public class JobRecordServiceImpl implements JobRecordService {
         Date startTime = DateUtils.getStartTime(new Date());
         Date endTime = DateUtils.getEndTime(new Date());
         //取当天数据
-        List<JobRecordView> jobRecords = jobRecordViewDao.findByStartTime(uId,startTime,endTime);
+        List<JobRecordGroupView> jobRecordGroupViewList = jobRecordGroupViewDao.findByCreateUser(uId);
 
         //取成功数据
-        Map<String,Long> mapSuccess = jobRecords.stream().filter(e->e.getRecordStatus()==2).collect(Collectors.groupingBy(JobRecordView::getRecordJobName,Collectors.counting()));
+        List<JobRecordGroupView> mapSuccess = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==2).collect(Collectors.toList());
         //取失败数
-        Map<String,Long> mapFail = jobRecords.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.groupingBy(JobRecordView::getRecordJobName,Collectors.counting()));
+        List<JobRecordGroupView> mapFail = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.toList());
 
         List<JobMonitorView> jobMonitorList = jobMonitorViewDao.findByCreateUser(uId);
         Map<String,Long> jobName = jobMonitorList.stream().collect(Collectors.groupingBy(JobMonitorView::getMonitorJobName,Collectors.counting()));
