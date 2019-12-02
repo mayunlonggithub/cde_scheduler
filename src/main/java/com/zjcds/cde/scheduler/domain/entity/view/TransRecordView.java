@@ -18,6 +18,7 @@ public class TransRecordView {
     private String logFilePath;
     private Integer createUser;
     private String recordTransName;
+    private String duration;
 
     @Id
     @Column(name = "record_id")
@@ -97,5 +98,15 @@ public class TransRecordView {
 
     public void setRecordTransName(String recordTransName) {
         this.recordTransName = recordTransName;
+    }
+
+    @Basic
+    @Column(name = "duration")
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

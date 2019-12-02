@@ -13,10 +13,12 @@ import com.zjcds.cde.scheduler.domain.entity.Job;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
+import com.zjcds.cde.scheduler.service.InitializeService;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pentaho.di.core.KettleEnvironment;
@@ -65,6 +67,8 @@ public class JobServiceImpl implements JobService {
     private JobRecordDao jobRecordDao;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private InitializeService initializeService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -188,7 +192,7 @@ public class JobServiceImpl implements JobService {
         Assert.notNull(uId, "未登录,请重新登录");
         Assert.notNull(jobId, "要更新的jobId不能为空");
         Job j = jobDao.findByJobIdAndDelFlag(jobId, 1);
-        Integer jobQuartz=j.getJobQuartz();
+        Integer quartz = j.getJobQuartz();
         Assert.notNull(j, "要修改的作业不存在或已删除");
         Job job = BeanPropertyCopyUtils.copy(updateJob, Job.class);
         job.setModifyUser(uId);
@@ -199,19 +203,22 @@ public class JobServiceImpl implements JobService {
         if (job.getJobQuartz() != null) {
             TaskForm.AddTask addTask = new TaskForm.AddTask();
             addTask.setJobId(job.getJobId());
-            addTask.setQuartzId(job.getJobQuartz());
+            addTask.setQuartzId(updateJob.getJobQuartz());
             addTask.setTaskName(job.getJobName());
             addTask.setTaskGroup("job");
             addTask.setTaskDescription(job.getJobDescription());
-            if (updateJob.getJobQuartz() != jobQuartz) {
-                //移除策略
-                taskService.deleteTask(updateJob.getJobQuartz());
+            if (!updateJob.getJobQuartz().equals(quartz)) {
+                if(quartz!=null){
+                    //移除策略
+                    taskService.deleteTask(quartz);
+                }
                 //新增策略
                 taskService.addTask(addTask, uId);
-
             }
         }
     }
+
+
     /**
      * @param jobId 作业ID
      * @return void
@@ -255,7 +262,7 @@ public class JobServiceImpl implements JobService {
     @Transactional
     public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String, String> param) throws KettleException {
         Assert.notNull(userId, "未登录,请重新登录");
-        KettleDatabaseRepository kettleDatabaseRepository = init(repository);
+        KettleDatabaseRepository kettleDatabaseRepository = initializeService.init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(jobPath);
         JobMeta jobMeta = kettleDatabaseRepository.loadJob(jobName, directory, new ProgressNullMonitorListener(), null);
@@ -312,6 +319,7 @@ public class JobServiceImpl implements JobService {
                     jobRecord.setRecordStatus(recordStatus);
                     jobRecord.setStartTime(executeTime);
                     jobRecord.setStopTime(jobStopDate);
+                    jobRecord.setDuration(DateUtils.getDuration(executeTime,jobStopDate));
                     writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime, runStatus, userId);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -320,34 +328,6 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    /**
-     * 资源库初始化并连接
-     *
-     * @param repository
-     * @return
-     * @throws KettleException
-     */
-    public KettleDatabaseRepository init(Repository repository) throws KettleException {
-        KettleEnvironment.init();
-        DatabaseMeta databaseMeta = new DatabaseMeta(null, repository.getRepositoryType(), repository.getDatabaseAccess(),
-                repository.getDatabaseHost(), repository.getDatabaseName(), repository.getDatabasePort(), repository.getDatabaseUsername(), repository.getDatabasePassword());
-        databaseMeta.addExtraOption(databaseMeta.getPluginId(), "characterEncoding", "UTF-8");
-        databaseMeta.addExtraOption(databaseMeta.getPluginId(), "useUnicode", "true");
-        //资源库元对象
-        KettleDatabaseRepositoryMeta repositoryInfo = new KettleDatabaseRepositoryMeta();
-        repositoryInfo.setConnection(databaseMeta);
-        //资源库
-        KettleDatabaseRepository kettleDatabaseRepository = new KettleDatabaseRepository();
-        kettleDatabaseRepository.init(repositoryInfo);
-        kettleDatabaseRepository.connect("admin", "admin");
-        //判断是否连接成功
-        if (kettleDatabaseRepository.isConnected()) {
-            System.out.println("connected");
-        } else {
-            System.out.println("error");
-        }
-        return kettleDatabaseRepository;
-    }
 
 
     /**

@@ -18,6 +18,7 @@ public class JobRecordView {
     private String logFilePath;
     private Integer createUser;
     private String recordJobName;
+    private String duration;
 
     @Id
     @Column(name = "record_id")
@@ -97,5 +98,15 @@ public class JobRecordView {
 
     public void setRecordJobName(String recordJobName) {
         this.recordJobName = recordJobName;
+    }
+
+    @Basic
+    @Column(name = "duration")
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

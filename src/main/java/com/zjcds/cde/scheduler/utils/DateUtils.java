@@ -30,4 +30,37 @@ public class DateUtils {
         todayEnd.set(Calendar.MILLISECOND, 999);
         return todayEnd.getTime();
     }
+
+    /**
+     * 获取时间差
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static String getDuration(Date startTime, Date endTime){
+        String duration=null;
+        try {
+            long diff = endTime.getTime() - startTime.getTime();//这样得到的差值是微秒级别
+            long days = diff / (1000 * 60 * 60 * 24);
+            long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
+            long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
+            long second = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000);
+            if(days>0){
+                duration = ""+days+"天"+hours+"小时"+minutes+"分"+second+"秒";
+            }
+            if(days<=0){
+                duration = ""+hours+"小时"+minutes+"分"+second+"秒";
+            }
+            if(days<=0&&hours<=0){
+                duration = ""+minutes+"分"+second+"秒";
+            }
+            if(days<=0&&hours<=0&&minutes<=0){
+                duration = ""+second+"秒";
+            }
+            return duration;
+        }catch (Exception e) {
+            return duration;
+        }
+
+    }
 }

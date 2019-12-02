@@ -32,7 +32,7 @@ public class JobRecordForm {
         @ApiModelProperty(value = "停止时间")
         private Date stopTime;
         @ApiModelProperty(value = "执行时长")
-        private Date duration;
+        private String duration;
         @ApiModelProperty(value = "任务执行结果")
         private Integer recordStatus;
         @ApiModelProperty(value = "作业日志记录文件保存位置")

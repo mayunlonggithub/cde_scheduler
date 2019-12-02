@@ -21,6 +21,8 @@ public class JobMonitorView {
     private Date lastExecuteTime;
     private Date nextExecuteTime;
     private String monitorJobName;
+    private Integer repositoryId;
+    private String repositoryName;
 
     @Id
     @Column(name = "monitor_id")
@@ -120,5 +122,25 @@ public class JobMonitorView {
 
     public void setMonitorJobName(String monitorJobName) {
         this.monitorJobName = monitorJobName;
+    }
+
+    @Basic
+    @Column(name = "repository_id")
+    public Integer getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(Integer repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
+    @Basic
+    @Column(name = "repository_name")
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 }

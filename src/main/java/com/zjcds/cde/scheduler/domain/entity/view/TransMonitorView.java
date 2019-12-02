@@ -20,6 +20,8 @@ public class TransMonitorView {
     private Date lastExecuteTime;
     private Date nextExecuteTime;
     private String monitorTransName;
+    private Integer repositoryId;
+    private String repositoryName;
 
     @Id
     @Column(name = "monitor_id")
@@ -119,5 +121,25 @@ public class TransMonitorView {
 
     public void setMonitorTransName(String monitorTransName) {
         this.monitorTransName = monitorTransName;
+    }
+
+    @Basic
+    @Column(name = "repository_id")
+    public Integer getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(Integer repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
+    @Basic
+    @Column(name = "repository_name")
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 }

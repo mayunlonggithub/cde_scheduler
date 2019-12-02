@@ -7,6 +7,7 @@ import com.zjcds.cde.scheduler.dao.jpa.*;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryForm;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTreeForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
+import com.zjcds.cde.scheduler.service.InitializeService;
 import com.zjcds.cde.scheduler.service.RepositoryService;
 import com.zjcds.cde.scheduler.utils.RepositoryUtil;
 import org.pentaho.di.core.exception.KettleException;
@@ -42,6 +43,8 @@ public class RepositoryServiceImpl implements RepositoryService {
 
     @Autowired
     private CdmJobDao cdmJobDao;
+    @Autowired
+    private InitializeService initializeService;
 
     /**
      * @Title getRepositoryTreeList
@@ -217,13 +220,14 @@ public class RepositoryServiceImpl implements RepositoryService {
     @Override
     @Transactional
     public void saveTreeList(Integer repositoryId,Integer uId) throws KettleException{
+        Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
+        KettleDatabaseRepository kettleDatabaseRepository  = initializeService.init(kRepository);
         if(uId!=2){//判断非管控用户
-            KettleDatabaseRepository kettleDatabaseRepository = null;
             List<RepositoryTreeForm> allRepositoryTreeList = new ArrayList<>();
             if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
                 kettleDatabaseRepository = RepositoryUtil.KettleDatabaseRepositoryCatch.get(repositoryId);
             }else {
-                Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
+
                 kettleDatabaseRepository = RepositoryUtil.connectionRepository(kRepository);
             }
             if (null != kettleDatabaseRepository){

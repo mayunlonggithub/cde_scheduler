@@ -27,6 +27,8 @@ public class TransRecord {
     private Integer createUser;
     //转换名称
     private String recordTransName;
+    //时间差
+    private String duration;
 
     @Id
     @Column(name = "record_id")
@@ -107,5 +109,15 @@ public class TransRecord {
 
     public void setRecordTransName(String recordTransName) {
         this.recordTransName = recordTransName;
+    }
+
+    @Basic
+    @Column(name = "duration")
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

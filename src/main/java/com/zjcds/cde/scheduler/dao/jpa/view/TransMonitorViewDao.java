@@ -12,4 +12,6 @@ import java.util.List;
 public interface TransMonitorViewDao extends CustomRepostory<TransMonitorView,Integer> {
 
     public List<TransMonitorView> findByCreateUserAndMonitorStatus(Integer createUser, Integer monitorStatus);
+
+    public List<TransMonitorView> findByCreateUser(Integer createUser);
 }

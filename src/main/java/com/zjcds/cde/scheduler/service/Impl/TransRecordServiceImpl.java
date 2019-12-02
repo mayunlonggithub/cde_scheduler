@@ -3,10 +3,14 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransRecordDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.TransMonitorViewDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.TransRecordGroupViewDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.TransRecordViewDao;
+import com.zjcds.cde.scheduler.domain.dto.JobMonitorForm;
+import com.zjcds.cde.scheduler.domain.dto.TransMonitorForm;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
-import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
+import com.zjcds.cde.scheduler.domain.entity.view.*;
 import com.zjcds.cde.scheduler.service.TransRecordService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
@@ -18,8 +22,10 @@ import org.springframework.util.Assert;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * jackson 相关配置
@@ -36,6 +42,10 @@ public class TransRecordServiceImpl implements TransRecordService {
 
     @Autowired
     private TransService transService;
+    @Autowired
+    private TransRecordGroupViewDao transRecordGroupViewDao;
+    @Autowired
+    private TransMonitorViewDao transMonitorViewDao;
 
 
     /**
@@ -124,6 +134,48 @@ public class TransRecordServiceImpl implements TransRecordService {
         }
         System.out.println("Download the file successfully!");
 
+    }
+
+    /**
+     * 当天转换运行统计
+     * @param uId
+     * @return
+     */
+    @Override
+    public List<TransMonitorForm.TransMonitorStatis> getListToday(Integer uId){
+        //取当天数据
+        List<TransRecordGroupView> transRecordGroupViewList = transRecordGroupViewDao.findByCreateUser(uId);
+        //取成功数据
+        List<TransRecordGroupView> success = transRecordGroupViewList.stream().filter(e->e.getRecordStatus()==2).collect(Collectors.toList());
+        //取失败数
+        List<TransRecordGroupView> fail = transRecordGroupViewList.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.toList());
+
+        List<TransMonitorView> transMonitorList = transMonitorViewDao.findByCreateUser(uId);
+        List<TransMonitorForm.TransMonitorStatis> statis = new ArrayList<>();
+
+        for (TransMonitorView s:transMonitorList){
+            TransMonitorForm.TransMonitorStatis t = new TransMonitorForm.TransMonitorStatis();
+            //相同job的成功数据
+            TransRecordGroupView transSuccess = success.stream().filter(e->e.getRecordTrans().equals(s.getMonitorTrans())).findAny().orElse(new TransRecordGroupView());
+            //相同job的失败数据
+            TransRecordGroupView transFail = fail.stream().filter(e->e.getRecordTrans().equals(s.getMonitorTrans())).findAny().orElse(new TransRecordGroupView());
+
+            t.setMonitorTransName(s.getMonitorTransName());
+            t.setRepositoryName(s.getRepositoryName());
+            if(transSuccess.getRecordTrans()!=null){
+                t.setMonitorSuccess(transSuccess.getNum());
+            }else {
+                t.setMonitorSuccess(0);
+            }
+            if(transFail.getRecordTrans()!=null){
+                t.setMonitorFail(transFail.getNum());
+            }else {
+                t.setMonitorFail(0);
+            }
+
+            statis.add(t);
+        };
+        return statis;
     }
 
 }

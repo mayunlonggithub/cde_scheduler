@@ -1,5 +1,6 @@
 package com.zjcds.cde.scheduler.domain.dto;
 
+import com.zjcds.cde.scheduler.base.BaseBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -38,5 +39,19 @@ public class TransMonitorForm {
         private Date lastExecuteTime;
         @ApiModelProperty(value = "下次执行时间")
         private Date nextExecuteTime;
+    }
+
+    @Getter
+    @Setter
+    @ApiModel(value = "transMonitorStatis",description = "转换监控记录")
+    public static class TransMonitorStatis extends BaseBean {
+        @ApiModelProperty(value = "资源库名称")
+        private String repositoryName;
+        @ApiModelProperty(value = "监控的转换名称")
+        private String monitorTransName;
+        @ApiModelProperty(value = "成功次数")
+        private Integer monitorSuccess;
+        @ApiModelProperty(value = "失败次数")
+        private Integer monitorFail;
     }
 }

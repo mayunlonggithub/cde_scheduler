@@ -154,27 +154,36 @@ public class JobRecordServiceImpl implements JobRecordService {
      */
     @Override
     public List<JobMonitorForm.JobMonitorStatis> getListToday(Integer uId){
-        Date startTime = DateUtils.getStartTime(new Date());
-        Date endTime = DateUtils.getEndTime(new Date());
         //取当天数据
         List<JobRecordGroupView> jobRecordGroupViewList = jobRecordGroupViewDao.findByCreateUser(uId);
-
         //取成功数据
-        List<JobRecordGroupView> mapSuccess = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==2).collect(Collectors.toList());
+        List<JobRecordGroupView> success = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==2).collect(Collectors.toList());
         //取失败数
-        List<JobRecordGroupView> mapFail = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.toList());
+        List<JobRecordGroupView> fail = jobRecordGroupViewList.stream().filter(e->e.getRecordStatus()==3).collect(Collectors.toList());
 
         List<JobMonitorView> jobMonitorList = jobMonitorViewDao.findByCreateUser(uId);
         List<JobMonitorForm.JobMonitorStatis> statis = new ArrayList<>();
 
         for (JobMonitorView s:jobMonitorList){
             JobMonitorForm.JobMonitorStatis j = new JobMonitorForm.JobMonitorStatis();
-//            if(s.getMonitorJob()=)
+            //相同job的成功数据
+            JobRecordGroupView jobSuccess = success.stream().filter(e->e.getRecordJob().equals(s.getMonitorJob())).findAny().orElse(new JobRecordGroupView());
+            //相同job的失败数据
+            JobRecordGroupView jobFail = fail.stream().filter(e->e.getRecordJob().equals(s.getMonitorJob())).findAny().orElse(new JobRecordGroupView());
+
             j.setMonitorJobName(s.getMonitorJobName());
+            j.setRepositoryName(s.getRepositoryName());
+            if(jobSuccess.getRecordJob()!=null){
+                j.setMonitorSuccess(jobSuccess.getNum());
+            }else {
+                j.setMonitorSuccess(0);
+            }
+            if(jobFail.getRecordJob()!=null){
+                j.setMonitorFail(jobFail.getNum());
+            }else {
+                j.setMonitorFail(0);
+            }
 
-            Integer sumFail = 0;
-
-            j.setMonitorFail(sumFail);
             statis.add(j);
         };
         return statis;

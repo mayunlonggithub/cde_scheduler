@@ -27,6 +27,8 @@ public class JobRecord {
     private Integer createUser;
     //作业名称
     private String recordJobName;
+    //时间差
+    private String duration;
 
     @Id
     @Column(name = "record_id")
@@ -107,5 +109,15 @@ public class JobRecord {
 
     public void setRecordJobName(String recordJobName) {
         this.recordJobName = recordJobName;
+    }
+
+    @Basic
+    @Column(name = "duration")
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

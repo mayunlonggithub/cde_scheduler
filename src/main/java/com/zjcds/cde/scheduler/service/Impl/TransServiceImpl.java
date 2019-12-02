@@ -7,10 +7,12 @@ import com.zjcds.cde.scheduler.dao.jpa.*;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
+import com.zjcds.cde.scheduler.service.InitializeService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.pentaho.di.core.KettleEnvironment;
@@ -24,8 +26,10 @@ import org.pentaho.di.repository.RepositoryDirectoryInterface;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepository;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepositoryMeta;
 import org.pentaho.di.trans.TransMeta;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -59,6 +63,8 @@ public class TransServiceImpl implements TransService {
     private TransMonitorService transMonitorService;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private InitializeService initializeService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -183,6 +189,7 @@ public class TransServiceImpl implements TransService {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要更新的jobId不能为空");
         Trans t = transDao.findByTransIdAndDelFlag(transId,1);
+        Integer quartz = t.getTransQuartz();
         Assert.notNull(t,"要修改的作业不存在或已删除");
         Trans trans = BeanPropertyCopyUtils.copy(updateTrans,Trans.class);
         trans.setModifyUser(uId);
@@ -193,13 +200,16 @@ public class TransServiceImpl implements TransService {
         if(trans.getTransQuartz()!=null){
             TaskForm.AddTask addTask = new TaskForm.AddTask();
             addTask.setJobId(trans.getTransId());
-            addTask.setQuartzId(trans.getTransQuartz());
+            addTask.setQuartzId(updateTrans.getTransQuartz());
             addTask.setTaskName(trans.getTransName());
             addTask.setTaskGroup("trans");
             addTask.setTaskDescription(trans.getTransDescription());
-            if(updateTrans.getTransQuartz()!=t.getTransQuartz()){
-                //移除策略
-                taskService.deleteTask(t.getTransQuartz());
+            if(!updateTrans.getTransQuartz().equals(quartz)){
+                if(quartz!=null){
+                    //移除策略
+                    taskService.deleteTask(quartz);
+                }
+
                 //添加策略
                 taskService.addTask(addTask,uId);
             }
@@ -226,7 +236,7 @@ public class TransServiceImpl implements TransService {
         Date nexExecuteTime = null;
         //添加监控
         transMonitorService.addMonitor(uId,transId,nexExecuteTime);
-        manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param);
+        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param);
     }
 
     /**
@@ -243,11 +253,12 @@ public class TransServiceImpl implements TransService {
      * @param param 参数map
      * @throws KettleException
      */
+    @Async
     @Override
     @Transactional
     public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException {
         Assert.notNull(userId,"未登录,请重新登录");
-        KettleDatabaseRepository kettleDatabaseRepository  = init(repository);
+        KettleDatabaseRepository kettleDatabaseRepository  = initializeService.init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(transPath);
         TransMeta transMeta = kettleDatabaseRepository.loadTransformation(transName,directory,new ProgressNullMonitorListener(),true,null);
@@ -302,6 +313,7 @@ public class TransServiceImpl implements TransService {
                     transRecord.setRecordStatus(recordStatus);
                     transRecord.setStartTime(executeTime);
                     transRecord.setStopTime(transStopDate);
+                    transRecord.setDuration(DateUtils.getDuration(executeTime,transStopDate));
                     writeToDBAndFile(transRecord, logText, executeTime, nexExecuteTime,runStatus,userId);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -310,33 +322,6 @@ public class TransServiceImpl implements TransService {
         }
     }
 
-    /**
-     * 资源库初始化并连接
-     * @param repository
-     * @return
-     * @throws KettleException
-     */
-    public KettleDatabaseRepository init(Repository repository)throws KettleException{
-        KettleEnvironment.init();
-        DatabaseMeta databaseMeta = new DatabaseMeta(null, repository.getRepositoryType(), repository.getDatabaseAccess(),
-                repository.getDatabaseHost(), repository.getDatabaseName(), repository.getDatabasePort(), repository.getDatabaseUsername(), repository.getDatabasePassword());
-        databaseMeta.addExtraOption(databaseMeta.getPluginId(), "characterEncoding", "UTF-8");
-        databaseMeta.addExtraOption(databaseMeta.getPluginId(), "useUnicode", "true");
-        //资源库元对象
-        KettleDatabaseRepositoryMeta repositoryInfo = new KettleDatabaseRepositoryMeta();
-        repositoryInfo.setConnection(databaseMeta);
-        //资源库
-        KettleDatabaseRepository kettleDatabaseRepository = new KettleDatabaseRepository();
-        kettleDatabaseRepository.init(repositoryInfo);
-        kettleDatabaseRepository.connect("admin", "admin");
-        //判断是否连接成功
-        if (kettleDatabaseRepository.isConnected()) {
-            System.out.println( "connected" );
-        }else{
-            System.out.println("error");
-        }
-        return kettleDatabaseRepository;
-    }
 
 
     /**

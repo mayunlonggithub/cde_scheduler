@@ -9,10 +9,7 @@ import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.domain.entity.view.JobMonitorView;
 import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
-import com.zjcds.cde.scheduler.service.JobMonitorService;
-import com.zjcds.cde.scheduler.service.JobService;
-import com.zjcds.cde.scheduler.service.TransMonitorService;
-import com.zjcds.cde.scheduler.service.TransService;
+import com.zjcds.cde.scheduler.service.*;
 import com.zjcds.cde.scheduler.utils.Constant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,6 +40,10 @@ public class IndexController {
     private TransService transService;
     @Autowired
     private JobService jobService;
+    @Autowired
+    private JobRecordService jobRecordService;
+    @Autowired
+    private TransRecordService transRecordService;
 
     @GetMapping("/allRuning")
     @ApiOperation(value = "总监控任务数", produces = "application/json;charset=utf-8")
@@ -79,30 +80,28 @@ public class IndexController {
     @GetMapping("/getTrans")
     @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
 
-    public ResponseResult<TransMonitorForm.TransMonitor> getTrans(HttpServletRequest request){
+    public ResponseResult<TransMonitorForm.TransMonitorStatis> getTrans(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        List<TransMonitorView> transMonitorList = transMonitorService.getList(kUser.getId());
-        if(transMonitorList.size()>5){
-            transMonitorList = transMonitorList.subList(1,5);
+        List<TransMonitorForm.TransMonitorStatis> owner = transRecordService.getListToday(kUser.getId());
+        if(owner.size()>5){
+            owner = owner.subList(1,5);
         }
-        List<TransMonitorForm.TransMonitor> owner = BeanPropertyCopyUtils.copy(transMonitorList,TransMonitorForm.TransMonitor.class);
         return new ResponseResult(true,"请求成功",owner);
     }
 
-//    @GetMapping("/getJob")
-//    @ApiOperation(value = "转换监控记录Top5", produces = "application/json;charset=utf-8")
-//
-//    public ResponseResult<JobMonitorForm.JobMonitor> getJob(HttpServletRequest request){
-//        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-//        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-//        List<JobMonitorView> jobMonitorList = jobMonitorService.getList(kUser.getId());
-//        if(jobMonitorList.size()>5){
-//            jobMonitorList = jobMonitorList.subList(1,5);
-//        }
-//        List<JobMonitorForm.JobMonitor> owner = BeanPropertyCopyUtils.copy(jobMonitorList,JobMonitorForm.JobMonitor.class);
-//        return new ResponseResult(true,"请求成功",owner);
-//    }
+    @GetMapping("/getJob")
+    @ApiOperation(value = "作业监控记录Top5", produces = "application/json;charset=utf-8")
+
+    public ResponseResult<JobMonitorForm.JobMonitorStatis> getJob(HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        List<JobMonitorForm.JobMonitorStatis> owner = jobRecordService.getListToday(kUser.getId());
+        if(owner.size()>5){
+            owner = owner.subList(1,5);
+        }
+        return new ResponseResult(true,"请求成功",owner);
+    }
 
     @GetMapping("/getKettleLine")
     @ApiOperation(value = "转换监控记录", produces = "application/json;charset=utf-8")
