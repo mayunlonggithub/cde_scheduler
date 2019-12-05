@@ -210,7 +210,7 @@ public class JobServiceImpl implements JobService {
             if (!updateJob.getJobQuartz().equals(quartz)) {
                 if(quartz!=null){
                     //移除策略
-                    taskService.deleteTask(quartz);
+                    taskService.deleteTask(jobId,"job");
                 }
                 //新增策略
                 taskService.addTask(addTask, uId);

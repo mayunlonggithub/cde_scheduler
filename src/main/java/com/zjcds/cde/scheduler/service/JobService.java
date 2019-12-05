@@ -26,6 +26,11 @@ public interface JobService {
      */
     public PageResult<Job> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
 
+    /**
+     *
+     * @param uId
+     * @return
+     */
     public List<Job> getList(Integer uId);
 
 

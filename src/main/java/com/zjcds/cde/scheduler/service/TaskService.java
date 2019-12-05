@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.service;
 
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.domain.entity.Task;
@@ -14,7 +15,9 @@ import java.util.List;
 public interface TaskService {
     void addTask(TaskForm.AddTask addTask, Integer uId);
 
-    void deleteTask(Integer taskId);
+    ResponseResult<Void> deleteTask(Integer taskId);
+
+    void deleteTask(Integer jobId, String taskGroup);
 
     PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId);
 

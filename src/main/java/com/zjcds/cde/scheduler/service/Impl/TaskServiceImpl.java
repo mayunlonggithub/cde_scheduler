@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
@@ -42,6 +43,7 @@ public class TaskServiceImpl implements TaskService {
     private TransService transService;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
+
     @Override
     @Transactional
     public void addTask(TaskForm.AddTask addTask,Integer uId){
@@ -54,24 +56,42 @@ public class TaskServiceImpl implements TaskService {
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
-        jobService.updateJobQuartz(task.getJobId(),task.getQuartzId());
-    }
+        if("job".equals(task.getTaskGroup())){
+        jobService.updateJobQuartz(task.getJobId(),task.getQuartzId());}
+        else if("trans".equals(task.getTaskGroup())) {
+            transService.updateTransQuartz(task.getJobId(),task.getQuartzId());}
+        }
 
     @Override
     @Transactional
-    public void deleteTask(Integer taskId){
+    public ResponseResult<Void> deleteTask(Integer taskId){
         Task task = taskDao.findByTaskId(taskId);
-        if(task!=null) {
-            shutDown(taskId);
-            task.setStatus(Constant.INVALID);
-            taskDao.save(task);
+        if(task.getStatus()!=Constant.PAUSE){
+            return new ResponseResult(false,"请求失败");
         }
+        shutDown(taskId);
+        task.setStatus(Constant.INVALID);
+        taskDao.save(task);
         if("trans".equals(task.getTaskGroup())){
             transService.updateTransQuartz(task.getJobId(),null);
         }else if("job".equals(task.getTaskGroup())){
             jobService.updateJobQuartz(task.getJobId(),null);
         }
+        return new ResponseResult(false,"请求失败");
     }
+
+    @Override
+    @Transactional
+    public void deleteTask(Integer jobId, String taskGroup){
+
+        Task task = taskDao.findByJobIdAndTaskGroupAndStatus(jobId,taskGroup,Constant.PAUSE);
+        Integer taskId=task.getTaskId();
+        shutDown(taskId);
+        task.setStatus(Constant.INVALID);
+        taskDao.save(task);
+
+    }
+
     @Override
     public PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId) {
         queryString.add("createUser~Eq~"+uId);

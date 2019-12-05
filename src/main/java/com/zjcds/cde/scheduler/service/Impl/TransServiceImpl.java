@@ -207,7 +207,7 @@ public class TransServiceImpl implements TransService {
             if(!updateTrans.getTransQuartz().equals(quartz)){
                 if(quartz!=null){
                     //移除策略
-                    taskService.deleteTask(quartz);
+                    taskService.deleteTask(transId,"trans");
                 }
 
                 //添加策略
