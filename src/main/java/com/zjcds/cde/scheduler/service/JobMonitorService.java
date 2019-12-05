@@ -74,4 +74,20 @@ public interface JobMonitorService {
      * @param uId
      */
     public void updateRunStatusJob(Integer jobId,Integer uId,Integer runStatus);
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内作业的成功柱状图
+     */
+    public Map<String, Object> getJobSuccess(Integer uId,List<String> dateList);
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内作业的失败柱状图
+     */
+    public Map<String, Object> getJobFail(Integer uId,List<String> dateList);
 }

@@ -63,4 +63,15 @@ public class DateUtils {
         }
 
     }
+
+
+    public static Date getYmd(Date date) {
+        Calendar Ymd = Calendar.getInstance();
+        Ymd.setTime(date);
+        Ymd.set(Calendar.HOUR_OF_DAY, 0);
+        Ymd.set(Calendar.MINUTE, 0);
+        Ymd.set(Calendar.SECOND, 0);
+        Ymd.set(Calendar.MILLISECOND, 0);
+        return Ymd.getTime();
+    }
 }

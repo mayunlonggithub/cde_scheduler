@@ -13,4 +13,6 @@ public interface TransRecordDao extends CustomRepostory<TransRecord,Integer> {
     public TransRecord findByRecordIdAndCreateUser(Integer recordId,Integer createUser);
 
     public List<TransRecord> findByCreateUser(Integer createUser);
+
+    public List<TransRecord> findByCreateUserAndRecordStatus(Integer createUser,Integer recordStatus);
 }

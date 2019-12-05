@@ -12,6 +12,7 @@ import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -138,7 +139,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         //获取当前用户所有执行记录
         List<JobRecord> jobRecordList = jobRecordDao.findByCreateUser(uId);
         //截取时间日期到日
-        jobRecordList.stream().forEach(e ->e.setStartTime(valueOf(e.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())));
+        jobRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
         Map<Date,Long> job = jobRecordList.stream().collect(Collectors.groupingBy(JobRecord :: getStartTime,Collectors.counting()));
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -163,6 +164,92 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             i += 1;
         }
         resultMap.put("name", "作业");
+        resultMap.put("data", resultList);
+        return resultMap;
+    }
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内作业的成功柱状图
+     */
+    @Override
+    public Map<String, Object> getJobSuccess(Integer uId,List<String> dateList) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        List<Integer> resultList = new ArrayList<Integer>();
+        //获取当前用户所有执行记录
+        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndRecordStatus(uId,2);
+        //截取时间日期到日
+        jobRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
+        //group by 根据时间日期
+        Map<Date,Long> job = jobRecordList.stream().collect(Collectors.groupingBy(JobRecord :: getStartTime,Collectors.counting()));
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Date> dates = new ArrayList<>();
+        dateList.forEach(e->{
+            try {
+                dates.add(format.parse(e));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+        });
+        Integer i=0;
+        //根据时间循环取出执行数量
+        for(Date s : dates){
+            Integer sum ;
+            if(job.get(s)==null){
+                sum=0;
+            }else {
+                sum=job.get(s).intValue();
+            }
+            resultList.add(i,sum);
+            i += 1;
+        }
+        resultMap.put("name", "作业成功");
+        resultMap.put("data", resultList);
+        return resultMap;
+    }
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内作业的失败柱状图
+     */
+    @Override
+    public Map<String, Object> getJobFail(Integer uId,List<String> dateList) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        List<Integer> resultList = new ArrayList<Integer>();
+        //获取当前用户所有执行记录
+        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndRecordStatus(uId,3);
+        //截取时间日期到日
+        jobRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
+        //group by 根据时间日期
+        Map<Date,Long> job = jobRecordList.stream().collect(Collectors.groupingBy(JobRecord :: getStartTime,Collectors.counting()));
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Date> dates = new ArrayList<>();
+        dateList.forEach(e->{
+            try {
+                dates.add(format.parse(e));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+        });
+        Integer i=0;
+        //根据时间循环取出执行数量
+        for(Date s : dates){
+            Integer sum ;
+            if(job.get(s)==null){
+                sum=0;
+            }else {
+                sum=job.get(s).intValue();
+            }
+            resultList.add(i,sum);
+            i += 1;
+        }
+        resultMap.put("name", "作业失败");
         resultMap.put("data", resultList);
         return resultMap;
     }

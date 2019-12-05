@@ -16,5 +16,7 @@ public interface JobRecordDao extends CustomRepostory<JobRecord,Integer> {
 
     public List<JobRecord> findByCreateUser(Integer createUser);
 
+    public List<JobRecord> findByCreateUserAndRecordStatus(Integer createUser,Integer recordStatus);
+
 
 }

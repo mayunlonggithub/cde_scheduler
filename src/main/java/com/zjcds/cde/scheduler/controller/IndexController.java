@@ -118,10 +118,24 @@ public class IndexController {
             dateList.add(dateFormat);
         }
         resultMap.put("legend", dateList);
+        //总数
         Map<String, Object> transLine = transMonitorService.getTransLine(kUser.getId(),dateList);
         resultMap.put("trans", transLine);
+        //成功
+        Map<String, Object> transSuccess = transMonitorService.getTransSuccess(kUser.getId(),dateList);
+        resultMap.put("transSuccess", transSuccess);
+        //失败
+        Map<String, Object> transFail = transMonitorService.getTransFail(kUser.getId(),dateList);
+        resultMap.put("transFail", transFail);
+        //总数
         Map<String, Object> jobLine = jobMonitorService.getJobLine(kUser.getId(),dateList);
         resultMap.put("job", jobLine);
+        //成功
+        Map<String, Object> jobSuccess = jobMonitorService.getJobSuccess(kUser.getId(),dateList);
+        resultMap.put("jobSuccess", jobSuccess);
+        //失败
+        Map<String, Object> jobFail = jobMonitorService.getJobFail(kUser.getId(),dateList);
+        resultMap.put("jobFail", jobFail);
         return new ResponseResult<>(true,"请求成功",resultMap);
     }
 

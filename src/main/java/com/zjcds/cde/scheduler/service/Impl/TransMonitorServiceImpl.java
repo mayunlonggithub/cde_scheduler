@@ -13,6 +13,7 @@ import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.CommonUtils;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -147,7 +148,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         //获取当前用户所有执行记录
         List<TransRecord> transRecordList = transRecordDao.findByCreateUser(uId);
         //截取时间日期到日
-        transRecordList.stream().forEach(e ->e.setStartTime(valueOf(e.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())));
+        transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
         Map<Date,Long> trans = transRecordList.stream().collect(Collectors.groupingBy(TransRecord :: getStartTime,Collectors.counting()));
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -172,6 +173,93 @@ public class TransMonitorServiceImpl implements TransMonitorService {
             i += 1;
         }
         resultMap.put("name", "转换");
+        resultMap.put("data", resultList);
+        return resultMap;
+    }
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内转换的成功柱状图
+     */
+    @Override
+    public Map<String, Object> getTransSuccess(Integer uId,List<String> dateList) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        List<Integer> resultList = new ArrayList<Integer>();
+        //获取当前用户所有执行记录
+        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatus(uId,2);
+        //截取时间日期到日
+
+        transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
+        //group by 根据时间日期
+        Map<Date,Long> trans = transRecordList.stream().collect(Collectors.groupingBy(TransRecord :: getStartTime,Collectors.counting()));
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Date> dates = new ArrayList<>();
+        dateList.forEach(e->{
+            try {
+                dates.add(format.parse(e));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+        });
+        Integer i=0;
+        //根据时间循环取出执行数量
+        for(Date s : dates){
+            Integer sum ;
+            if(trans.get(s)==null){
+                sum=0;
+            }else {
+                sum=trans.get(s).intValue();
+            }
+            resultList.add(i,sum);
+            i += 1;
+        }
+        resultMap.put("name", "转换成功");
+        resultMap.put("data", resultList);
+        return resultMap;
+    }
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内转换的失败柱状图
+     */
+    @Override
+    public Map<String, Object> getTransFail(Integer uId,List<String> dateList) {
+        Assert.notNull(uId,"未登录,请重新登录");
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        List<Integer> resultList = new ArrayList<Integer>();
+        //获取当前用户所有执行记录
+        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatus(uId,3);
+        //截取时间日期到日
+        transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
+        //group by 根据时间日期
+        Map<Date,Long> trans = transRecordList.stream().collect(Collectors.groupingBy(TransRecord :: getStartTime,Collectors.counting()));
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Date> dates = new ArrayList<>();
+        dateList.forEach(e->{
+            try {
+                dates.add(format.parse(e));
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+        });
+        Integer i=0;
+        //根据时间循环取出执行数量
+        for(Date s : dates){
+            Integer sum ;
+            if(trans.get(s)==null){
+                sum=0;
+            }else {
+                sum=trans.get(s).intValue();
+            }
+            resultList.add(i,sum);
+            i += 1;
+        }
+        resultMap.put("name", "转换失败");
         resultMap.put("data", resultList);
         return resultMap;
     }

@@ -76,4 +76,22 @@ public interface TransMonitorService {
      * @param uId
      */
     public void updateRunStatusTrans(Integer transId,Integer uId,Integer runStatus);
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内转换的成功柱状图
+     */
+    public Map<String, Object> getTransSuccess(Integer uId,List<String> dateList);
+
+    /**
+     * @param uId 用户ID
+     * @return Map<String   ,   Object>
+     * @Title getTransLine
+     * @Description 获取7天内转换的失败柱状图
+     */
+    public Map<String, Object> getTransFail(Integer uId,List<String> dateList);
+
+
 }
