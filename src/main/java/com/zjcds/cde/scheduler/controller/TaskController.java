@@ -61,8 +61,7 @@ public class TaskController {
     @ApiOperation(value = "删除策略", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> delete(@PathVariable("taskId") Integer taskId){
         Assert.notNull(taskId,"要删除的策略id不能为空");
-        taskService.deleteTask(taskId);
-        return new ResponseResult(true,"请求成功");
+        return taskService.deleteTask(taskId);
     }
 
     @GetMapping("/getList/{quartzId}")
@@ -154,5 +153,4 @@ public class TaskController {
         taskService.shutDownAllTasks();
         return new ResponseResult(true,"请求成功");
     }
-
 }
