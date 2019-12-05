@@ -61,7 +61,6 @@ public class UserController {
         return new ResponseResult<>(true,"注销成功");
     }
 
-
     @GetMapping("/isAdmin")
     @ApiOperation(value = "是否管理员", produces = "application/json;charset=utf-8")
 

@@ -6,9 +6,11 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
+import com.zjcds.cde.scheduler.dao.jpa.view.JobTransViewDao;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.domain.entity.Task;
+import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import com.zjcds.cde.scheduler.quartz.DynamicTask;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TaskService;
@@ -41,6 +43,8 @@ public class TaskServiceImpl implements TaskService {
     private JobService jobService;
     @Autowired
     private TransService transService;
+    @Autowired
+    private JobTransViewDao  jobTransViewDao;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
@@ -93,12 +97,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public PageResult<Task> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId) {
+    public PageResult<JobTransView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId) {
         queryString.add("createUser~Eq~"+uId);
-        queryString.add("status~lt~"+Constant.INVALID);
-        queryString.add("quartzId~Eq~"+quartzId);
-        PageResult<Task> task = taskDao.findAll(paging,queryString,orderBys);
-        return task;
+        queryString.add("stat~lt~"+Constant.INVALID);
+        queryString.add("jobQuartz~Eq~"+quartzId);
+        PageResult<JobTransView> jobTransView= jobTransViewDao.findAll(paging,queryString,orderBys);
+        return jobTransView;
     }
 
     //获取JobDataMap.(Job参数对象)

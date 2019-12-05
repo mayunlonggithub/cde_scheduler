@@ -50,6 +50,9 @@ public class Quartz extends CreateModifyTime {
     private Integer execMonth;
     //执行年份
     private Integer execYear;
+    //说明
+    private String quartzName;
+
 
     @Id
     @Column(name = "quartz_id")
@@ -58,7 +61,6 @@ public class Quartz extends CreateModifyTime {
     public Integer getQuartzId() {
         return quartzId;
     }
-
     public void setQuartzId(Integer quartzId) {
         this.quartzId = quartzId;
     }
@@ -252,4 +254,13 @@ public class Quartz extends CreateModifyTime {
         this.execYear = execYear;
     }
 
+    @Basic
+    @Column(name = "quartz_Name")
+    public String getQuartzName() {
+        return quartzName;
+    }
+
+    public void setQuartzName(String quartzName) {
+        this.quartzName = quartzName;
+    }
 }

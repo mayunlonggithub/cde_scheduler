@@ -33,6 +33,7 @@ public class DynamicTask implements Job {
      * @param executorContext executorContext JobExecutionContext中封装有Quartz运行所需要的所有信息
      * @throws JobExecutionException execute()方法只允许抛出JobExecutionException异常
      */
+    @Override
     public void execute(JobExecutionContext executorContext) throws JobExecutionException {
         long ExeStartTime = System.currentTimeMillis();
         //JobDetail中的JobDataMap是共用的,从getMergedJobDataMap获取的JobDataMap是全新的对象
@@ -44,8 +45,8 @@ public class DynamicTask implements Job {
         String param = map.getString("param");
         Map<String, String> paramMap = (Map) JSON.parse(param);
         logger.info("Running Job ID : {} ", map.getInt("jobId"));
-        logger.info("Running Quartz ID: { }" + map.getInt("quartzId"));
-        logger.info("Running Quartz Description : { }" + map.getString("quartzDesc"));
+        logger.info("Running Quartz ID: {}" , map.getInt("quartzId"));
+        logger.info("Running Quartz Description : {}" , map.getString("quartzDesc"));
         logger.info("Running Task Name : {} ", groupName);
         logger.info("Running Task Group: {} ", map.getString("taskGroup"));
         logger.info("Running User ID: {} ", map.getInt("userId"));

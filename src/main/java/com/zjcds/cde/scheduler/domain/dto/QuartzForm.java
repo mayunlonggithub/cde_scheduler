@@ -56,6 +56,8 @@ public class QuartzForm {
                 private Integer execMonth;
                 @ApiModelProperty(value = "执行年份")
                 private Integer execYear;
+                @ApiModelProperty(value = "策略名称")
+                private String quartzName;
         }
 
         @Getter
@@ -94,6 +96,8 @@ public class QuartzForm {
                 private String quartzDescription;
                 @ApiModelProperty(value = "策略Corn表达式")
                 private String quartzCron;
+                @ApiModelProperty(value = "策略名称")
+                private String quartzName;
         }
         @Getter
         @Setter

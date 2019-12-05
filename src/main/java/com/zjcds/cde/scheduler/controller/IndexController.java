@@ -138,5 +138,4 @@ public class IndexController {
         resultMap.put("jobFail", jobFail);
         return new ResponseResult<>(true,"请求成功",resultMap);
     }
-
 }

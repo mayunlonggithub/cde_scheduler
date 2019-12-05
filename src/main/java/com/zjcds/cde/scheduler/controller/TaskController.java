@@ -7,6 +7,7 @@ import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.domain.entity.User;
+import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import io.swagger.annotations.Api;
@@ -93,17 +94,17 @@ public class TaskController {
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<TaskForm.Task> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request,@PathVariable("quartzId") Integer  quartzId){
+    public ResponseResult<TaskForm.TaskView> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request,@PathVariable("quartzId") Integer  quartzId){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
-            ((List) orderBys).add("startTimeDesc");
+            ((List) orderBys).add("createTimeDesc");
         }
-        PageResult<Task> task= taskService.getList(paging,queryString,orderBys,kUser.getId(),quartzId);
-        PageResult<TaskForm.Task> owner = PageUtils.copyPageResult(task, TaskForm.Task.class);
+        PageResult<JobTransView> task= taskService.getList(paging,queryString,orderBys,kUser.getId(),quartzId);
+        PageResult<TaskForm.TaskView> owner = PageUtils.copyPageResult(task, TaskForm.TaskView.class);
         return new ResponseResult(true,"请求成功",owner);
     }
 
