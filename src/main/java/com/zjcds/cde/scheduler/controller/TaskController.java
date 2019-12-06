@@ -59,10 +59,11 @@ public class TaskController {
     }
 
     @DeleteMapping("/deleteTask/{taskId}")
-    @ApiOperation(value = "删除策略", produces = "application/json;charset=utf-8")
+    @ApiOperation(value = "删除", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> delete(@PathVariable("taskId") Integer taskId){
         Assert.notNull(taskId,"要删除的策略id不能为空");
-        return taskService.deleteTask(taskId);
+        taskService.deleteTask(taskId);
+        return new ResponseResult(true,"请求成功");
     }
 
     @GetMapping("/getList/{quartzId}")

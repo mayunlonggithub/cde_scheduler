@@ -4,9 +4,14 @@ import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
+import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
+import com.zjcds.cde.scheduler.domain.entity.Task;
+import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.QuartzService;
+import com.zjcds.cde.scheduler.service.TransService;
+import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.cde.scheduler.utils.CronUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +30,12 @@ import java.util.List;
 public class QuartzServiceImpl implements QuartzService {
     @Autowired
     private QuartzDao quartzDao;
-
+    @Autowired
+    private TaskDao  taskDao;
+    @Autowired
+    private TransService transService;
+    @Autowired
+    private JobService jobService;
     @Override
     @Transactional
     public void addQuartz(QuartzForm.AddQuartz addQuartz) {
@@ -45,6 +55,15 @@ public class QuartzServiceImpl implements QuartzService {
         Quartz quartz = quartzDao.findByQuartzId(quartzId);
         quartz.setDelFlag(0);
         quartzDao.save(quartz);
+        Integer[] staArray={Constant.COMPLETION,Constant.IMPLEMENT};
+        List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);
+        for(Task task:taskList){
+            if("trans".equals(task.getTaskGroup())){
+                transService.updateTransQuartz(task.getJobId(),null);
+            }else if("job".equals(task.getTaskGroup())){
+                jobService.updateJobQuartz(task.getJobId(),null);
+            }
+        }
     }
 
     @Override
@@ -58,6 +77,15 @@ public class QuartzServiceImpl implements QuartzService {
         Quartz quartz = BeanPropertyCopyUtils.copy(updateQuartz, Quartz.class);
         quartz.setDelFlag(1);
         quartzDao.save(quartz);
+        Integer[] staArray={Constant.COMPLETION,Constant.IMPLEMENT};
+        List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);
+        for(Task task:taskList){
+            if("trans".equals(task.getTaskGroup())){
+                transService.updateTransQuartz(task.getJobId(),task.getQuartzId());
+            }else if("job".equals(task.getTaskGroup())){
+                jobService.updateJobQuartz(task.getJobId(),task.getQuartzId());
+            }
+        }
     }
 
     @Override
@@ -66,6 +94,7 @@ public class QuartzServiceImpl implements QuartzService {
         PageResult<Quartz> quartz = quartzDao.findAll(paging, queryString, orderBys);
         return quartz;
     }
+
     @Override
     //根据当前时间和Cron表达式获取下次执行时间
     public Date getNextValidTime(Date date, Integer quartzId) throws ParseException {

@@ -16,7 +16,7 @@ import java.util.List;
 public interface TaskService {
     void addTask(TaskForm.AddTask addTask, Integer uId);
 
-    ResponseResult<Void> deleteTask(Integer taskId);
+    void deleteTask(Integer taskId);
 
     void deleteTask(Integer jobId, String taskGroup);
 

@@ -9,7 +9,12 @@ import java.util.List;
  * @author Ma on 20191122
  */
 public interface TaskDao extends CustomRepostory<Task,Integer> {
-         List<Task> findByStatus(Integer status);
-         Task findByJobIdAndTaskGroupAndStatus(Integer jobId,String taskGroup,Integer status);
-         public Task findByTaskId(Integer TaskId);
+    List<Task> findByStatus(Integer status);
+
+    Task findByJobIdAndTaskGroup(Integer jobId, String taskGroup);
+
+    Task findByTaskId(Integer TaskId);
+
+    List<Task> findByQuartzIdAndStatusIn(Integer quartzId, Integer[] status);
 }
+

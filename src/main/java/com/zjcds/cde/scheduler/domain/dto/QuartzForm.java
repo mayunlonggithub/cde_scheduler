@@ -58,6 +58,8 @@ public class QuartzForm {
                 private Integer execYear;
                 @ApiModelProperty(value = "策略名称")
                 private String quartzName;
+                @ApiModelProperty(value = "是否有关联任务")
+                private Integer assTaskFlag;
         }
 
         @Getter

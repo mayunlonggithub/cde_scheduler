@@ -52,6 +52,8 @@ public class Quartz extends CreateModifyTime {
     private Integer execYear;
     //说明
     private String quartzName;
+    //是否有关联任务
+    private Integer assTaskFlag;
 
 
     @Id
@@ -262,5 +264,15 @@ public class Quartz extends CreateModifyTime {
 
     public void setQuartzName(String quartzName) {
         this.quartzName = quartzName;
+    }
+
+    @Basic
+    @Column(name = "asstask_flag")
+    public Integer getAssTaskFlag() {
+        return assTaskFlag;
+    }
+
+    public void setAssTaskFlag(Integer assTaskFlag) {
+        this.assTaskFlag = assTaskFlag;
     }
 }

@@ -53,6 +53,8 @@ public class TaskServiceImpl implements TaskService {
     public void addTask(TaskForm.AddTask addTask,Integer uId){
         Task task= BeanPropertyCopyUtils.copy(addTask,Task.class);
         Quartz quartz=quartzDao.findByQuartzId(task.getQuartzId());
+        quartz.setAssTaskFlag(1);
+        quartzDao.save(quartz);
         task.setStartTime(quartz.getStartTime());
         task.setEndTime(quartz.getEndTime());
         task.setUserId(uId);
@@ -60,35 +62,32 @@ public class TaskServiceImpl implements TaskService {
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
-        if("job".equals(task.getTaskGroup())){
-        jobService.updateJobQuartz(task.getJobId(),task.getQuartzId());}
-        else if("trans".equals(task.getTaskGroup())) {
-            transService.updateTransQuartz(task.getJobId(),task.getQuartzId());}
         }
 
     @Override
     @Transactional
-    public ResponseResult<Void> deleteTask(Integer taskId){
+    public void deleteTask(Integer taskId){
         Task task = taskDao.findByTaskId(taskId);
-        if(task.getStatus()!=Constant.PAUSE){
-            return new ResponseResult(false,"请求失败");
-        }
+        Integer quartzId=task.getQuartzId();
+        Quartz quartz=quartzDao.findByQuartzId(quartzId);
         shutDown(taskId);
         task.setStatus(Constant.INVALID);
+        Integer[] staArray={Constant.IMPLEMENT,Constant.COMPLETION};
+        if(taskDao.findByQuartzIdAndStatusIn(quartzId,staArray)==null){
+            quartz.setAssTaskFlag(0);
+        }
         taskDao.save(task);
         if("trans".equals(task.getTaskGroup())){
             transService.updateTransQuartz(task.getJobId(),null);
         }else if("job".equals(task.getTaskGroup())){
             jobService.updateJobQuartz(task.getJobId(),null);
         }
-        return new ResponseResult(false,"请求失败");
     }
 
     @Override
     @Transactional
     public void deleteTask(Integer jobId, String taskGroup){
-
-        Task task = taskDao.findByJobIdAndTaskGroupAndStatus(jobId,taskGroup,Constant.PAUSE);
+        Task task = taskDao.findByJobIdAndTaskGroup(jobId,taskGroup);
         Integer taskId=task.getTaskId();
         shutDown(taskId);
         task.setStatus(Constant.INVALID);

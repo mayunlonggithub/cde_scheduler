@@ -29,8 +29,7 @@ import java.util.List;
 @Api(description = "作业管理")
 @RequestMapping("/job")
 public class JobController {
-    
-    
+
     @Autowired
     private JobService jobService;
 
