@@ -261,6 +261,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Title addMonitor
      * @Description 添加监控
      */
+    @Async
     @Override
     @Transactional
     public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime) {
