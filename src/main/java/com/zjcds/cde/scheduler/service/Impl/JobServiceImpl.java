@@ -16,6 +16,7 @@ import com.zjcds.cde.scheduler.domain.entity.Repository;
 import com.zjcds.cde.scheduler.service.InitializeService;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
+import com.zjcds.cde.scheduler.service.QuartzService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.cde.scheduler.utils.DateUtils;
@@ -43,6 +44,7 @@ import org.springframework.util.Assert;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +71,8 @@ public class JobServiceImpl implements JobService {
     private TaskService taskService;
     @Autowired
     private InitializeService initializeService;
+    @Autowired
+    private QuartzService quartzService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -215,9 +219,14 @@ public class JobServiceImpl implements JobService {
                 //新增策略
                 taskService.addTask(addTask, uId);
             }
-        }
-    }
+        }else{
+            if(quartz!=null) {
+                taskService.deleteTask(jobId, "job");
+            }
 
+        }
+
+    }
 
     /**
      * @param jobId 作业ID
@@ -227,18 +236,21 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     @Transactional
-    public void start(Integer jobId, Integer uId, Map<String, String> param) throws KettleException {
+    public void start(Integer jobId, Integer uId, Map<String, String> param) throws KettleException, ParseException {
         Assert.notNull(uId, "未登录,请重新登录");
         Assert.notNull(jobId, "要启动的作业id不能为空");
         Job job = jobDao.findByJobId(jobId);
         Repository repository = repositoryDao.findByRepositoryId(job.getJobRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
-        Date nexExecuteTime = null;
+        Date  nexExecuteTime;
+        if(job.getJobQuartz()==null){
+            nexExecuteTime=null;
+        }else{
+             nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());}
         //添加监控
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime);
-        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime, param);
-
+        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param);
     }
 
 

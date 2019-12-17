@@ -8,6 +8,7 @@ import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.entity.*;
 import com.zjcds.cde.scheduler.service.InitializeService;
+import com.zjcds.cde.scheduler.service.QuartzService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
@@ -37,6 +38,7 @@ import org.springframework.util.Assert;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +67,8 @@ public class TransServiceImpl implements TransService {
     private TaskService taskService;
     @Autowired
     private InitializeService initializeService;
+    @Autowired
+    private QuartzService quartzService;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -214,6 +218,10 @@ public class TransServiceImpl implements TransService {
                 taskService.addTask(addTask,uId);
             }
 
+        }else{
+            if(quartz!=null) {
+                taskService.deleteTask(transId, "trans");
+            }
         }
     }
 
@@ -226,14 +234,14 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     @Transactional
-    public void start(Integer transId,Integer uId,Map<String,String> param)throws KettleException {
+    public void start(Integer transId,Integer uId,Map<String,String> param) throws KettleException, ParseException {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要启动的作业id不能为空");
         Trans trans = transDao.findByTransId(transId);
         Repository repository = repositoryDao.findByRepositoryId(trans.getTransRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
-        Date nexExecuteTime = null;
+        Date nexExecuteTime = quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
         //添加监控
         transMonitorService.addMonitor(uId,transId,nexExecuteTime);
         ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param);

@@ -134,25 +134,25 @@ public class TaskController {
         taskService.shutDown(taskId);
         return new ResponseResult(true,"请求成功");
     }
-    /**
-     * 执行全部任务
-     * @throws SchedulerException
-     */
-    @GetMapping("/startAllTasks")
-    @ApiOperation(value = "全部执行", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> startAllTasks( ) {
-        taskService.startAllTasks();
-        return new ResponseResult(true,"请求成功");
-    }
-
-    /**
-     *停止全部任务
-     *
-     */
-    @GetMapping("/shutDownAllTasks")
-    @ApiOperation(value = "全部停止", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> shutDownAllTasks( ) {
-        taskService.shutDownAllTasks();
-        return new ResponseResult(true,"请求成功");
-    }
+//    /**
+//     * 执行全部任务
+//     * @throws SchedulerException
+//     */
+//    @GetMapping("/startAllTasks")
+//    @ApiOperation(value = "全部执行", produces = "application/json;charset=utf-8")
+//    public ResponseResult<Void> startAllTasks( ) {
+//        taskService.startAllTasks();
+//        return new ResponseResult(true,"请求成功");
+//    }
+//
+//    /**
+//     *停止全部任务
+//     *
+//     */
+//    @GetMapping("/shutDownAllTasks")
+//    @ApiOperation(value = "全部停止", produces = "application/json;charset=utf-8")
+//    public ResponseResult<Void> shutDownAllTasks( ) {
+//        taskService.shutDownAllTasks();
+//        return new ResponseResult(true,"请求成功");
+//    }
 }

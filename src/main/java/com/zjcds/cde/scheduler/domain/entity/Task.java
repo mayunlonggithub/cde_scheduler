@@ -39,6 +39,8 @@ public class Task {
     private Integer modifyUser;
     //调度策略描述
     private String quartzDesc;
+    //是否删除
+    private Integer delFlag;
 
     @Id
     @Column(name = "task_id")
@@ -181,5 +183,13 @@ public class Task {
     public void setQuartzDesc(String quartzDesc) {
         this.quartzDesc = quartzDesc;
     }
+    @Basic
+    @Column(name = "del_flag")
+    public Integer getDelFlag() {
+        return delFlag;
+    }
 
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
+    }
 }

@@ -30,26 +30,18 @@ public class CodeController {
     @ApiOperation(value = "监控状态信息", produces = "application/json;charset=utf-8")
     public ResponseResult<List<BaseValue>> getMonitorStatus() {
         List<BaseValue> bList = new ArrayList<>();
-        BaseValue baseValue = new BaseValue();
-        baseValue.setKey("0");
-        baseValue.setValue("未执行");
         BaseValue baseValue1 = new BaseValue();
         baseValue1.setKey("1");
-        baseValue1.setValue("执行");
+        baseValue1.setValue("生效");
         BaseValue baseValue2 = new BaseValue();
         baseValue2.setKey("2");
-        baseValue2.setValue("停止");
+        baseValue2.setValue("失效");
         BaseValue baseValue3 = new BaseValue();
         baseValue3.setKey("3");
         baseValue3.setValue("完成");
-        BaseValue baseValue4 = new BaseValue();
-        baseValue4.setKey("4");
-        baseValue4.setValue("失效");
-        bList.add(baseValue);
         bList.add(baseValue1);
         bList.add(baseValue2);
         bList.add(baseValue3);
-        bList.add(baseValue4);
         return new ResponseResult(true, "请求成功", bList);
     }
 
@@ -80,6 +72,9 @@ public class CodeController {
     @ApiOperation(value = "任务执行状态信息", produces = "application/json;charset=utf-8")
     public ResponseResult<List<BaseValue>> getRecordStatus() {
         List<BaseValue> bList = new ArrayList<>();
+        BaseValue baseValue0 = new BaseValue();
+        baseValue0.setKey("1");
+        baseValue0.setValue("执行中");
         BaseValue baseValue1 = new BaseValue();
         baseValue1.setKey("2");
         baseValue1.setValue("成功");
@@ -88,6 +83,7 @@ public class CodeController {
         baseValue2.setValue("失败");
         bList.add(baseValue1);
         bList.add(baseValue2);
+        bList.add(baseValue0);
         return new ResponseResult(true, "请求成功", bList);
     }
 

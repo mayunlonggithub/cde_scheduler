@@ -17,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -122,11 +123,10 @@ public class JobController {
     @PutMapping("/start/{jobId}")
     @ApiOperation(value = "开始作业", produces = "application/json;charset=utf-8")
 
-    public ResponseResult<Void> start(@RequestBody JobForm.JobParam jobParam, @PathVariable(required = true ,name = "jobId") Integer jobId, HttpServletRequest request)throws KettleException {
+    public ResponseResult<Void> start(@RequestBody JobForm.JobParam jobParam, @PathVariable(required = true ,name = "jobId") Integer jobId, HttpServletRequest request) throws KettleException, ParseException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         jobService.start(jobId,kUser.getId(),jobParam.getParam());
         return new ResponseResult(true,"请求成功");
     }
-    
 }

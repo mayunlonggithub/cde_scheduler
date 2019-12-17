@@ -41,7 +41,7 @@ public class DynamicTask implements Job {
         Integer taskId = map.getInt("taskId");
         Integer jobId = map.getInt("jobId");
         Integer uId = map.getInt("userId");
-        String groupName = map.getString("groupName");
+        String groupName = map.getString("taskGroup");
         String param = map.getString("param");
         Map<String, String> paramMap = (Map) JSON.parse(param);
         logger.info("Running Job ID : {} ", map.getInt("jobId"));

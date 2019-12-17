@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class CdmJobController {
     @PostMapping("/cdmJobExecute")
     @ApiOperation(value = "执行任务", produces = "application/json;charset=utf-8")
 
-    public ResponseResult<Void> cdmJobExecute(@RequestBody CdmJobForm.CdmJobParam cdmJobParam, HttpServletRequest request) throws KettleException {
+    public ResponseResult<Void> cdmJobExecute(@RequestBody CdmJobForm.CdmJobParam cdmJobParam, HttpServletRequest request) throws KettleException, ParseException {
 //        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
 //        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         cdmJobService.cdmJobExecute(cdmJobParam,2);

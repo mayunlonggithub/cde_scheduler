@@ -54,14 +54,17 @@ public class QuartzServiceImpl implements QuartzService {
     public void deleteQuartz(Integer quartzId) {
         Quartz quartz = quartzDao.findByQuartzId(quartzId);
         quartz.setDelFlag(0);
+        quartz.setAssTaskFlag(0);
         quartzDao.save(quartz);
-        Integer[] staArray={Constant.COMPLETION,Constant.IMPLEMENT};
+        Integer[] staArray={Constant.COMPLETION,Constant.VALID};
         List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);
-        for(Task task:taskList){
-            if("trans".equals(task.getTaskGroup())){
-                transService.updateTransQuartz(task.getJobId(),null);
-            }else if("job".equals(task.getTaskGroup())){
-                jobService.updateJobQuartz(task.getJobId(),null);
+        if(taskList!=null) {
+            for (Task task : taskList) {
+                if ("trans".equals(task.getTaskGroup())) {
+                    transService.updateTransQuartz(task.getJobId(), null);
+                } else if ("job".equals(task.getTaskGroup())) {
+                    jobService.updateJobQuartz(task.getJobId(), null);
+                }
             }
         }
     }
@@ -77,13 +80,15 @@ public class QuartzServiceImpl implements QuartzService {
         Quartz quartz = BeanPropertyCopyUtils.copy(updateQuartz, Quartz.class);
         quartz.setDelFlag(1);
         quartzDao.save(quartz);
-        Integer[] staArray={Constant.COMPLETION,Constant.IMPLEMENT};
+        Integer[] staArray={Constant.COMPLETION,Constant.VALID};
         List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);
-        for(Task task:taskList){
-            if("trans".equals(task.getTaskGroup())){
-                transService.updateTransQuartz(task.getJobId(),task.getQuartzId());
-            }else if("job".equals(task.getTaskGroup())){
-                jobService.updateJobQuartz(task.getJobId(),task.getQuartzId());
+        if(taskList!=null) {
+            for (Task task : taskList) {
+                if ("trans".equals(task.getTaskGroup())) {
+                    transService.updateTransQuartz(task.getJobId(), task.getQuartzId());
+                } else if ("job".equals(task.getTaskGroup())) {
+                    jobService.updateJobQuartz(task.getJobId(), task.getQuartzId());
+                }
             }
         }
     }
@@ -102,7 +107,6 @@ public class QuartzServiceImpl implements QuartzService {
         CronExpression cronExpression = new CronExpression(cron);
         return cronExpression.getNextValidTimeAfter(date);
     }
-
     @Override
     public List<Quartz> getQuartzByDelFlag(Integer flag){
         return quartzDao.findByDelFlag(flag);

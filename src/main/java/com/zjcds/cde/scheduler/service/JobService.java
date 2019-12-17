@@ -9,6 +9,7 @@ import org.pentaho.di.core.exception.KettleException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public interface JobService {
      * @Title start
      * @Description 启动作业
      */
-    public void start(Integer jobId,Integer uId,Map<String,String> param)throws KettleException;
+    public void start(Integer jobId,Integer uId,Map<String,String> param) throws KettleException, ParseException;
 
     /**
      * 手动执行

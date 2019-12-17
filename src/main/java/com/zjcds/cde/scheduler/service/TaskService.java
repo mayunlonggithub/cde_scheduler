@@ -28,7 +28,7 @@ public interface TaskService {
 
     void shutDown(Integer taskId);
 
-    void startAllTasks();
-
-    void shutDownAllTasks();
+//    void startAllTasks();
+//
+//    void shutDownAllTasks();
 }

@@ -3,7 +3,6 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
-import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobTransViewDao;
@@ -58,7 +57,8 @@ public class TaskServiceImpl implements TaskService {
         task.setStartTime(quartz.getStartTime());
         task.setEndTime(quartz.getEndTime());
         task.setUserId(uId);
-        task.setStatus(Constant.IMPLEMENT);
+        task.setStatus(Constant.VALID);
+        task.setDelFlag(1);
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
@@ -71,9 +71,10 @@ public class TaskServiceImpl implements TaskService {
         Integer quartzId=task.getQuartzId();
         Quartz quartz=quartzDao.findByQuartzId(quartzId);
         shutDown(taskId);
-        task.setStatus(Constant.INVALID);
-        Integer[] staArray={Constant.IMPLEMENT,Constant.COMPLETION};
-        if(taskDao.findByQuartzIdAndStatusIn(quartzId,staArray)==null){
+        task.setDelFlag(0);
+        Integer[] staArray={Constant.VALID,Constant.COMPLETION};
+        List<Task> list=taskDao.findByQuartzIdAndStatusIn(quartzId,staArray);
+        if(list.size()==0){
             quartz.setAssTaskFlag(0);
         }
         taskDao.save(task);
@@ -87,18 +88,24 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public void deleteTask(Integer jobId, String taskGroup){
-        Task task = taskDao.findByJobIdAndTaskGroup(jobId,taskGroup);
+        Integer[] status={Constant.VALID,Constant.COMPLETION};
+        Task task = taskDao.findByJobIdAndTaskGroupAndStatusIn(jobId,taskGroup,status);
+        Integer quartzId=task.getQuartzId();
         Integer taskId=task.getTaskId();
         shutDown(taskId);
-        task.setStatus(Constant.INVALID);
+        task.setDelFlag(0);
         taskDao.save(task);
-
+        Quartz quartz=quartzDao.findByQuartzId(quartzId);
+        List<Task> list=taskDao.findByQuartzIdAndStatusIn(quartzId,status);
+        if(list.size()==0){
+            quartz.setAssTaskFlag(0);
+        }
     }
 
     @Override
     public PageResult<JobTransView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId) {
         queryString.add("createUser~Eq~"+uId);
-        queryString.add("stat~lt~"+Constant.INVALID);
+        queryString.add("delFlag~eq~1");
         queryString.add("jobQuartz~Eq~"+quartzId);
         PageResult<JobTransView> jobTransView= jobTransViewDao.findAll(paging,queryString,orderBys);
         return jobTransView;
@@ -152,7 +159,7 @@ public class TaskServiceImpl implements TaskService {
             scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.deleteJob(jobKey);
         }
-        List<Task> list = taskDao.findByStatus(Constant.IMPLEMENT);
+        List<Task> list = taskDao.findByStatus(Constant.VALID);
         for (Task task : list) {
             logger.info("Job register name : {} , cron : {}", task.getTaskName(),task.getTaskGroup());
             JobDataMap map = getJobDataMap(task);
@@ -165,7 +172,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void runTask(Integer taskId) {
         Task task = taskDao.findByTaskId(taskId);
-        task.setStatus(Constant.IMPLEMENT);
+        task.setStatus(Constant.VALID);
         taskDao.save(task);
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         JobDataMap map = getJobDataMap(task);
@@ -177,59 +184,58 @@ public class TaskServiceImpl implements TaskService {
         } catch (SchedulerException e) {
             logger.error(e.toString());
         }
-
     }
+
     @Override
     public void shutDown(Integer taskId) {
         Task task = taskDao.findByTaskId(taskId);
-        task.setStatus(Constant.PAUSE);
+        task.setStatus(Constant.INVALID);
         taskDao.save(task);
-        TriggerKey triggerKey = new TriggerKey(task.getTaskGroup() + task.getTaskName());
         JobKey jobKey = getTaskKey(task);
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         try {
-            scheduler.unscheduleJob(triggerKey);
+            scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.deleteJob(jobKey);
         }catch (SchedulerException e) {
             logger.error(e.toString());
         }
     }
-
-    @Override
-    public void startAllTasks() {
-        List<Task> list = taskDao.findByStatus(Constant.PAUSE);
-        Scheduler scheduler = schedulerFactoryBean.getScheduler();
-        for (Task task : list) {
-            JobDataMap map = getJobDataMap(task);
-            JobKey jobKey = getTaskKey(task);
-            JobDetail jobDetail = getTaskDetail(jobKey, task.getTaskDesc(), map);
-            task.setStatus(Constant.IMPLEMENT);
-            taskDao.save(task);
-            try {
-            scheduler.scheduleJob(jobDetail, getTrigger(task));
-            }catch (SchedulerException e) {
-                logger.error(e.toString());
-            }
-            logger.info("Job register name : {} , cron : {}", task.getTaskName(),task.getTaskGroup());
-        }
-    }
-
-    @Override
-    public void shutDownAllTasks( ){
-        List<Task> list = taskDao.findByStatus(Constant.IMPLEMENT);
-        Scheduler scheduler = schedulerFactoryBean.getScheduler();
-        for (Task task : list) {
-            TriggerKey triggerKey = new TriggerKey(task.getTaskGroup() + task.getTaskName());
-            JobKey jobKey = getTaskKey(task);
-            task.setStatus(Constant.PAUSE);
-            taskDao.save(task);
-            try {
-                scheduler.unscheduleJob(triggerKey);
-                scheduler.deleteJob(jobKey);
-            }catch (SchedulerException e) {
-            logger.error(e.toString());
-        }
-            logger.info("Job Pause name : {} , cron : {}", task.getTaskName(),task.getTaskGroup());
-        }
-    }
+//
+//    @Override
+//    public void startAllTasks() {
+//        List<Task> list = taskDao.findByStatus(Constant.VALID);
+//        Scheduler scheduler = schedulerFactoryBean.getScheduler();
+//        for (Task task : list) {
+//            JobDataMap map = getJobDataMap(task);
+//            JobKey jobKey = getTaskKey(task);
+//            JobDetail jobDetail = getTaskDetail(jobKey, task.getTaskDesc(), map);
+//            task.setStatus(Constant.VALID);
+//            taskDao.save(task);
+//            try {
+//            scheduler.scheduleJob(jobDetail, getTrigger(task));
+//            }catch (SchedulerException e) {
+//                logger.error(e.toString());
+//            }
+//            logger.info("Job register name : {} , cron : {}", task.getTaskName(),task.getTaskGroup());
+//        }
+//    }
+//
+//    @Override
+//    public void shutDownAllTasks( ){
+//        List<Task> list = taskDao.findByStatus(Constant.VALID);
+//        Scheduler scheduler = schedulerFactoryBean.getScheduler();
+//        for (Task task : list) {
+//            TriggerKey triggerKey = new TriggerKey(task.getTaskGroup() + task.getTaskName());
+//            JobKey jobKey = getTaskKey(task);
+//            task.setStatus(Constant.INVALID);
+//            taskDao.save(task);
+//            try {
+//                scheduler.unscheduleJob(triggerKey);
+//                scheduler.deleteJob(jobKey);
+//            }catch (SchedulerException e) {
+//            logger.error(e.toString());
+//        }
+//            logger.info("Job Pause name : {} , cron : {}", task.getTaskName(),task.getTaskGroup());
+//        }
+//    }
 }

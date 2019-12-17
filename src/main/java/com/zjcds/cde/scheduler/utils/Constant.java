@@ -85,10 +85,9 @@ public class Constant extends Const {
 	public static Properties props;
 
 	/** job status **/
-	public static final Integer IMPLEMENT=1;
-	public static final Integer PAUSE=2;
+	public static final Integer VALID =1;
+	public static final Integer INVALID =2;
 	public static final Integer COMPLETION=3;
-	public static final Integer INVALID=4;
 
 	/**quartz flag**/
 	public static final Integer Period=1;

@@ -9,6 +9,7 @@ import org.pentaho.di.core.exception.KettleException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public interface TransService {
      * @Title start
      * @Description 启动转换
      */
-    public void start(Integer transId,Integer uId,Map<String,String> param)throws KettleException;
+    public void start(Integer transId,Integer uId,Map<String,String> param) throws KettleException, ParseException;
 
 
     /**

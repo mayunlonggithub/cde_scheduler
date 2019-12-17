@@ -11,12 +11,14 @@ import com.zjcds.cde.scheduler.quartz.DBConnectionModel;
 import com.zjcds.cde.scheduler.service.CdmJobService;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
+import com.zjcds.cde.scheduler.service.QuartzService;
 import org.pentaho.di.core.exception.KettleException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -36,21 +38,22 @@ public class CdmJobServiceImpl implements CdmJobService {
     JobMonitorService jobMonitorService;
     @Autowired
     private JobDao jobDao;
-
+    @Autowired
+    private QuartzService quartzService;
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath1;
 
 
     @Override
     @Transactional
-    public void cdmJobExecute(CdmJobForm.CdmJobParam cdmJobParam,Integer uId) throws KettleException {
+    public void cdmJobExecute(CdmJobForm.CdmJobParam cdmJobParam,Integer uId) throws KettleException, ParseException {
         Repository repository = repositoryDao.findByCreateUserAndDelFlag(uId,1).get(0);
 //        DBConnectionModel dBConnectionModel = new DBConnectionModel(driverClassName,url,username,password);
         Job job = jobDao.findByJobNameAndDelFlagAndCreateUser(cdmJobParam.getJobName(),1,uId);
         String logLevel = job.getJobLogLevel();
         String logFilePath = cdeLogFilePath1;
         Date executeTime = new Date();
-        Date nexExecuteTime = null;
+        Date nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());
         //添加监控
         jobMonitorService.addMonitor(uId,job.getJobId(),nexExecuteTime);
         jobService.manualRunRepositoryJob(repository,job.getJobId().toString(),job.getJobName(),job.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam());
