@@ -39,5 +39,9 @@ public class JobRecordForm {
         private String logFilePath;
         @ApiModelProperty(value = "添加者")
         private Integer createUser;
+        @ApiModelProperty(value = "资源库ID")
+        private Integer repositoryId;
+        @ApiModelProperty(value = "是否手动执行")
+        private  Integer manualExe;
     }
 }

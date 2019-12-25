@@ -12,6 +12,7 @@ import java.util.Objects;
 public class JobRecordView {
     private Integer recordId;
     private Integer recordJob;
+    private Date planStartTime;
     private Date startTime;
     private Date stopTime;
     private Integer recordStatus;
@@ -19,6 +20,8 @@ public class JobRecordView {
     private Integer createUser;
     private String recordJobName;
     private String duration;
+    private Integer repositoryId;
+    private Integer manualExe;
 
     @Id
     @Column(name = "record_id")
@@ -105,8 +108,37 @@ public class JobRecordView {
     public String getDuration() {
         return duration;
     }
-
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    @Basic
+    @Column(name = "job_repository_id")
+    public Integer getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(Integer repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
+    @Basic
+    @Column(name = "manual_execution")
+    public Integer getManualExe() {
+        return manualExe;
+    }
+
+    public void setManualExe(Integer manualExe) {
+        this.manualExe = manualExe;
+    }
+
+    @Basic
+    @Column(name = "plan_start_time")
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
     }
 }

@@ -19,6 +19,9 @@ public class TransRecordView {
     private Integer createUser;
     private String recordTransName;
     private String duration;
+    private Integer repositoryId;
+    private Integer manualExe;
+    private Date planStartTime;
 
     @Id
     @Column(name = "record_id")
@@ -108,5 +111,33 @@ public class TransRecordView {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    @Basic
+    @Column(name = "trans_repository_id")
+    public Integer getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(Integer repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+    @Basic
+    @Column(name = "manual_execution")
+    public Integer getManualExe() {
+        return manualExe;
+    }
+
+    public void setManualExe(Integer manualExe) {
+        this.manualExe = manualExe;
+    }
+    @Basic
+    @Column(name="plan_start_time")
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
     }
 }

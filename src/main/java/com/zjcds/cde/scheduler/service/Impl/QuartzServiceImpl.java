@@ -6,10 +6,12 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
+import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.QuartzService;
+import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.cde.scheduler.utils.CronUtils;
@@ -36,6 +38,8 @@ public class QuartzServiceImpl implements QuartzService {
     private TransService transService;
     @Autowired
     private JobService jobService;
+    @Autowired
+    private TaskService taskService;
     @Override
     @Transactional
     public void addQuartz(QuartzForm.AddQuartz addQuartz) {
@@ -62,8 +66,10 @@ public class QuartzServiceImpl implements QuartzService {
             for (Task task : taskList) {
                 if ("trans".equals(task.getTaskGroup())) {
                     transService.updateTransQuartz(task.getJobId(), null);
+                    taskService.shutDown(task.getTaskId());
                 } else if ("job".equals(task.getTaskGroup())) {
                     jobService.updateJobQuartz(task.getJobId(), null);
+                    taskService.shutDown(task.getTaskId());
                 }
             }
         }
@@ -79,17 +85,18 @@ public class QuartzServiceImpl implements QuartzService {
         }
         Quartz quartz = BeanPropertyCopyUtils.copy(updateQuartz, Quartz.class);
         quartz.setDelFlag(1);
+        quartz.setAssTaskFlag(1);
         quartzDao.save(quartz);
         Integer[] staArray={Constant.COMPLETION,Constant.VALID};
         List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);
         if(taskList!=null) {
             for (Task task : taskList) {
-                if ("trans".equals(task.getTaskGroup())) {
-                    transService.updateTransQuartz(task.getJobId(), task.getQuartzId());
-                } else if ("job".equals(task.getTaskGroup())) {
-                    jobService.updateJobQuartz(task.getJobId(), task.getQuartzId());
+                task.setQuartzDesc(quartz.getQuartzDescription());
+                task.setStartTime(quartz.getStartTime());
+                task.setEndTime(quartz.getEndTime());
+                taskService.shutDown(task.getTaskId());
+                taskService.runTask(task.getTaskId());
                 }
-            }
         }
     }
 

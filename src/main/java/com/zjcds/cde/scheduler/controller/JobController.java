@@ -71,7 +71,7 @@ public class JobController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
-            ((List) orderBys).add("createTimeDesc");
+            ((List) orderBys).add("jobQuartzDesc");
         }
         PageResult<Job> job = jobService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<JobForm.Job>  owner = PageUtils.copyPageResult(job,JobForm.Job.class);
@@ -126,7 +126,7 @@ public class JobController {
     public ResponseResult<Void> start(@RequestBody JobForm.JobParam jobParam, @PathVariable(required = true ,name = "jobId") Integer jobId, HttpServletRequest request) throws KettleException, ParseException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        jobService.start(jobId,kUser.getId(),jobParam.getParam());
+        jobService.start(jobId,kUser.getId(),jobParam.getParam(),1);
         return new ResponseResult(true,"请求成功");
     }
 }

@@ -62,9 +62,9 @@ public class DynamicTask implements Job {
                 log.info(">>>>>>>>>>>>>Trigger has been completed>>>>>>>>>>>>>");
             }
             if("job".equals(groupName)) {
-                jobService.start(jobId, uId, paramMap);
+                jobService.start(jobId, uId, paramMap,0);
             }else if("trans".equals(groupName)) {
-                transService.start(jobId, uId, paramMap);
+                transService.start(jobId, uId, paramMap,0);
             }
         } catch(Exception e){
                 e.printStackTrace();

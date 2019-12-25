@@ -29,6 +29,10 @@ public class TransRecord {
     private String recordTransName;
     //时间差
     private String duration;
+    //是否手动执行
+    private Integer manualExecute;
+    //计划开始时间
+    private Date  planStartTime;
 
     @Id
     @Column(name = "record_id")
@@ -120,4 +124,23 @@ public class TransRecord {
     public void setDuration(String duration) {
         this.duration = duration;
     }
+
+    @Basic
+    @Column(name="manual_execution")
+    public Integer getManualExecute() {
+        return manualExecute;
+    }
+
+    public void setManualExecute(Integer manualExecute) {
+        this.manualExecute = manualExecute;
+    }
+    @Basic
+    @Column(name = "plan_start_time")
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
+    }
+
 }

@@ -83,7 +83,7 @@ public class JobMonitorController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
-            ((List) orderBys).add("lastExecuteTimeDesc");
+            ((List) orderBys).add("monitorStatusDesc");
 
         }
         PageResult<JobMonitorView> job = jobMonitorService.getList(paging,queryString, orderBys, kUser.getId());

@@ -15,8 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "v_job_trans")
-@IdClass(JobTransViewPK.class)
-public class JobTransView {
+public class JobTransView  {
     private Integer taskId;
     private int jobId;
     private Integer categoryId;

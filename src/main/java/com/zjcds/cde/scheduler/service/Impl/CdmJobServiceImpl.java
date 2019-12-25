@@ -56,7 +56,7 @@ public class CdmJobServiceImpl implements CdmJobService {
         Date nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());
         //添加监控
         jobMonitorService.addMonitor(uId,job.getJobId(),nexExecuteTime);
-        jobService.manualRunRepositoryJob(repository,job.getJobId().toString(),job.getJobName(),job.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam());
+        jobService.manualRunRepositoryJob(repository,job.getJobId().toString(),job.getJobName(),job.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam(),null);
     }
 
 

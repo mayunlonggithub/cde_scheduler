@@ -126,7 +126,7 @@ public class TransController {
     public ResponseResult<Void> start(@RequestBody TransForm.TransParam transParam, @PathVariable(required = true ,name = "transId") Integer transId, HttpServletRequest request) throws KettleException, ParseException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        transService.start(transId,kUser.getId(),transParam.getParam());
+        transService.start(transId,kUser.getId(),transParam.getParam(),1);
         return new ResponseResult(true,"请求成功");
     }
 }

@@ -82,6 +82,7 @@ public class TransMonitorController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
+            orderBys.add("monitorStatusDesc");
         }
         PageResult<TransMonitorView> trans = transMonitorService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<TransMonitorForm.TransMonitor>  owner = PageUtils.copyPageResult(trans,TransMonitorForm.TransMonitor.class);

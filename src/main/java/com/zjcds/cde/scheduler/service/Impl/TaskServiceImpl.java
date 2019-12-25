@@ -24,6 +24,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -57,12 +58,18 @@ public class TaskServiceImpl implements TaskService {
         task.setStartTime(quartz.getStartTime());
         task.setEndTime(quartz.getEndTime());
         task.setUserId(uId);
-        task.setStatus(Constant.VALID);
+        Date date=new Date();
+        if(date.after(quartz.getEndTime())){
+        task.setStatus(Constant.VALID);}
+        else{
+            task.setStatus(Constant.COMPLETION);
+        }
         task.setDelFlag(1);
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
         }
+
 
     @Override
     @Transactional
@@ -89,7 +96,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void deleteTask(Integer jobId, String taskGroup){
         Integer[] status={Constant.VALID,Constant.COMPLETION};
-        Task task = taskDao.findByJobIdAndTaskGroupAndStatusIn(jobId,taskGroup,status);
+        Task task = taskDao.findByJobIdAndTaskGroupAndStatusInAndDelFlag(jobId,taskGroup,status,1);
         Integer quartzId=task.getQuartzId();
         Integer taskId=task.getTaskId();
         shutDown(taskId);

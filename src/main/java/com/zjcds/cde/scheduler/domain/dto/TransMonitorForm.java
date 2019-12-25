@@ -39,6 +39,8 @@ public class TransMonitorForm {
         private Date lastExecuteTime;
         @ApiModelProperty(value = "下次执行时间")
         private Date nextExecuteTime;
+        @ApiModelProperty(value = "资源库ID")
+        private Integer repositoryId;
     }
 
     @Getter

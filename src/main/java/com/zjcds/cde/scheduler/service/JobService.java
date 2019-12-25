@@ -87,7 +87,7 @@ public interface JobService {
      * @Title start
      * @Description 启动作业
      */
-    public void start(Integer jobId,Integer uId,Map<String,String> param) throws KettleException, ParseException;
+    public void start(Integer jobId,Integer uId,Map<String,String> param,Integer manualExe) throws KettleException, ParseException;
 
     /**
      * 手动执行
@@ -103,7 +103,7 @@ public interface JobService {
      * @param param 参数map
      * @throws KettleException
      */
-    public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException;
+    public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param,Integer manualExe) throws KettleException;
 
 
     /**

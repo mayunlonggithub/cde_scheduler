@@ -22,9 +22,7 @@ import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.pentaho.di.core.KettleEnvironment;
 import org.pentaho.di.core.ProgressNullMonitorListener;
-import org.pentaho.di.core.database.DatabaseMeta;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.KettleLogStore;
 import org.pentaho.di.core.logging.LogLevel;
@@ -32,7 +30,6 @@ import org.pentaho.di.core.logging.LoggingBuffer;
 import org.pentaho.di.job.JobMeta;
 import org.pentaho.di.repository.RepositoryDirectoryInterface;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepository;
-import org.pentaho.di.repository.kdr.KettleDatabaseRepositoryMeta;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -223,9 +220,7 @@ public class JobServiceImpl implements JobService {
             if(quartz!=null) {
                 taskService.deleteTask(jobId, "job");
             }
-
         }
-
     }
 
     /**
@@ -235,22 +230,24 @@ public class JobServiceImpl implements JobService {
      * @Description 启动作业
      */
     @Override
-    @Transactional
-    public void start(Integer jobId, Integer uId, Map<String, String> param) throws KettleException, ParseException {
+//    @Transactional
+    public void start(Integer jobId, Integer uId, Map<String, String> param,Integer manualExe) throws KettleException, ParseException {
         Assert.notNull(uId, "未登录,请重新登录");
         Assert.notNull(jobId, "要启动的作业id不能为空");
         Job job = jobDao.findByJobId(jobId);
         Repository repository = repositoryDao.findByRepositoryId(job.getJobRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
-        Date  nexExecuteTime;
+        Date nexExecuteTime;
         if(job.getJobQuartz()==null){
             nexExecuteTime=null;
         }else{
-             nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());}
+             nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());
+        }
         //添加监控
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime);
-        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param);
+        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
+
     }
 
 
@@ -271,8 +268,8 @@ public class JobServiceImpl implements JobService {
      */
     @Async
     @Override
-    @Transactional
-    public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String, String> param) throws KettleException {
+//    @Transactional
+    public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String, String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId, "未登录,请重新登录");
         KettleDatabaseRepository kettleDatabaseRepository = initializeService.init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
@@ -290,11 +287,21 @@ public class JobServiceImpl implements JobService {
             job.setLogLevel(Constant.logger(logLevel));
         }
         String exception = null;
-        Integer recordStatus = 2;
+
 //            Date jobStartDate = null;
         Date jobStopDate = null;
         String logText = null;
         Integer runStatus = 2;
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(Integer.parseInt(jobId),Integer.parseInt(userId));
+        JobRecord jobRecord = new JobRecord();
+        jobRecord.setRecordJob(Integer.parseInt(jobId));
+        jobRecord.setCreateUser(Integer.parseInt(userId));
+        jobRecord.setRecordStatus(1);
+        jobRecord.setPlanStartTime(templateOne.getLastExecuteTime());
+        jobRecord.setStartTime(executeTime);
+        jobRecord.setManualExecute(manualExe);
+        jobRecordDao.save(jobRecord);
+        Integer recordStatus = 2;
         try {
 //                jobStartDate = new Date();
             //更改监控状态为执行中
@@ -324,12 +331,8 @@ public class JobServiceImpl implements JobService {
                 LoggingBuffer appender = KettleLogStore.getAppender();
                 logText = appender.getBuffer(logChannelId, true).toString();
                 try {
-                    JobRecord jobRecord = new JobRecord();
-                    jobRecord.setRecordJob(Integer.parseInt(jobId));
-                    jobRecord.setCreateUser(Integer.parseInt(userId));
                     jobRecord.setLogFilePath(allLogFilePath.toString());
                     jobRecord.setRecordStatus(recordStatus);
-                    jobRecord.setStartTime(executeTime);
                     jobRecord.setStopTime(jobStopDate);
                     jobRecord.setDuration(DateUtils.getDuration(executeTime,jobStopDate));
                     writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime, runStatus, userId);

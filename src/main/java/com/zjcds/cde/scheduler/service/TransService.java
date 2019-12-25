@@ -84,7 +84,7 @@ public interface TransService {
      * @Title start
      * @Description 启动转换
      */
-    public void start(Integer transId,Integer uId,Map<String,String> param) throws KettleException, ParseException;
+    public void start(Integer transId,Integer uId,Map<String,String> param,Integer manualExe) throws KettleException, ParseException;
 
 
     /**
@@ -101,7 +101,7 @@ public interface TransService {
      * @param param 参数map
      * @throws KettleException
      */
-    public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException;
+    public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param,Integer manualExe) throws KettleException;
 
 
     /**

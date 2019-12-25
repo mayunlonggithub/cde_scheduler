@@ -234,7 +234,7 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     @Transactional
-    public void start(Integer transId,Integer uId,Map<String,String> param) throws KettleException, ParseException {
+    public void start(Integer transId,Integer uId,Map<String,String> param,Integer manualExe) throws KettleException, ParseException {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要启动的作业id不能为空");
         Trans trans = transDao.findByTransId(transId);
@@ -244,7 +244,7 @@ public class TransServiceImpl implements TransService {
         Date nexExecuteTime = quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
         //添加监控
         transMonitorService.addMonitor(uId,transId,nexExecuteTime);
-        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param);
+        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
     }
 
     /**
@@ -264,7 +264,7 @@ public class TransServiceImpl implements TransService {
     @Async
     @Override
     @Transactional
-    public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param) throws KettleException {
+    public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId,"未登录,请重新登录");
         KettleDatabaseRepository kettleDatabaseRepository  = initializeService.init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
@@ -285,6 +285,15 @@ public class TransServiceImpl implements TransService {
 //            Date jobStartDate = null;
         Date transStopDate = null;
         String logText = null;
+        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(Integer.parseInt(transId),Integer.parseInt(userId));
+        TransRecord transRecord = new TransRecord();
+        transRecord.setRecordTrans(Integer.parseInt(transId));
+        transRecord.setCreateUser(Integer.parseInt(userId));
+        transRecord.setRecordStatus(1);
+        transRecord.setPlanStartTime(templateOne.getLastExecuteTime());
+        transRecord.setStartTime(executeTime);
+        transRecord.setManualExecute(manualExe);
+        transRecordDao.save(transRecord);
         Integer runStatus = 2;
         try {
             //更改监控状态为执行中
@@ -314,12 +323,8 @@ public class TransServiceImpl implements TransService {
                 LoggingBuffer appender = KettleLogStore.getAppender();
                 logText = appender.getBuffer(logChannelId, true).toString();
                 try {
-                    TransRecord transRecord = new TransRecord();
-                    transRecord.setRecordTrans(Integer.parseInt(transId));
-                    transRecord.setCreateUser(Integer.parseInt(userId));
                     transRecord.setLogFilePath(allLogFilePath.toString());
                     transRecord.setRecordStatus(recordStatus);
-                    transRecord.setStartTime(executeTime);
                     transRecord.setStopTime(transStopDate);
                     transRecord.setDuration(DateUtils.getDuration(executeTime,transStopDate));
                     writeToDBAndFile(transRecord, logText, executeTime, nexExecuteTime,runStatus,userId);

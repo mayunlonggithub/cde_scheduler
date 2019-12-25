@@ -5,14 +5,11 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.TransMonitorDao;
 import com.zjcds.cde.scheduler.dao.jpa.TransRecordDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.TransMonitorViewDao;
-import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
 import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
-import com.zjcds.cde.scheduler.utils.CommonUtils;
-import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -23,11 +20,12 @@ import org.springframework.util.Assert;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.sql.Date.valueOf;
 
 /**
  * jackson 相关配置

@@ -23,6 +23,8 @@ public class JobRecord {
     private Integer recordId;
     //作业ID
     private Integer recordJob;
+    //计划开始时间
+    private Date  planStartTime;
     //启动时间
     private Date startTime;
     //停止时间
@@ -37,6 +39,8 @@ public class JobRecord {
     private String recordJobName;
     //时间差
     private String duration;
+    //是否手动执行
+    private Integer manualExecute;
 
     @Id
     @Column(name = "record_id")
@@ -127,5 +131,25 @@ public class JobRecord {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    @Basic
+    @Column(name = "plan_start_time")
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
+    }
+
+    @Basic
+    @Column(name="manual_execution")
+
+    public Integer getManualExecute() {
+        return manualExecute;
+    }
+
+    public void setManualExecute(Integer manualExecute) {
+        this.manualExecute = manualExecute;
     }
 }

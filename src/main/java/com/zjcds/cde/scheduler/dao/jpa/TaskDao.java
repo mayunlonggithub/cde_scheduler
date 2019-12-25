@@ -11,7 +11,7 @@ import java.util.List;
 public interface TaskDao extends CustomRepostory<Task,Integer> {
     List<Task> findByStatus(Integer status);
 
-    Task findByJobIdAndTaskGroupAndStatusIn(Integer jobId, String taskGroup,Integer[] status);
+    Task findByJobIdAndTaskGroupAndStatusInAndDelFlag(Integer jobId, String taskGroup,Integer[] status,Integer delFlag);
 
     Task findByTaskId(Integer TaskId);
 
