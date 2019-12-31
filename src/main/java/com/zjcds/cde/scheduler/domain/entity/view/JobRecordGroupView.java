@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.domain.entity.view;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -12,8 +13,8 @@ import java.util.Objects;
 public class JobRecordGroupView {
     private Integer recordId;
     private Integer recordJob;
-    private Timestamp startTime;
-    private Timestamp stopTime;
+    private Date startTime;
+    private Date stopTime;
     private Integer recordStatus;
     private String logFilePath;
     private Integer createUser;
@@ -45,21 +46,21 @@ public class JobRecordGroupView {
 
     @Basic
     @Column(name = "start_time")
-    public Timestamp getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
     @Basic
     @Column(name = "stop_time")
-    public Timestamp getStopTime() {
+    public Date getStopTime() {
         return stopTime;
     }
 
-    public void setStopTime(Timestamp stopTime) {
+    public void setStopTime(Date stopTime) {
         this.stopTime = stopTime;
     }
 

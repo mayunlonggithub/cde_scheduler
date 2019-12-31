@@ -116,7 +116,7 @@ public class TransServiceImpl implements TransService {
         trans.setDelFlag(0);
         transDao.save(trans);
         //移除策略
-        taskService.deleteTask(trans.getTransQuartz());
+        taskService.deleteTask(transId,"trans",uId);
     }
 
     /**
@@ -211,16 +211,16 @@ public class TransServiceImpl implements TransService {
             if(!updateTrans.getTransQuartz().equals(quartz)){
                 if(quartz!=null){
                     //移除策略
-                    taskService.deleteTask(transId,"trans");
+                    taskService.deleteTask(transId,"trans",uId);
                 }
 
                 //添加策略
-                taskService.addTask(addTask,uId);
+                taskService.addTask(addTask,uId,transId);
             }
 
         }else{
             if(quartz!=null) {
-                taskService.deleteTask(transId, "trans");
+                taskService.deleteTask(transId, "trans",uId);
             }
         }
     }

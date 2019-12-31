@@ -6,13 +6,16 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.dao.jpa.JobDao;
 import com.zjcds.cde.scheduler.dao.jpa.JobMonitorDao;
 import com.zjcds.cde.scheduler.dao.jpa.JobRecordDao;
+import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.RepositoryDao;
+import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.domain.dto.JobForm;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
 import com.zjcds.cde.scheduler.domain.entity.Job;
 import com.zjcds.cde.scheduler.domain.entity.JobMonitor;
 import com.zjcds.cde.scheduler.domain.entity.JobRecord;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
+import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.service.InitializeService;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
@@ -70,6 +73,10 @@ public class JobServiceImpl implements JobService {
     private InitializeService initializeService;
     @Autowired
     private QuartzService quartzService;
+    @Autowired
+    private QuartzDao quartzDao;
+    @Autowired
+    private TaskDao taskdao;
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -116,7 +123,7 @@ public class JobServiceImpl implements JobService {
         job.setDelFlag(0);
         jobDao.save(job);
         //移除策略
-        taskService.deleteTask(job.getJobQuartz());
+        taskService.deleteTask(jobId,uId);
     }
 
     /**
@@ -211,14 +218,16 @@ public class JobServiceImpl implements JobService {
             if (!updateJob.getJobQuartz().equals(quartz)) {
                 if(quartz!=null){
                     //移除策略
-                    taskService.deleteTask(jobId,"job");
+                    taskService.deleteTask(jobId,"job",uId);
                 }
+
                 //新增策略
-                taskService.addTask(addTask, uId);
+                taskService.addTask(addTask, uId,jobId);
+
             }
         }else{
             if(quartz!=null) {
-                taskService.deleteTask(jobId, "job");
+                taskService.deleteTask(jobId, "job",uId);
             }
         }
     }
@@ -238,16 +247,10 @@ public class JobServiceImpl implements JobService {
         Repository repository = repositoryDao.findByRepositoryId(job.getJobRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
-        Date nexExecuteTime;
-        if(job.getJobQuartz()==null){
-            nexExecuteTime=null;
-        }else{
-             nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());
-        }
+        Date nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
         //添加监控
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime);
         ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
-
     }
 
 

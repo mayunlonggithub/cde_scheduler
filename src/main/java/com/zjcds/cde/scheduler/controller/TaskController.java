@@ -49,20 +49,14 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/addTask")
-    @ApiOperation(value = "添加任务", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> addTask(@RequestBody TaskForm.AddTask addTask, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        taskService.addTask(addTask,kUser.getId());
-        return new ResponseResult(true,"请求成功");
-    }
 
     @DeleteMapping("/deleteTask/{taskId}")
     @ApiOperation(value = "删除", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> delete(@PathVariable("taskId") Integer taskId){
+    public ResponseResult<Void> delete(@PathVariable("taskId") Integer taskId,HttpServletRequest request){
         Assert.notNull(taskId,"要删除的策略id不能为空");
-        taskService.deleteTask(taskId);
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        taskService.deleteTask(taskId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 

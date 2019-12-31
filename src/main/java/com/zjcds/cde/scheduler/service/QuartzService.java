@@ -13,10 +13,10 @@ import java.util.List;
  */
 public interface QuartzService
 {
-    void addQuartz(QuartzForm.AddQuartz addQuartz);
+    void addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId);
     void deleteQuartz(Integer quartzId);
     void updateQuartz(QuartzForm.UpdateQuartz updateQuartz);
-    PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys);
+    PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId);
     Date getNextValidTime(Date date, Integer quartzId) throws ParseException;
     List<Quartz> getQuartzByDelFlag(Integer flag);
 }

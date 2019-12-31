@@ -11,6 +11,7 @@ import com.zjcds.cde.scheduler.domain.entity.Quartz;
 import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import com.zjcds.cde.scheduler.quartz.DynamicTask;
+import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransService;
@@ -33,7 +34,7 @@ import java.util.Set;
  */
 @Service
 public class TaskServiceImpl implements TaskService {
-   @Autowired
+    @Autowired
     private TaskDao taskDao;
     @Autowired
     private QuartzDao quartzDao;
@@ -44,92 +45,97 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TransService transService;
     @Autowired
-    private JobTransViewDao  jobTransViewDao;
+    private JobTransViewDao jobTransViewDao;
+    @Autowired
+    private JobMonitorService jobMonitorService;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     @Override
     @Transactional
-    public void addTask(TaskForm.AddTask addTask,Integer uId){
-        Task task= BeanPropertyCopyUtils.copy(addTask,Task.class);
-        Quartz quartz=quartzDao.findByQuartzId(task.getQuartzId());
+    public void addTask(TaskForm.AddTask addTask, Integer uId, Integer jobId) {
+        Task task = BeanPropertyCopyUtils.copy(addTask, Task.class);
+        Quartz quartz = quartzDao.findByQuartzId(task.getQuartzId());
         quartz.setAssTaskFlag(1);
         quartzDao.save(quartz);
         task.setStartTime(quartz.getStartTime());
         task.setEndTime(quartz.getEndTime());
         task.setUserId(uId);
-        Date date=new Date();
-        if(date.after(quartz.getEndTime())){
-        task.setStatus(Constant.VALID);}
-        else{
+        Date date = new Date();
+        if (date.after(quartz.getEndTime())) {
             task.setStatus(Constant.COMPLETION);
+        } else {
+            task.setStatus(Constant.VALID);
         }
         task.setDelFlag(1);
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
-        }
+    }
 
 
     @Override
     @Transactional
-    public void deleteTask(Integer taskId){
+    public void deleteTask(Integer taskId,Integer uId) {
         Task task = taskDao.findByTaskId(taskId);
-        Integer quartzId=task.getQuartzId();
-        Quartz quartz=quartzDao.findByQuartzId(quartzId);
+        Integer quartzId = task.getQuartzId();
+        Integer jobId=task.getJobId();
+        Quartz quartz = quartzDao.findByQuartzId(quartzId);
         shutDown(taskId);
         task.setDelFlag(0);
-        Integer[] staArray={Constant.VALID,Constant.COMPLETION};
-        List<Task> list=taskDao.findByQuartzIdAndStatusIn(quartzId,staArray);
-        if(list.size()==0){
+        Integer[] staArray = {Constant.VALID, Constant.COMPLETION};
+        List<Task> list = taskDao.findByQuartzIdAndStatusIn(quartzId, staArray);
+        if (list.size() == 0) {
             quartz.setAssTaskFlag(0);
         }
         taskDao.save(task);
-        if("trans".equals(task.getTaskGroup())){
-            transService.updateTransQuartz(task.getJobId(),null);
-        }else if("job".equals(task.getTaskGroup())){
-            jobService.updateJobQuartz(task.getJobId(),null);
+        if ("trans".equals(task.getTaskGroup())) {
+            transService.updateTransQuartz(task.getJobId(), null);
+        } else if ("job".equals(task.getTaskGroup())) {
+            jobService.updateJobQuartz(task.getJobId(), null);
         }
+        jobMonitorService.addMonitor(uId,jobId,null);
     }
 
     @Override
     @Transactional
-    public void deleteTask(Integer jobId, String taskGroup){
-        Integer[] status={Constant.VALID,Constant.COMPLETION};
-        Task task = taskDao.findByJobIdAndTaskGroupAndStatusInAndDelFlag(jobId,taskGroup,status,1);
-        Integer quartzId=task.getQuartzId();
-        Integer taskId=task.getTaskId();
+    public void deleteTask(Integer jobId, String taskGroup,Integer uId) {
+        Integer[] status = {Constant.VALID, Constant.COMPLETION};
+        Task task = taskDao.findByJobIdAndTaskGroupAndStatusInAndDelFlag(jobId, taskGroup, status, 1);
+        Integer quartzId = task.getQuartzId();
+        Integer taskId = task.getTaskId();
         shutDown(taskId);
         task.setDelFlag(0);
         taskDao.save(task);
-        Quartz quartz=quartzDao.findByQuartzId(quartzId);
-        List<Task> list=taskDao.findByQuartzIdAndStatusIn(quartzId,status);
-        if(list.size()==0){
+        Quartz quartz = quartzDao.findByQuartzId(quartzId);
+        List<Task> list = taskDao.findByQuartzIdAndStatusIn(quartzId, status);
+        if (list.size() == 0) {
             quartz.setAssTaskFlag(0);
         }
+        jobMonitorService.addMonitor(uId,jobId,null);
     }
 
     @Override
-    public PageResult<JobTransView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId,Integer quartzId) {
-        queryString.add("createUser~Eq~"+uId);
+    public PageResult<JobTransView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId, Integer quartzId) {
+        queryString.add("createUser~Eq~" + uId);
         queryString.add("delFlag~eq~1");
-        queryString.add("jobQuartz~Eq~"+quartzId);
-        PageResult<JobTransView> jobTransView= jobTransViewDao.findAll(paging,queryString,orderBys);
+        queryString.add("jobQuartz~Eq~" + quartzId);
+        PageResult<JobTransView> jobTransView = jobTransViewDao.findAll(paging, queryString, orderBys);
         return jobTransView;
     }
 
     //获取JobDataMap.(Job参数对象)
     public JobDataMap getJobDataMap(Task task) {
         JobDataMap map = new JobDataMap();
-        map.put("taskId",task.getTaskId());
-        map.put("jobId",task.getJobId());
-        map.put("quartzId",task.getQuartzId());
-        map.put("quartzDesc",task.getQuartzDesc());
-        map.put("taskName",task.getTaskName());
-        map.put("taskGroup",task.getTaskGroup());
-        map.put("status",task.getStatus());
-        map.put("userId",task.getUserId());
-        map.put("param",task.getParam());
+        map.put("taskId", task.getTaskId());
+        map.put("jobId", task.getJobId());
+        map.put("quartzId", task.getQuartzId());
+        map.put("quartzDesc", task.getQuartzDesc());
+        map.put("taskName", task.getTaskName());
+        map.put("taskGroup", task.getTaskGroup());
+        map.put("status", task.getStatus());
+        map.put("userId", task.getUserId());
+        map.put("param", task.getParam());
         return map;
     }
 
@@ -146,7 +152,7 @@ public class TaskServiceImpl implements TaskService {
     //获取Trigger (Job的触发器,执行规则)
     public Trigger getTrigger(Task task) {
         return TriggerBuilder.newTrigger()
-                .withIdentity(task.getTaskName(),task.getTaskGroup())
+                .withIdentity(task.getTaskName(), task.getTaskGroup())
                 .withSchedule(CronScheduleBuilder.cronSchedule(quartzDao.findByQuartzId(task.getQuartzId()).getQuartzCron()))
                 .startAt(task.getStartTime())
                 .endAt(task.getEndTime())
@@ -168,7 +174,7 @@ public class TaskServiceImpl implements TaskService {
         }
         List<Task> list = taskDao.findByStatus(Constant.VALID);
         for (Task task : list) {
-            logger.info("Job register name : {} , cron : {}", task.getTaskName(),task.getTaskGroup());
+            logger.info("Job register name : {} , cron : {}", task.getTaskName(), task.getTaskGroup());
             JobDataMap map = getJobDataMap(task);
             JobKey jobKey = getTaskKey(task);
             JobDetail jobDetail = getTaskDetail(jobKey, task.getTaskDesc(), map);
@@ -185,7 +191,7 @@ public class TaskServiceImpl implements TaskService {
         JobDataMap map = getJobDataMap(task);
         JobKey jobKey = getTaskKey(task);
 
-        JobDetail jobDetail = getTaskDetail(jobKey,task.getTaskDesc(), map);
+        JobDetail jobDetail = getTaskDetail(jobKey, task.getTaskDesc(), map);
         try {
             scheduler.scheduleJob(jobDetail, getTrigger(task));
         } catch (SchedulerException e) {
@@ -203,7 +209,7 @@ public class TaskServiceImpl implements TaskService {
         try {
             scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.deleteJob(jobKey);
-        }catch (SchedulerException e) {
+        } catch (SchedulerException e) {
             logger.error(e.toString());
         }
     }

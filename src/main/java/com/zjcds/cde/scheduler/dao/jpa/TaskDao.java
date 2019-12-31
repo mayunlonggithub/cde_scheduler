@@ -16,5 +16,8 @@ public interface TaskDao extends CustomRepostory<Task,Integer> {
     Task findByTaskId(Integer TaskId);
 
     List<Task> findByQuartzIdAndStatusIn(Integer quartzId, Integer[] status);
+
+
+
 }
 

@@ -85,7 +85,7 @@ public class IndexController {
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         List<TransMonitorForm.TransMonitorStatis> owner = transRecordService.getListToday(kUser.getId());
         if(owner.size()>5){
-            owner = owner.subList(1,5);
+            owner = owner.subList(0,5);
         }
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -98,7 +98,7 @@ public class IndexController {
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         List<JobMonitorForm.JobMonitorStatis> owner = jobRecordService.getListToday(kUser.getId());
         if(owner.size()>5){
-            owner = owner.subList(1,5);
+            owner = owner.subList(0,5);
         }
         return new ResponseResult(true,"请求成功",owner);
     }

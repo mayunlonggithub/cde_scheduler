@@ -6,7 +6,9 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
 import com.zjcds.cde.scheduler.domain.entity.Quartz;
+import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.QuartzService;
+import com.zjcds.cde.scheduler.utils.Constant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -14,9 +16,12 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,13 +38,15 @@ public class QuartzController {
 
     @PostMapping("/addQuartz")
     @ApiOperation(value = "添加策略", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> addQuartz(@RequestBody QuartzForm.AddQuartz addQuartz){
+    public ResponseResult<Void> addQuartz(@RequestBody QuartzForm.AddQuartz addQuartz, HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (addQuartz.getQuartzCron()!=null) {
             if (!CronExpression.isValidExpression(addQuartz.getQuartzCron())) {
                 return new ResponseResult(false, "Cron表达式不正确");
             }
         }
-        quartzService.addQuartz(addQuartz);
+        quartzService.addQuartz(addQuartz,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 
@@ -92,7 +99,7 @@ public class QuartzController {
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys){
+    public ResponseResult<Void> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,HttpServletRequest request){
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -100,7 +107,9 @@ public class QuartzController {
             orderBys = new ArrayList();
             ((List) orderBys).add("createTimeDesc");
         }
-        PageResult<Quartz> quartz = quartzService.getList(paging,queryString,orderBys);
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        PageResult<Quartz> quartz = quartzService.getList(paging,queryString,orderBys,kUser.getId());
         PageResult<QuartzForm.Quartz> owner = PageUtils.copyPageResult(quartz, QuartzForm.Quartz.class);
         return new ResponseResult(true,"请求成功",owner);
     }

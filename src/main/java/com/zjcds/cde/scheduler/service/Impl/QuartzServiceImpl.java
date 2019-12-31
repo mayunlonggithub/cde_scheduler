@@ -42,7 +42,7 @@ public class QuartzServiceImpl implements QuartzService {
     private TaskService taskService;
     @Override
     @Transactional
-    public void addQuartz(QuartzForm.AddQuartz addQuartz) {
+    public void addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId) {
         if (addQuartz.getQuartzCron() == null) {
             List<String> cron = CronUtils.createQuartzCronressionAndDescription(addQuartz);
             addQuartz.setQuartzCron(cron.get(0));
@@ -50,6 +50,7 @@ public class QuartzServiceImpl implements QuartzService {
         }
         Quartz quartz = BeanPropertyCopyUtils.copy(addQuartz, Quartz.class);
         quartz.setDelFlag(1);
+        quartz.setCreateUser(uId);
         quartzDao.save(quartz);
     }
 
@@ -101,8 +102,9 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     @Override
-    public PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys) {
+    public PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId) {
         queryString.add("delFlag~eq~1");
+        queryString.add("createUser~eq~"+uId);
         PageResult<Quartz> quartz = quartzDao.findAll(paging, queryString, orderBys);
         return quartz;
     }

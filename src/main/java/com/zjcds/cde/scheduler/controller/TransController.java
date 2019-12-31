@@ -71,7 +71,7 @@ public class TransController {
         }
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
-            ((List) orderBys).add("createTimeDesc");
+            ((List) orderBys).add("transQuartzDesc");
         }
         PageResult<Trans> trans = transService.getList(paging,queryString, orderBys, kUser.getId());
         PageResult<TransForm.Trans>  owner = PageUtils.copyPageResult(trans,TransForm.Trans.class);

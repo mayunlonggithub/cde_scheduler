@@ -14,11 +14,11 @@ import java.util.List;
  * @author Ma on 20191122
  */
 public interface TaskService {
-    void addTask(TaskForm.AddTask addTask, Integer uId);
+    void addTask(TaskForm.AddTask addTask, Integer uId,Integer jobId);
 
-    void deleteTask(Integer taskId);
+    void deleteTask(Integer taskId,Integer uId);
 
-    void deleteTask(Integer jobId, String taskGroup);
+    void deleteTask(Integer jobId, String taskGroup,Integer uId);
 
     PageResult<JobTransView> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId, Integer quartzId);
 
