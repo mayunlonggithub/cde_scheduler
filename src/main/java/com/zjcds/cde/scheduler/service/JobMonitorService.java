@@ -58,7 +58,7 @@ public interface JobMonitorService {
      * @Title addMonitor
      * @Description 添加监控
      */
-    public void addMonitor(Integer userId, Integer jobId, Date nextExecuteTime);
+    public void addMonitor(Integer userId, Integer jobId, Date nextExecuteTime,Integer manualExe);
 
     /**
      * @param uId 用户ID

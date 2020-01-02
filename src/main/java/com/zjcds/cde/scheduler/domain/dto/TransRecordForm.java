@@ -42,5 +42,7 @@ public class TransRecordForm {
         private Integer repositoryId;
         @ApiModelProperty(value = "是否手动执行")
         private  Integer manualExe;
+        @ApiModelProperty(value = "转换路径")
+        private String transPath;
     }
 }

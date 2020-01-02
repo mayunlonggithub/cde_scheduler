@@ -41,6 +41,8 @@ public class TransMonitorForm {
         private Date nextExecuteTime;
         @ApiModelProperty(value = "资源库ID")
         private Integer repositoryId;
+        @ApiModelProperty(value = "转换路径")
+        private String transPath;
     }
 
     @Getter

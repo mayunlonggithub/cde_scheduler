@@ -22,6 +22,7 @@ public class JobRecordView {
     private String duration;
     private Integer repositoryId;
     private Integer manualExe;
+    private String  jobPath;
 
     @Id
     @Column(name = "record_id")
@@ -140,5 +141,15 @@ public class JobRecordView {
 
     public void setPlanStartTime(Date planStartTime) {
         this.planStartTime = planStartTime;
+    }
+
+    @Basic
+    @Column(name = "job_path")
+    public String getJobPath() {
+        return jobPath;
+    }
+
+    public void setJobPath(String jobPath) {
+        this.jobPath = jobPath;
     }
 }

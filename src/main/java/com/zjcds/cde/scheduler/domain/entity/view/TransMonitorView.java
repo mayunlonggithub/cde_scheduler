@@ -22,6 +22,7 @@ public class TransMonitorView {
     private String monitorTransName;
     private Integer repositoryId;
     private String repositoryName;
+    private String transPath;
 
     @Id
     @Column(name = "monitor_id")
@@ -141,5 +142,15 @@ public class TransMonitorView {
 
     public void setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;
+    }
+
+    @Basic
+    @Column(name = "trans_path")
+    public String getTransPath() {
+        return transPath;
+    }
+
+    public void setTransPath(String transPath) {
+        this.transPath = transPath;
     }
 }

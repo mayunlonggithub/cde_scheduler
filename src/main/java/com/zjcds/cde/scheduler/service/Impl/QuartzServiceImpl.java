@@ -116,6 +116,7 @@ public class QuartzServiceImpl implements QuartzService {
         CronExpression cronExpression = new CronExpression(cron);
         return cronExpression.getNextValidTimeAfter(date);
     }
+
     @Override
     public List<Quartz> getQuartzByDelFlag(Integer flag){
         return quartzDao.findByDelFlag(flag);

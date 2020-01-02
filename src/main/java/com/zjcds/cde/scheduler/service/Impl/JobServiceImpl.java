@@ -249,7 +249,7 @@ public class JobServiceImpl implements JobService {
         Date executeTime = new Date();
         Date nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
         //添加监控
-        jobMonitorService.addMonitor(uId,jobId,nexExecuteTime);
+        jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe);
         ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
     }
 

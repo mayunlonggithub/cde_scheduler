@@ -23,6 +23,7 @@ public class JobMonitorView {
     private String monitorJobName;
     private Integer repositoryId;
     private String repositoryName;
+    private String jobPath;
 
     @Id
     @Column(name = "monitor_id")
@@ -142,5 +143,15 @@ public class JobMonitorView {
 
     public void setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;
+    }
+
+    @Basic
+    @Column(name = "job_path")
+    public String getJobPath() {
+        return jobPath;
+    }
+
+    public void setJobPath(String jobPath) {
+        this.jobPath = jobPath;
     }
 }

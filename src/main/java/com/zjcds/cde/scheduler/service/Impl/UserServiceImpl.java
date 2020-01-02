@@ -182,8 +182,8 @@ public class UserServiceImpl implements UserService {
         }
         Assert.notNull(u,"该用户不存在或已删除");
         User user = BeanPropertyCopyUtils.copy(updateUser,User.class);
-        Assert.isTrue(user.getAccount().equals("admin"),"管理员admin用户不能修改");
-        Assert.isTrue(user.getAccount().equals("cdm"),"数据治理cdm用户不能修改");
+        Assert.isTrue(!"admin".equals(u.getAccount()),"管理员admin用户不能修改");
+        Assert.isTrue(!"cdm".equals(u.getAccount()),"数据治理cdm用户不能修改");
         user.setPassword(u.getPassword());
         user.setCreateUser(u.getCreateUser());
         user.setModifyUser(uId);

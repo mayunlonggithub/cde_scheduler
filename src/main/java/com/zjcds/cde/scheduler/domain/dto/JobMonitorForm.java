@@ -41,8 +41,8 @@ public class JobMonitorForm {
         private Date nextExecuteTime;
         @ApiModelProperty(value = "资源库ID")
         private Integer repositoryId;
-
-
+        @ApiModelProperty(value = "作业路径")
+        private String jobPath;
     }
 
     @Getter

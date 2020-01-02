@@ -94,7 +94,7 @@ public class TaskServiceImpl implements TaskService {
         } else if ("job".equals(task.getTaskGroup())) {
             jobService.updateJobQuartz(task.getJobId(), null);
         }
-        jobMonitorService.addMonitor(uId,jobId,null);
+        jobMonitorService.addMonitor(uId,jobId,null,0);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class TaskServiceImpl implements TaskService {
         if (list.size() == 0) {
             quartz.setAssTaskFlag(0);
         }
-        jobMonitorService.addMonitor(uId,jobId,null);
+        jobMonitorService.addMonitor(uId,jobId,null,0);
     }
 
     @Override

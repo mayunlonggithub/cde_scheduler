@@ -43,5 +43,7 @@ public class JobRecordForm {
         private Integer repositoryId;
         @ApiModelProperty(value = "是否手动执行")
         private  Integer manualExe;
+        @ApiModelProperty(value = "作业路径")
+        private String jobPath;
     }
 }

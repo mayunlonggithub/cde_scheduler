@@ -264,7 +264,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Async
     @Override
     @Transactional
-    public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime) {
+    public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime,Integer manualExe) {
         Assert.notNull(uId,"未登录,请重新登录");
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobId,uId);
         if (null != templateOne) {

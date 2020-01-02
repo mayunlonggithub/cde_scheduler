@@ -22,6 +22,7 @@ public class TransRecordView {
     private Integer repositoryId;
     private Integer manualExe;
     private Date planStartTime;
+    private String transPath;
 
     @Id
     @Column(name = "record_id")
@@ -139,5 +140,15 @@ public class TransRecordView {
 
     public void setPlanStartTime(Date planStartTime) {
         this.planStartTime = planStartTime;
+    }
+
+    @Basic
+    @Column(name = "trans_path")
+    public String getTransPath() {
+        return transPath;
+    }
+
+    public void setTransPath(String transPath) {
+        this.transPath = transPath;
     }
 }
