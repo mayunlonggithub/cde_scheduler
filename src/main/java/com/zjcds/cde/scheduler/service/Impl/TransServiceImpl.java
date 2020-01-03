@@ -272,6 +272,16 @@ public class TransServiceImpl implements TransService {
     @Transactional
     public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId,"未登录,请重新登录");
+        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(Integer.parseInt(transId),Integer.parseInt(userId));
+        TransRecord transRecord = new TransRecord();
+        transRecord.setRecordTrans(Integer.parseInt(transId));
+        transRecord.setCreateUser(Integer.parseInt(userId));
+        transRecord.setRecordStatus(1);
+        transRecord.setPlanStartTime(templateOne.getLastExecuteTime());
+        transRecord.setStartTime(executeTime);
+        transRecord.setManualExecute(manualExe);
+        transRecordDao.save(transRecord);
+        Integer runStatus = 2;
         KettleDatabaseRepository kettleDatabaseRepository  = initializeService.init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(transPath);
@@ -291,16 +301,6 @@ public class TransServiceImpl implements TransService {
 //            Date jobStartDate = null;
         Date transStopDate = null;
         String logText = null;
-        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(Integer.parseInt(transId),Integer.parseInt(userId));
-        TransRecord transRecord = new TransRecord();
-        transRecord.setRecordTrans(Integer.parseInt(transId));
-        transRecord.setCreateUser(Integer.parseInt(userId));
-        transRecord.setRecordStatus(1);
-        transRecord.setPlanStartTime(templateOne.getLastExecuteTime());
-        transRecord.setStartTime(executeTime);
-        transRecord.setManualExecute(manualExe);
-        transRecordDao.save(transRecord);
-        Integer runStatus = 2;
         try {
             //更改监控状态为执行中
             transMonitorService.updateRunStatusTrans(Integer.parseInt(transId),Integer.parseInt(userId),1);

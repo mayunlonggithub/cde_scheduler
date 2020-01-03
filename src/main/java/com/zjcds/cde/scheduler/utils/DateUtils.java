@@ -44,7 +44,7 @@ public class DateUtils {
             long days = diff / (1000 * 60 * 60 * 24);
             long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
             long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
-            long second = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000);
+            long second = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60)-minutes*(1000*60))/(1000);
             if(days>0){
                 duration = ""+days+"天"+hours+"小时"+minutes+"分"+second+"秒";
             }

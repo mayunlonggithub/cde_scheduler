@@ -272,6 +272,16 @@ public class JobServiceImpl implements JobService {
 //    @Transactional
     public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String, String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId, "未登录,请重新登录");
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(Integer.parseInt(jobId),Integer.parseInt(userId));
+        JobRecord jobRecord = new JobRecord();
+        jobRecord.setRecordJob(Integer.parseInt(jobId));
+        jobRecord.setCreateUser(Integer.parseInt(userId));
+        jobRecord.setRecordStatus(1);
+        jobRecord.setPlanStartTime(templateOne.getLastExecuteTime());
+        jobRecord.setStartTime(executeTime);
+        jobRecord.setManualExecute(manualExe);
+        jobRecordDao.save(jobRecord);
+        Integer recordStatus = 2;
         KettleDatabaseRepository kettleDatabaseRepository = initializeService.init(repository);
         RepositoryDirectoryInterface directory = kettleDatabaseRepository.loadRepositoryDirectoryTree()
                 .findDirectory(jobPath);
@@ -293,16 +303,6 @@ public class JobServiceImpl implements JobService {
         Date jobStopDate = null;
         String logText = null;
         Integer runStatus = 2;
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(Integer.parseInt(jobId),Integer.parseInt(userId));
-        JobRecord jobRecord = new JobRecord();
-        jobRecord.setRecordJob(Integer.parseInt(jobId));
-        jobRecord.setCreateUser(Integer.parseInt(userId));
-        jobRecord.setRecordStatus(1);
-        jobRecord.setPlanStartTime(templateOne.getLastExecuteTime());
-        jobRecord.setStartTime(executeTime);
-        jobRecord.setManualExecute(manualExe);
-        jobRecordDao.save(jobRecord);
-        Integer recordStatus = 2;
         try {
 //                jobStartDate = new Date();
             //更改监控状态为执行中
