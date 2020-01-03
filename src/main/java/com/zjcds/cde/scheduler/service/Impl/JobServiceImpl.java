@@ -218,7 +218,6 @@ public class JobServiceImpl implements JobService {
                 }
                 //新增策略
                 taskService.addTask(addTask, uId,jobId);
-
             }
         }else{
             if(quartz!=null) {
@@ -235,7 +234,7 @@ public class JobServiceImpl implements JobService {
      */
     @Override
 //    @Transactional
-    public void start(Integer jobId, Integer uId, Map<String, String> param,Integer manualExe) throws KettleException, ParseException {
+    public void start(Integer jobId, Integer uId, Map<String, String> param,Integer manualExe,Integer completion) throws KettleException, ParseException {
         Assert.notNull(uId, "未登录,请重新登录");
         Assert.notNull(jobId, "要启动的作业id不能为空");
         Job job = jobDao.findByJobId(jobId);
@@ -243,12 +242,12 @@ public class JobServiceImpl implements JobService {
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime=null;
+        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
         if(job.getJobQuartz()!=null){
             nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
-            jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe);}
+            jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe,completion);}
         else{
-        jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe);}
-        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
+        jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe,completion);}
     }
 
 
@@ -277,7 +276,8 @@ public class JobServiceImpl implements JobService {
         jobRecord.setRecordJob(Integer.parseInt(jobId));
         jobRecord.setCreateUser(Integer.parseInt(userId));
         jobRecord.setRecordStatus(1);
-        jobRecord.setPlanStartTime(templateOne.getLastExecuteTime());
+        if(templateOne!=null){
+        jobRecord.setPlanStartTime(templateOne.getNextExecuteTime());}
         jobRecord.setStartTime(executeTime);
         jobRecord.setManualExecute(manualExe);
         jobRecordDao.save(jobRecord);

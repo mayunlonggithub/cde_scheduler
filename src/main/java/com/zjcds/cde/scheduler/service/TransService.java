@@ -84,7 +84,7 @@ public interface TransService {
      * @Title start
      * @Description 启动转换
      */
-    public void start(Integer transId,Integer uId,Map<String,String> param,Integer manualExe) throws KettleException, ParseException;
+    public void start(Integer transId,Integer uId,Map<String,String> param,Integer manualExe,Integer completion) throws KettleException, ParseException;
 
 
     /**

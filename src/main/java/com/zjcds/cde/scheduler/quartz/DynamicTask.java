@@ -59,12 +59,18 @@ public class DynamicTask implements Job {
             if (triggerState.equals(Trigger.TriggerState.COMPLETE)) {
                 task.setStatus(Constant.COMPLETION);
                 taskDao.save(task);
+                if("job".equals(groupName)) {
+                    jobService.start(jobId, uId, paramMap,0,1);
+                }else if("trans".equals(groupName)) {
+                    transService.start(jobId, uId, paramMap,0,1);
+                }
                 log.info(">>>>>>>>>>>>>Trigger has been completed>>>>>>>>>>>>>");
-            }
-            if("job".equals(groupName)) {
-                jobService.start(jobId, uId, paramMap,0);
-            }else if("trans".equals(groupName)) {
-                transService.start(jobId, uId, paramMap,0);
+            }else {
+                if ("job".equals(groupName)) {
+                    jobService.start(jobId, uId, paramMap, 0,0 );
+                } else if ("trans".equals(groupName)) {
+                    transService.start(jobId, uId, paramMap, 0,0);
+                }
             }
         } catch(Exception e){
                 e.printStackTrace();

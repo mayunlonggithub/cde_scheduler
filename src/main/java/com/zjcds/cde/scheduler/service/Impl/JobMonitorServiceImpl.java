@@ -260,16 +260,19 @@ public class JobMonitorServiceImpl implements JobMonitorService {
 //    @Async
     @Override
     @Transactional
-    public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime,Integer manualExe) {
+    public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime,Integer manualExe,Integer completionFlag) {
         Assert.notNull(uId,"未登录,请重新登录");
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobId,uId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
             templateOne.setRunStatus(0);
-            if(manualExe==1){
+            if(manualExe==1||completionFlag==0){
             templateOne.setLastExecuteTime(new Date());}
             if(manualExe==0){
             templateOne.setNextExecuteTime(nextExecuteTime);}
+            if(completionFlag==1){
+                templateOne.setNextExecuteTime(null);
+            }
             jobMonitorDao.save(templateOne);
         } else {
             JobMonitor jobMonitor = new JobMonitor();
@@ -279,11 +282,17 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             jobMonitor.setMonitorFail(0);
             jobMonitor.setMonitorStatus(1);
             jobMonitor.setRunStatus(0);
-            jobMonitor.setLastExecuteTime(null);
+            if(completionFlag==1){
+            jobMonitor.setLastExecuteTime(null);}
+            else{
+                jobMonitor.setLastExecuteTime(new Date());
+            }
+
             if(manualExe==0){
                 jobMonitor.setNextExecuteTime(nextExecuteTime);
             }
             jobMonitorDao.save(jobMonitor);
+
         }
     }
 

@@ -235,8 +235,8 @@ public class TransServiceImpl implements TransService {
      * @Description 启动转换
      */
     @Override
-    @Transactional
-    public void start(Integer transId,Integer uId,Map<String,String> param,Integer manualExe) throws KettleException, ParseException {
+//    @Transactional
+    public void start(Integer transId,Integer uId,Map<String,String> param,Integer manualExe,Integer completion) throws KettleException, ParseException {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要启动的作业id不能为空");
         Trans trans = transDao.findByTransId(transId);
@@ -244,13 +244,14 @@ public class TransServiceImpl implements TransService {
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime=null;
+        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
         if(trans.getTransQuartz()!=null){
             nexExecuteTime=quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
-            transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe);
+            transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe,completion);
         }else {
-            transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe);
+            transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe,completion);
         }
-        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
+
     }
 
     /**
@@ -269,7 +270,7 @@ public class TransServiceImpl implements TransService {
      */
     @Async
     @Override
-    @Transactional
+//    @Transactional
     public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId,"未登录,请重新登录");
         TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(Integer.parseInt(transId),Integer.parseInt(userId));
@@ -277,7 +278,8 @@ public class TransServiceImpl implements TransService {
         transRecord.setRecordTrans(Integer.parseInt(transId));
         transRecord.setCreateUser(Integer.parseInt(userId));
         transRecord.setRecordStatus(1);
-        transRecord.setPlanStartTime(templateOne.getLastExecuteTime());
+        if(templateOne!=null)
+        transRecord.setPlanStartTime(templateOne.getNextExecuteTime());
         transRecord.setStartTime(executeTime);
         transRecord.setManualExecute(manualExe);
         transRecordDao.save(transRecord);

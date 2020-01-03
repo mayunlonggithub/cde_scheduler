@@ -87,7 +87,7 @@ public interface JobService {
      * @Title start
      * @Description 启动作业
      */
-    public void start(Integer jobId,Integer uId,Map<String,String> param,Integer manualExe) throws KettleException, ParseException;
+    public void start(Integer jobId,Integer uId,Map<String,String> param,Integer manualExe,Integer completionFlag) throws KettleException, ParseException;
 
     /**
      * 手动执行

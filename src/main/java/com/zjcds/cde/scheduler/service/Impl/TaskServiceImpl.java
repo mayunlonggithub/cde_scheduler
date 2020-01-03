@@ -3,7 +3,6 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
-import com.zjcds.cde.scheduler.dao.jpa.JobDao;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobTransViewDao;
@@ -14,12 +13,19 @@ import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import com.zjcds.cde.scheduler.quartz.DynamicTask;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
-import com.zjcds.cde.scheduler.service.QuartzService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
-import org.quartz.*;
-import com.zjcds.cde.scheduler.domain.entity.Job;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +58,6 @@ public class TaskServiceImpl implements TaskService {
     private JobTransViewDao jobTransViewDao;
     @Autowired
     private JobMonitorService jobMonitorService;
-    @Autowired
-    private QuartzService quartzService;
-    @Autowired
-    private JobDao jobDao;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
@@ -73,7 +75,7 @@ public class TaskServiceImpl implements TaskService {
         Date date = new Date();
         if (date.after(quartz.getEndTime())) {
             task.setStatus(Constant.COMPLETION);
-//            jobMonitorService.addMonitor(uId,jobId,null,0);
+            jobMonitorService.addMonitor(uId,jobId,null,0,1);
         } else {
             task.setStatus(Constant.VALID);
         }
@@ -83,7 +85,6 @@ public class TaskServiceImpl implements TaskService {
         runTask(task.getTaskId());
 
     }
-
 
     @Override
     @Transactional
@@ -106,7 +107,7 @@ public class TaskServiceImpl implements TaskService {
             jobService.updateJobQuartz(task.getJobId(), null);
         }
 
-        jobMonitorService.addMonitor(uId,jobId,null,0);
+        jobMonitorService.addMonitor(uId,jobId,null,0,1);
     }
 
     @Override
@@ -124,7 +125,7 @@ public class TaskServiceImpl implements TaskService {
         if (list.size() == 0) {
             quartz.setAssTaskFlag(0);
         }
-        jobMonitorService.addMonitor(uId,jobId,null,0);
+        jobMonitorService.addMonitor(uId,jobId,null,0,1);
     }
 
     @Override
