@@ -38,10 +38,6 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     private JobMonitorDao jobMonitorDao;
     @Autowired
     private JobMonitorViewDao jobMonitorViewDao;
-
-    @Autowired
-    private JobService jobService;
-
     @Autowired
     private JobRecordDao jobRecordDao;
 
@@ -261,7 +257,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
      * @Title addMonitor
      * @Description 添加监控
      */
-    @Async
+//    @Async
     @Override
     @Transactional
     public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime,Integer manualExe) {
@@ -270,8 +266,10 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
             templateOne.setRunStatus(0);
-            templateOne.setLastExecuteTime(templateOne.getNextExecuteTime());
-            templateOne.setNextExecuteTime(nextExecuteTime);
+            if(manualExe==1){
+            templateOne.setLastExecuteTime(new Date());}
+            if(manualExe==0){
+            templateOne.setNextExecuteTime(nextExecuteTime);}
             jobMonitorDao.save(templateOne);
         } else {
             JobMonitor jobMonitor = new JobMonitor();
@@ -281,7 +279,10 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             jobMonitor.setMonitorFail(0);
             jobMonitor.setMonitorStatus(1);
             jobMonitor.setRunStatus(0);
-            jobMonitor.setNextExecuteTime(nextExecuteTime);
+            jobMonitor.setLastExecuteTime(null);
+            if(manualExe==0){
+                jobMonitor.setNextExecuteTime(nextExecuteTime);
+            }
             jobMonitorDao.save(jobMonitor);
         }
     }

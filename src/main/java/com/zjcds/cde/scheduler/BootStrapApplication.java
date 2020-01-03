@@ -10,7 +10,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @SpringBootApplication
 @EnableTransactionManagement
-//@EnableAsync
+@EnableAsync
 public class BootStrapApplication {
     public static void main(String[] args) {
         SpringApplication.run(BootStrapApplication.class, args);

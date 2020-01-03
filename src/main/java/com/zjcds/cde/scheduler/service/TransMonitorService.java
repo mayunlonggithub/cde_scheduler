@@ -68,7 +68,7 @@ public interface TransMonitorService {
      * @Title addMonitor
      * @Description 添加监控
      */
-    public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime);
+    public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime,Integer manualExe);
 
     /**
      * 更新转换状态

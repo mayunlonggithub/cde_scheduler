@@ -3,6 +3,7 @@ package com.zjcds.cde.scheduler.service.Impl;
 import com.zjcds.cde.scheduler.base.BeanPropertyCopyUtils;
 import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.dao.jpa.JobDao;
 import com.zjcds.cde.scheduler.dao.jpa.QuartzDao;
 import com.zjcds.cde.scheduler.dao.jpa.TaskDao;
 import com.zjcds.cde.scheduler.dao.jpa.view.JobTransViewDao;
@@ -13,10 +14,12 @@ import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import com.zjcds.cde.scheduler.quartz.DynamicTask;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
+import com.zjcds.cde.scheduler.service.QuartzService;
 import com.zjcds.cde.scheduler.service.TaskService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import org.quartz.*;
+import com.zjcds.cde.scheduler.domain.entity.Job;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -48,12 +52,16 @@ public class TaskServiceImpl implements TaskService {
     private JobTransViewDao jobTransViewDao;
     @Autowired
     private JobMonitorService jobMonitorService;
+    @Autowired
+    private QuartzService quartzService;
+    @Autowired
+    private JobDao jobDao;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     @Override
     @Transactional
-    public void addTask(TaskForm.AddTask addTask, Integer uId, Integer jobId) {
+    public void addTask(TaskForm.AddTask addTask, Integer uId, Integer jobId) throws ParseException {
         Task task = BeanPropertyCopyUtils.copy(addTask, Task.class);
         Quartz quartz = quartzDao.findByQuartzId(task.getQuartzId());
         quartz.setAssTaskFlag(1);
@@ -61,9 +69,11 @@ public class TaskServiceImpl implements TaskService {
         task.setStartTime(quartz.getStartTime());
         task.setEndTime(quartz.getEndTime());
         task.setUserId(uId);
+//        Job job= jobDao.findByJobId(jobId);
         Date date = new Date();
         if (date.after(quartz.getEndTime())) {
             task.setStatus(Constant.COMPLETION);
+//            jobMonitorService.addMonitor(uId,jobId,null,0);
         } else {
             task.setStatus(Constant.VALID);
         }
@@ -71,6 +81,7 @@ public class TaskServiceImpl implements TaskService {
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
+
     }
 
 
@@ -94,6 +105,7 @@ public class TaskServiceImpl implements TaskService {
         } else if ("job".equals(task.getTaskGroup())) {
             jobService.updateJobQuartz(task.getJobId(), null);
         }
+
         jobMonitorService.addMonitor(uId,jobId,null,0);
     }
 

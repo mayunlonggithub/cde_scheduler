@@ -9,12 +9,13 @@ import com.zjcds.cde.scheduler.domain.entity.Task;
 import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import org.quartz.SchedulerException;
 
+import java.text.ParseException;
 import java.util.List;
 /**
  * @author Ma on 20191122
  */
 public interface TaskService {
-    void addTask(TaskForm.AddTask addTask, Integer uId,Integer jobId);
+    void addTask(TaskForm.AddTask addTask, Integer uId,Integer jobId) throws ParseException;
 
     void deleteTask(Integer taskId,Integer uId);
 

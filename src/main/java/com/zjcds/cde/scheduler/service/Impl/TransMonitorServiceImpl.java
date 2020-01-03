@@ -12,6 +12,7 @@ import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Autowired
     private TransMonitorViewDao transMonitorViewDao;
     @Autowired
+    @Lazy
     private TransService transService;
     @Autowired
     private TransRecordDao transRecordDao;
@@ -271,13 +273,16 @@ public class TransMonitorServiceImpl implements TransMonitorService {
      */
     @Override
     @Transactional
-    public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime) {
+    public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime,Integer manualExe) {
         Assert.notNull(userId,"未登录,请重新登录");
         TransMonitor templateOne = transMonitorDao.findByCreateUserAndMonitorTrans(userId,transId);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
             templateOne.setRunStatus(0);
-            templateOne.setNextExecuteTime(nextExecuteTime);
+            if(manualExe==1){
+            templateOne.setLastExecuteTime(new Date());}
+            if(manualExe==0){
+            templateOne.setNextExecuteTime(nextExecuteTime);}
             transMonitorDao.save(templateOne);
         } else {
             TransMonitor kTransMonitor = new TransMonitor();
@@ -287,7 +292,9 @@ public class TransMonitorServiceImpl implements TransMonitorService {
             kTransMonitor.setMonitorFail(0);
             kTransMonitor.setRunStatus(0);
             kTransMonitor.setMonitorStatus(1);
-            kTransMonitor.setNextExecuteTime(nextExecuteTime);
+            kTransMonitor.setLastExecuteTime(new Date());
+            if(manualExe==0){
+            kTransMonitor.setNextExecuteTime(nextExecuteTime);}
             transMonitorDao.save(kTransMonitor);
         }
     }

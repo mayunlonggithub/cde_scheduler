@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ import java.util.List;
 public class JobController {
 
     @Autowired
+    @Lazy
     private JobService jobService;
 
     @GetMapping("/getList")
@@ -91,7 +93,7 @@ public class JobController {
     @PutMapping("/update/{jobId}")
     @ApiOperation(value = "修改作业信息", produces = "application/json;charset=utf-8")
 
-    public ResponseResult<Void> update(@RequestBody JobForm.UpdateJob updateJob, @PathVariable(required = true ,name = "jobId") Integer jobId,HttpServletRequest request){
+    public ResponseResult<Void> update(@RequestBody JobForm.UpdateJob updateJob, @PathVariable(required = true ,name = "jobId") Integer jobId,HttpServletRequest request) throws ParseException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         jobService.update(updateJob,jobId,kUser.getId());

@@ -20,6 +20,7 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -218,11 +219,13 @@ public class RepositoryServiceImpl implements RepositoryService {
      * @throws KettleException
      */
     @Override
-    @Transactional
+//    @Transactional
     public void saveTreeList(Integer repositoryId,Integer uId) throws KettleException{
         Repository kRepository = repositoryDao.findByRepositoryId(repositoryId);
+        kRepository.setModifyTime(new Date());
+        repositoryDao.save(kRepository);
         KettleDatabaseRepository kettleDatabaseRepository  = initializeService.init(kRepository);
-        if(uId!=2){//判断非管控用户
+        if(uId!=2){    //判断非管控用户
             List<RepositoryTreeForm> allRepositoryTreeList = new ArrayList<>();
             if (RepositoryUtil.KettleDatabaseRepositoryCatch.containsKey(repositoryId)){
                 kettleDatabaseRepository = RepositoryUtil.KettleDatabaseRepositoryCatch.get(repositoryId);
@@ -264,7 +267,7 @@ public class RepositoryServiceImpl implements RepositoryService {
             //保存转换信息
             List<Trans> transList = addTrans(repositoryTrans,repositoryId,uId);
             transDao.saveAll(transList);
-        }else {//管控用户的任务从初始化表获取任务信息
+        }else {  //管控用户的任务从初始化表获取任务信息
             List<CdmJob> cdmJobList = cdmJobDao.findAll();
             List<RepositoryTree> RepositoryTree = new ArrayList<>();
             if(cdmJobList.size()>0){

@@ -79,7 +79,7 @@ public interface JobService {
      * @Title update
      * @Description 更新作业信息
      */
-    public void update(JobForm.UpdateJob updateJob, Integer jobId,Integer uId);
+    public void update(JobForm.UpdateJob updateJob, Integer jobId,Integer uId) throws ParseException;
 
     /**
      * @param jobId 作业ID

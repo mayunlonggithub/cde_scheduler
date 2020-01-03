@@ -21,6 +21,7 @@ import com.zjcds.cde.scheduler.utils.DateUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -48,6 +49,7 @@ public class JobRecordServiceImpl implements JobRecordService {
     private JobRecordViewDao jobRecordViewDao;
 
     @Autowired
+    @Lazy
     private JobService jobService;
     @Autowired
     private JobMonitorViewDao jobMonitorViewDao;

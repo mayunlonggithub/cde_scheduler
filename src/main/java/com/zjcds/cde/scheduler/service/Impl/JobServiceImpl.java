@@ -56,7 +56,6 @@ import java.util.Map;
 @Service
 public class JobServiceImpl implements JobService {
 
-
     @Autowired
     private JobDao jobDao;
     @Autowired
@@ -73,10 +72,7 @@ public class JobServiceImpl implements JobService {
     private InitializeService initializeService;
     @Autowired
     private QuartzService quartzService;
-    @Autowired
-    private QuartzDao quartzDao;
-    @Autowired
-    private TaskDao taskdao;
+
 
     @Value("${cde.log.file.path}")
     private String cdeLogFilePath;
@@ -196,7 +192,7 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     @Transactional
-    public void update(JobForm.UpdateJob updateJob, Integer jobId, Integer uId) {
+    public void update(JobForm.UpdateJob updateJob, Integer jobId, Integer uId) throws ParseException {
         Assert.notNull(uId, "未登录,请重新登录");
         Assert.notNull(jobId, "要更新的jobId不能为空");
         Job j = jobDao.findByJobIdAndDelFlag(jobId, 1);
@@ -220,7 +216,6 @@ public class JobServiceImpl implements JobService {
                     //移除策略
                     taskService.deleteTask(jobId,"job",uId);
                 }
-
                 //新增策略
                 taskService.addTask(addTask, uId,jobId);
 
@@ -247,9 +242,12 @@ public class JobServiceImpl implements JobService {
         Repository repository = repositoryDao.findByRepositoryId(job.getJobRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
-        Date nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
-        //添加监控
-        jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe);
+        Date nexExecuteTime=null;
+        if(job.getJobQuartz()!=null){
+            nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
+            jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe);}
+        else{
+        jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe);}
         ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
     }
 

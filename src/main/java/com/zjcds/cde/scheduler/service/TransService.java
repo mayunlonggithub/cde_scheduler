@@ -75,7 +75,7 @@ public interface TransService {
      * @Title update
      * @Description 更新转换信息
      */
-    public void update(TransForm.UpdateTrans updateTrans, Integer transId, Integer uId);
+    public void update(TransForm.UpdateTrans updateTrans, Integer transId, Integer uId) throws ParseException;
 
 
     /**

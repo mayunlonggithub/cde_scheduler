@@ -30,6 +30,7 @@ import org.pentaho.di.trans.TransMeta;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,10 +65,12 @@ public class TransServiceImpl implements TransService {
     @Autowired
     private TransMonitorService transMonitorService;
     @Autowired
+    @Lazy
     private TaskService taskService;
     @Autowired
     private InitializeService initializeService;
     @Autowired
+    @Lazy
     private QuartzService quartzService;
 
     @Value("${cde.log.file.path}")
@@ -189,7 +192,7 @@ public class TransServiceImpl implements TransService {
      */
     @Override
     @Transactional
-    public void update(TransForm.UpdateTrans updateTrans, Integer transId,Integer uId) {
+    public void update(TransForm.UpdateTrans updateTrans, Integer transId,Integer uId) throws ParseException {
         Assert.notNull(uId,"未登录,请重新登录");
         Assert.notNull(transId,"要更新的jobId不能为空");
         Trans t = transDao.findByTransIdAndDelFlag(transId,1);
@@ -213,7 +216,6 @@ public class TransServiceImpl implements TransService {
                     //移除策略
                     taskService.deleteTask(transId,"trans",uId);
                 }
-
                 //添加策略
                 taskService.addTask(addTask,uId,transId);
             }
@@ -241,9 +243,13 @@ public class TransServiceImpl implements TransService {
         Repository repository = repositoryDao.findByRepositoryId(trans.getTransRepositoryId());
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
-        Date nexExecuteTime = quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
-        //添加监控
-        transMonitorService.addMonitor(uId,transId,nexExecuteTime);
+        Date nexExecuteTime=null;
+        if(trans.getTransQuartz()!=null){
+            nexExecuteTime=quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
+            transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe);
+        }else {
+            transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe);
+        }
         ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
     }
 

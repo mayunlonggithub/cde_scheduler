@@ -17,6 +17,7 @@ import com.zjcds.cde.scheduler.utils.Constant;
 import com.zjcds.cde.scheduler.utils.CronUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,10 @@ public class QuartzServiceImpl implements QuartzService {
     @Autowired
     private TaskDao  taskDao;
     @Autowired
+    @Lazy
     private TransService transService;
     @Autowired
+    @Lazy
     private JobService jobService;
     @Autowired
     private TaskService taskService;
@@ -78,7 +81,7 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     @Transactional
-    public void updateQuartz(QuartzForm.UpdateQuartz updateQuartz) {
+    public void updateQuartz(QuartzForm.UpdateQuartz updateQuartz,Integer uId) {
         if (updateQuartz.getQuartzCron() == null) {
             List<String> cron = CronUtils.createQuartzCronressionAndDescription(updateQuartz);
             updateQuartz.setQuartzCron(cron.get(0));
@@ -87,6 +90,7 @@ public class QuartzServiceImpl implements QuartzService {
         Quartz quartz = BeanPropertyCopyUtils.copy(updateQuartz, Quartz.class);
         quartz.setDelFlag(1);
         quartz.setAssTaskFlag(1);
+        quartz.setCreateUser(uId);
         quartzDao.save(quartz);
         Integer[] staArray={Constant.COMPLETION,Constant.VALID};
         List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);

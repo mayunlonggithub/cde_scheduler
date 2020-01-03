@@ -60,13 +60,15 @@ public class QuartzController {
 
     @PutMapping("/updateQuartz")
     @ApiOperation(value = "手动修改策略", produces = "application/json;charset=utf-8")
-    public  ResponseResult<Void> updateQuartz(@RequestBody QuartzForm.UpdateQuartz updateQuartz) {
+    public  ResponseResult<Void> updateQuartz(@RequestBody QuartzForm.UpdateQuartz updateQuartz,HttpServletRequest request) {
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (updateQuartz.getQuartzCron() != null) {
             if (!CronExpression.isValidExpression(updateQuartz.getQuartzCron())) {
                 return new ResponseResult(false, "Cron表达式不正确");
             }
         }
-        quartzService.updateQuartz(updateQuartz);
+        quartzService.updateQuartz(updateQuartz,kUser.getId());
         return new ResponseResult(true, "请求成功");
     }
 

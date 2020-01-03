@@ -14,6 +14,7 @@ import com.zjcds.cde.scheduler.utils.Constant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,14 +34,13 @@ import java.util.*;
 public class IndexController {
 
     @Autowired
+    @Lazy
     private TransMonitorService transMonitorService;
     @Autowired
+    @Lazy
     private JobMonitorService jobMonitorService;
     @Autowired
-    private TransService transService;
-    @Autowired
-    private JobService jobService;
-    @Autowired
+    @Lazy
     private JobRecordService jobRecordService;
     @Autowired
     private TransRecordService transRecordService;

@@ -11,6 +11,7 @@ import com.zjcds.cde.scheduler.service.QuartzService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,7 @@ import java.util.List;
 public class CodeController {
 
     @Autowired
+    @Lazy
     private QuartzService quartzService;
     @Autowired
     private CodeService codeService;

@@ -91,7 +91,7 @@ public class TransController {
     @PutMapping("/update/{transId}")
     @ApiOperation(value = "修改转换信息", produces = "application/json;charset=utf-8")
 
-    public ResponseResult<Void> update(@RequestBody TransForm.UpdateTrans updateTrans, @PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request){
+    public ResponseResult<Void> update(@RequestBody TransForm.UpdateTrans updateTrans, @PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request) throws ParseException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         transService.update(updateTrans,transId,kUser.getId());
