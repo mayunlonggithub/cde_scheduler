@@ -119,7 +119,7 @@ public class JobServiceImpl implements JobService {
         job.setDelFlag(0);
         jobDao.save(job);
         //移除策略
-        taskService.deleteTask(jobId,uId);
+        taskService.deleteTask(jobId,"job",uId);
     }
 
     /**

@@ -117,20 +117,22 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Integer jobId, String taskGroup,Integer uId) {
         Integer[] status = {Constant.VALID, Constant.COMPLETION};
         Task task = taskDao.findByJobIdAndTaskGroupAndStatusInAndDelFlag(jobId, taskGroup, status, 1);
-        Integer quartzId = task.getQuartzId();
-        Integer taskId = task.getTaskId();
-        shutDown(taskId);
-        task.setDelFlag(0);
-        taskDao.save(task);
-        Quartz quartz = quartzDao.findByQuartzId(quartzId);
-        List<Task> list = taskDao.findByQuartzIdAndStatusIn(quartzId, status);
-        if (list.size() == 0) {
-            quartz.setAssTaskFlag(0);
-        }
-        if("job".equals(taskGroup)){
-        jobMonitorService.addMonitor(uId,jobId,null,0,1);}
-        else if("trans".equals(taskGroup)){
-            transMonitorService.addMonitor(uId,jobId,null,0,1);
+        if(task!=null) {
+            Integer quartzId = task.getQuartzId();
+            Integer taskId = task.getTaskId();
+            shutDown(taskId);
+            task.setDelFlag(0);
+            taskDao.save(task);
+            Quartz quartz = quartzDao.findByQuartzId(quartzId);
+            List<Task> list = taskDao.findByQuartzIdAndStatusIn(quartzId, status);
+            if (list.size() == 0) {
+                quartz.setAssTaskFlag(0);
+            }
+            if ("job".equals(taskGroup)) {
+                jobMonitorService.addMonitor(uId, jobId, null, 0, 1);
+            } else if ("trans".equals(taskGroup)) {
+                transMonitorService.addMonitor(uId, jobId, null, 0, 1);
+            }
         }
     }
 
