@@ -43,6 +43,7 @@ public class QuartzServiceImpl implements QuartzService {
     private JobService jobService;
     @Autowired
     private TaskService taskService;
+
     @Override
     @Transactional
     public void addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId) {
@@ -71,6 +72,7 @@ public class QuartzServiceImpl implements QuartzService {
                 if ("trans".equals(task.getTaskGroup())) {
                     transService.updateTransQuartz(task.getJobId(), null);
                     taskService.shutDown(task.getTaskId());
+
                 } else if ("job".equals(task.getTaskGroup())) {
                     jobService.updateJobQuartz(task.getJobId(), null);
                     taskService.shutDown(task.getTaskId());

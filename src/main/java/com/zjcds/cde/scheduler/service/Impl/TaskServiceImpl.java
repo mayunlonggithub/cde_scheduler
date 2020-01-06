@@ -14,6 +14,7 @@ import com.zjcds.cde.scheduler.quartz.DynamicTask;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobService;
 import com.zjcds.cde.scheduler.service.TaskService;
+import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
 import org.quartz.CronScheduleBuilder;
@@ -58,6 +59,8 @@ public class TaskServiceImpl implements TaskService {
     private JobTransViewDao jobTransViewDao;
     @Autowired
     private JobMonitorService jobMonitorService;
+    @Autowired
+    private TransMonitorService transMonitorService;
 
     private static Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
 
@@ -103,11 +106,13 @@ public class TaskServiceImpl implements TaskService {
         taskDao.save(task);
         if ("trans".equals(task.getTaskGroup())) {
             transService.updateTransQuartz(task.getJobId(), null);
+            transMonitorService.addMonitor(uId,jobId,null,0,1);
         } else if ("job".equals(task.getTaskGroup())) {
             jobService.updateJobQuartz(task.getJobId(), null);
+            jobMonitorService.addMonitor(uId,jobId,null,0,1);
         }
 
-        jobMonitorService.addMonitor(uId,jobId,null,0,1);
+
     }
 
     @Override

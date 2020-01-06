@@ -242,12 +242,13 @@ public class JobServiceImpl implements JobService {
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime=null;
+        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
         if(job.getJobQuartz()!=null){
             nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
             jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe,completion);}
         else{
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe,completion);}
-        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
+
     }
 
 

@@ -244,13 +244,14 @@ public class TransServiceImpl implements TransService {
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime=null;
+        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
         if(trans.getTransQuartz()!=null){
             nexExecuteTime=quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
             transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe,completion);
         }else {
             transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe,completion);
         }
-        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
+
     }
 
     /**
