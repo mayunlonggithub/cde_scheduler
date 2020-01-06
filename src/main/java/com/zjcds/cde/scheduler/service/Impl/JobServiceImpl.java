@@ -242,12 +242,12 @@ public class JobServiceImpl implements JobService {
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime=null;
-        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
         if(job.getJobQuartz()!=null){
             nexExecuteTime=quartzService.getNextValidTime(executeTime,job.getJobQuartz());
             jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe,completion);}
         else{
         jobMonitorService.addMonitor(uId,jobId,nexExecuteTime,manualExe,completion);}
+        ((JobServiceImpl) AopContext.currentProxy()).manualRunRepositoryJob(repository, jobId.toString(), job.getJobName(), job.getJobPath(), uId.toString(), job.getJobLogLevel(), logFilePath, executeTime, nexExecuteTime,param,manualExe);
     }
 
 
@@ -276,7 +276,7 @@ public class JobServiceImpl implements JobService {
         jobRecord.setRecordJob(Integer.parseInt(jobId));
         jobRecord.setCreateUser(Integer.parseInt(userId));
         jobRecord.setRecordStatus(1);
-        if(templateOne!=null){
+        if(templateOne!=null&&manualExe==0){
         jobRecord.setPlanStartTime(templateOne.getNextExecuteTime());}
         jobRecord.setStartTime(executeTime);
         jobRecord.setManualExecute(manualExe);
@@ -366,10 +366,10 @@ public class JobServiceImpl implements JobService {
         template.setMonitorJob(jobRecord.getRecordJob());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobRecord.getRecordJob(), Integer.parseInt(uId));
-        templateOne.setLastExecuteTime(lastExecuteTime);
-        templateOne.setRunStatus(runStatus);
-        //在监控表中增加下一次执行时间
-        templateOne.setNextExecuteTime(nextExecuteTime);
+//        templateOne.setLastExecuteTime(lastExecuteTime);
+//        templateOne.setRunStatus(runStatus);
+//        //在监控表中增加下一次执行时间
+//        templateOne.setNextExecuteTime(nextExecuteTime);
         if (jobRecord.getRecordStatus() == 2) {// 证明成功
             //成功次数加1
             templateOne.setMonitorSuccess(templateOne.getMonitorSuccess() + 1);

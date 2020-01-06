@@ -268,7 +268,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             templateOne.setRunStatus(0);
             if(manualExe==1||completionFlag==0){
             templateOne.setLastExecuteTime(new Date());}
-            if(manualExe==0){
+            if(manualExe==0||completionFlag==0){
             templateOne.setNextExecuteTime(nextExecuteTime);}
             if(completionFlag==1){
                 templateOne.setNextExecuteTime(null);
@@ -287,7 +287,6 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             else{
                 jobMonitor.setLastExecuteTime(new Date());
             }
-
             if(manualExe==0){
                 jobMonitor.setNextExecuteTime(nextExecuteTime);
             }

@@ -244,14 +244,13 @@ public class TransServiceImpl implements TransService {
         String logFilePath = cdeLogFilePath;
         Date executeTime = new Date();
         Date nexExecuteTime=null;
-        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
         if(trans.getTransQuartz()!=null){
             nexExecuteTime=quartzService.getNextValidTime(executeTime,trans.getTransQuartz());
             transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe,completion);
         }else {
             transMonitorService.addMonitor(uId,transId,nexExecuteTime,manualExe,completion);
         }
-
+        ((TransServiceImpl) AopContext.currentProxy()).manualRunRepositoryTrans(repository,transId.toString(),trans.getTransName(),trans.getTransPath(),uId.toString(),trans.getTransLogLevel(),logFilePath,executeTime,nexExecuteTime,param,manualExe);
     }
 
     /**
@@ -365,10 +364,10 @@ public class TransServiceImpl implements TransService {
         template.setMonitorJob(transRecord.getRecordTrans());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
         TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(transRecord.getRecordTrans(),Integer.parseInt(uId));
-        templateOne.setRunStatus(runStatus);
-        templateOne.setLastExecuteTime(lastExecuteTime);
-        //在监控表中增加下一次执行时间
-        templateOne.setNextExecuteTime(nextExecuteTime);
+//        templateOne.setRunStatus(runStatus);
+//        templateOne.setLastExecuteTime(lastExecuteTime);
+//        //在监控表中增加下一次执行时间
+//        templateOne.setNextExecuteTime(nextExecuteTime);
         if (transRecord.getRecordStatus() == 2) {// 证明成功
             //成功次数加1
             templateOne.setMonitorSuccess(templateOne.getMonitorSuccess() + 1);

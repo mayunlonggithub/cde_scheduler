@@ -281,7 +281,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
             templateOne.setRunStatus(0);
             if(manualExe==1||completionFlag==0){
                 templateOne.setLastExecuteTime(new Date());}
-            if(manualExe==0){
+            if(manualExe==0||completionFlag==0){
                 templateOne.setNextExecuteTime(nextExecuteTime);}
             if(completionFlag==1){
                 templateOne.setNextExecuteTime(null);
