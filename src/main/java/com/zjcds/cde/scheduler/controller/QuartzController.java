@@ -52,9 +52,11 @@ public class QuartzController {
 
     @DeleteMapping("/deleteQuartz/{quartzId}")
     @ApiOperation(value = "删除策略", produces = "application/json;charset=utf-8")
-    public ResponseResult<Void> delete(@PathVariable("quartzId") Integer quartzId){
+    public ResponseResult<Void> delete(@PathVariable("quartzId") Integer quartzId,HttpServletRequest request){
+        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         Assert.notNull(quartzId,"要删除的策略id不能为空");
-        quartzService.deleteQuartz(quartzId);
+        quartzService.deleteQuartz(quartzId,kUser.getId());
         return new ResponseResult(true,"请求成功");
     }
 

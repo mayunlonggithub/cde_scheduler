@@ -60,7 +60,7 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     @Transactional
-    public void deleteQuartz(Integer quartzId) {
+    public void deleteQuartz(Integer quartzId,Integer uId) {
         Quartz quartz = quartzDao.findByQuartzId(quartzId);
         quartz.setDelFlag(0);
         quartz.setAssTaskFlag(0);
@@ -71,11 +71,11 @@ public class QuartzServiceImpl implements QuartzService {
             for (Task task : taskList) {
                 if ("trans".equals(task.getTaskGroup())) {
                     transService.updateTransQuartz(task.getJobId(), null);
-                    taskService.shutDown(task.getTaskId());
+                    taskService.deleteTask(task.getJobId(),"trans",uId);
 
                 } else if ("job".equals(task.getTaskGroup())) {
                     jobService.updateJobQuartz(task.getJobId(), null);
-                    taskService.shutDown(task.getTaskId());
+                    taskService.deleteTask(task.getJobId(),"job",uId);
                 }
             }
         }
@@ -83,7 +83,7 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     @Transactional
-    public void updateQuartz(QuartzForm.UpdateQuartz updateQuartz,Integer uId) {
+    public void updateQuartz(QuartzForm.UpdateQuartz updateQuartz,Integer uId) throws ParseException {
         if (updateQuartz.getQuartzCron() == null) {
             List<String> cron = CronUtils.createQuartzCronressionAndDescription(updateQuartz);
             updateQuartz.setQuartzCron(cron.get(0));
@@ -101,8 +101,9 @@ public class QuartzServiceImpl implements QuartzService {
                 task.setQuartzDesc(quartz.getQuartzDescription());
                 task.setStartTime(quartz.getStartTime());
                 task.setEndTime(quartz.getEndTime());
-                taskService.shutDown(task.getTaskId());
-                taskService.runTask(task.getTaskId());
+                TaskForm.AddTask addTask=BeanPropertyCopyUtils.copy(task, TaskForm.AddTask.class);
+                taskService.deleteTask(task.getTaskId(),uId);
+                taskService.addTask(addTask,uId,task.getJobId());
                 }
         }
     }

@@ -86,7 +86,6 @@ public class TaskServiceImpl implements TaskService {
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
-
     }
 
     @Override
@@ -111,8 +110,6 @@ public class TaskServiceImpl implements TaskService {
             jobService.updateJobQuartz(task.getJobId(), null);
             jobMonitorService.addMonitor(uId,jobId,null,0,1);
         }
-
-
     }
 
     @Override
@@ -130,7 +127,11 @@ public class TaskServiceImpl implements TaskService {
         if (list.size() == 0) {
             quartz.setAssTaskFlag(0);
         }
-        jobMonitorService.addMonitor(uId,jobId,null,0,1);
+        if("job".equals(taskGroup)){
+        jobMonitorService.addMonitor(uId,jobId,null,0,1);}
+        else if("trans".equals(taskGroup)){
+            transMonitorService.addMonitor(uId,jobId,null,0,1);
+        }
     }
 
     @Override
