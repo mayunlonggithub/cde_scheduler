@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,7 +63,7 @@ public class QuartzController {
 
     @PutMapping("/updateQuartz")
     @ApiOperation(value = "手动修改策略", produces = "application/json;charset=utf-8")
-    public  ResponseResult<Void> updateQuartz(@RequestBody QuartzForm.UpdateQuartz updateQuartz,HttpServletRequest request) {
+    public  ResponseResult<Void> updateQuartz(@RequestBody QuartzForm.UpdateQuartz updateQuartz,HttpServletRequest request) throws ParseException {
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
         if (updateQuartz.getQuartzCron() != null) {
