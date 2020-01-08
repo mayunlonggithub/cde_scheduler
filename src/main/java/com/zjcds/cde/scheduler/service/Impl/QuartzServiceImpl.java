@@ -46,7 +46,7 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     @Transactional
-    public void addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId) {
+    public Quartz addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId) {
         if (addQuartz.getQuartzCron() == null) {
             List<String> cron = CronUtils.createQuartzCronressionAndDescription(addQuartz);
             addQuartz.setQuartzCron(cron.get(0));
@@ -55,7 +55,8 @@ public class QuartzServiceImpl implements QuartzService {
         Quartz quartz = BeanPropertyCopyUtils.copy(addQuartz, Quartz.class);
         quartz.setDelFlag(1);
         quartz.setCreateUser(uId);
-        quartzDao.save(quartz);
+        Quartz quartz1 = quartzDao.save(quartz);
+        return quartz1;
     }
 
     @Override

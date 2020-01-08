@@ -146,6 +146,20 @@ public class RepositoryServiceImpl implements RepositoryService {
     }
 
     /**
+     * @Title getKRepository
+     * @Description 获取资源库对象
+     * @param uId 用户ID
+     * @return
+     * @return KRepository
+     */
+    @Override
+    public Repository getRepository(Integer uId){
+        Assert.notNull(uId,"未登录,请重新登录");
+        //如果根据主键没有获取到对象，返回null
+        return repositoryDao.findByCreateUser(uId);
+    }
+
+    /**
      * @Title getAccess
      * @Description 获取资源库访问类型
      * @return

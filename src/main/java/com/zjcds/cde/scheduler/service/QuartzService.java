@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface QuartzService
 {
-    void addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId);
+    Quartz addQuartz(QuartzForm.AddQuartz addQuartz,Integer uId);
     void deleteQuartz(Integer quartzId,Integer uId);
     void updateQuartz(QuartzForm.UpdateQuartz updateQuartz,Integer uId) throws ParseException;
     PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId);

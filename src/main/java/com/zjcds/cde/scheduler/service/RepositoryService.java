@@ -59,6 +59,15 @@ public interface RepositoryService {
     public Repository getRepository(Integer repositoryId,Integer uId);
 
     /**
+     * @Title getKRepository
+     * @Description 获取资源库对象
+     * @param uId 用户ID
+     * @return
+     * @return KRepository
+     */
+    public Repository getRepository(Integer uId);
+
+    /**
      * @Title getAccess
      * @Description 获取资源库访问类型
      * @return
