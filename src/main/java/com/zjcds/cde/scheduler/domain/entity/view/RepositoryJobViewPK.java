@@ -35,11 +35,15 @@ public class RepositoryJobViewPK implements Serializable {
     }
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         RepositoryJobViewPK that = (RepositoryJobViewPK) o;
-        return rId == that.rId &&
-                repositoryId == that.repositoryId;
+        return rId.equals(that.rId) &&
+                repositoryId.equals(that.repositoryId);
     }
 
     @Override

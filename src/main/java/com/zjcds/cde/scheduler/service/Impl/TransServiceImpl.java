@@ -278,8 +278,9 @@ public class TransServiceImpl implements TransService {
         transRecord.setRecordTrans(Integer.parseInt(transId));
         transRecord.setCreateUser(Integer.parseInt(userId));
         transRecord.setRecordStatus(1);
-        if(templateOne!=null)
-        transRecord.setPlanStartTime(templateOne.getNextExecuteTime());
+        if(templateOne!=null) {
+            transRecord.setPlanStartTime(templateOne.getNextExecuteTime());
+        }
         transRecord.setStartTime(executeTime);
         transRecord.setManualExecute(manualExe);
         transRecordDao.save(transRecord);

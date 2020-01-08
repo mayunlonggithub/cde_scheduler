@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author zr
@@ -131,11 +132,14 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseResult IllegalArgumentException(HttpServletRequest request, RuntimeException e) throws RuntimeException {
+    public ResponseResult IllegalArgumentException(HttpServletRequest request, HttpServletResponse response, RuntimeException e) throws RuntimeException {
         e.printStackTrace();
         logger.error("请求：{}, params:{}, 参数错误：{}", request.getRequestURI(), request.getParameterMap().toString(), e);
-        return new ResponseResult(false,e.getMessage());
+        response.setStatus(HttpStatus.OK.value());
+        return new ResponseResult(true,e.getMessage());
     }
+
+
 
 //    /**
 //     * 拦截服务器异常

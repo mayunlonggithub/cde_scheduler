@@ -85,7 +85,12 @@ public class RepositoryServiceImpl implements RepositoryService {
     public boolean check(RepositoryForm.AddRepository addRepository,Integer uId) throws KettleException{
         Assert.notNull(uId,"未登录,请重新登录");
         Repository repository = BeanPropertyCopyUtils.copy(addRepository,Repository.class);
-        KettleDatabaseRepository kettleDatabaseRepository = RepositoryUtil.connectionRepository(repository);
+        KettleDatabaseRepository kettleDatabaseRepository;
+        try {
+            kettleDatabaseRepository = RepositoryUtil.connectionRepository(repository);
+        }catch (KettleException e){
+            return false;
+        }
         if (kettleDatabaseRepository != null){
             if (kettleDatabaseRepository.isConnected()){
                 return true;
