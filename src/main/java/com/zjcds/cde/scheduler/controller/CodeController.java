@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 /**
  * @author Ma on 20191122
@@ -92,9 +93,11 @@ public class CodeController {
         BaseValue baseValue = new BaseValue();
         List<BaseValue> bList = new ArrayList<>();
         for (Quartz quartz : qList) {
-            baseValue.setKey(String.valueOf(quartz.getQuartzId()));
-            baseValue.setValue(quartz.getQuartzDescription());
-            bList.add(baseValue);
+            if (quartz.getEndTime().after(new Date())) {
+                baseValue.setKey(String.valueOf(quartz.getQuartzId()));
+                baseValue.setValue(quartz.getQuartzDescription());
+                bList.add(baseValue);
+            }
         }
         return new ResponseResult(true, "请求成功", bList);
     }

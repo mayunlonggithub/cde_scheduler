@@ -273,6 +273,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             if(completionFlag==1){
                 templateOne.setNextExecuteTime(null);
             }
+            templateOne.setDelFlag(1);
             jobMonitorDao.save(templateOne);
         } else {
             JobMonitor jobMonitor = new JobMonitor();

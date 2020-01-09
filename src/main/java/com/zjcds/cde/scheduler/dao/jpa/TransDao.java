@@ -16,6 +16,8 @@ public interface TransDao extends CustomRepostory<Trans,Integer> {
 
     public List<Trans> findByTransRepositoryId(Integer transRepositoryId);
 
+    public List<Trans> findByTransRepositoryIdAndDelFlag(Integer transRepositoryId,Integer delFlag);
+
     public List<Trans> findByDelFlag(Integer delFlag);
 
     public Trans findByTransIdAndDelFlag(Integer transId,Integer delFlag);

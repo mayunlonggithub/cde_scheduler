@@ -60,6 +60,8 @@ public class QuartzForm {
                 private String quartzName;
                 @ApiModelProperty(value = "是否有关联任务")
                 private Integer assTaskFlag;
+                @ApiModelProperty(value = "是否有效")
+                private Integer ifValid;
         }
 
         @Getter

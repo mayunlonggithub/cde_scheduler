@@ -283,9 +283,11 @@ public class RepositoryServiceImpl implements RepositoryService {
             //保存作业信息
             List<Job> jobList = addJob(repositoryJob,repositoryId,uId);
             jobDao.saveAll(jobList);
+            deleteJobs(repositoryJob,repositoryId);
             //保存转换信息
             List<Trans> transList = addTrans(repositoryTrans,repositoryId,uId);
             transDao.saveAll(transList);
+            deleteTrans(repositoryTrans,repositoryId);
         }else {  //管控用户的任务从初始化表获取任务信息
             List<CdmJob> cdmJobList = cdmJobDao.findAll();
             List<RepositoryTree> RepositoryTree = new ArrayList<>();
@@ -306,10 +308,41 @@ public class RepositoryServiceImpl implements RepositoryService {
             jobDao.saveAll(jobList);
         }
 
-
     }
 
-    //整合新增的作业信息
+    //删除多余的作业
+    private void deleteJobs(List<RepositoryTree> repositoryJob,Integer repositoryId) {
+        boolean flag = true;
+        List<Job> jobs = jobDao.findByJobRepositoryIdAndDelFlag(repositoryId, 1);
+        for (Job job : jobs) {
+            for (RepositoryTree j : repositoryJob) {
+                if (job.getJobName().equals(j.getText()) && job.getJobPath().equals(j.getPath()) && job.getJobRepositoryId().equals(j.getRepositoryId())) {
+                    flag = false;
+                }
+            }
+            if (flag ==false) {
+                jobDao.save(job);
+            }
+        }
+    }
+
+    //删除多余的转换
+    private void deleteTrans(List<RepositoryTree> repositoryJob,Integer repositoryId) {
+        boolean flag = true;
+        List<Trans> transList = transDao.findByTransRepositoryIdAndDelFlag(repositoryId, 1);
+        for (Trans trans: transList) {
+            for (RepositoryTree t : repositoryJob) {
+                if (trans.getTransName().equals(t.getText()) && trans.getTransPath().equals(t.getPath()) && trans.getTransRepositoryId().equals(t.getRepositoryId())) {
+                    flag = false;
+                }
+            }
+            if (flag == false) {
+                transDao.save(trans);
+            }
+        }
+    }
+
+        //整合新增的作业信息
     private List<Job> addJob(List<RepositoryTree> repositoryJob,Integer repositoryId,Integer uId){
         List<Job> jobs = jobDao.findByJobRepositoryId(repositoryId);
         List<Job> jobList = new ArrayList<>();
@@ -332,7 +365,7 @@ public class RepositoryServiceImpl implements RepositoryService {
         return jobList;
     }
 
-    //整合新增的转换信息
+        //整合新增的转换信息
     private List<Trans> addTrans(List<RepositoryTree> repositoryTrans,Integer repositoryId,Integer uId){
         List<Trans> trans = transDao.findByTransRepositoryId(repositoryId);
         List<Trans> transList = new ArrayList<>();

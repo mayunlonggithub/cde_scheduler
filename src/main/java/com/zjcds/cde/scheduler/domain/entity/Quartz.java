@@ -54,6 +54,8 @@ public class Quartz extends CreateModifyTime {
     private String quartzName;
     //是否有关联任务
     private Integer assTaskFlag;
+    //是否有效
+    private Integer ifValid;
 
 
     @Id
@@ -274,5 +276,15 @@ public class Quartz extends CreateModifyTime {
 
     public void setAssTaskFlag(Integer assTaskFlag) {
         this.assTaskFlag = assTaskFlag;
+    }
+
+    @Basic
+    @Column(name = "if_valid")
+    public Integer getIfValid() {
+        return ifValid;
+    }
+
+    public void setIfValid(Integer ifValid) {
+        this.ifValid = ifValid;
     }
 }

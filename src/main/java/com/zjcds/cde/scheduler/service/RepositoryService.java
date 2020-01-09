@@ -5,6 +5,7 @@ import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryForm;
 import com.zjcds.cde.scheduler.domain.dto.RepositoryTreeForm;
 import com.zjcds.cde.scheduler.domain.entity.Repository;
+import com.zjcds.cde.scheduler.domain.entity.RepositoryTree;
 import com.zjcds.cde.scheduler.domain.entity.RepositoryType;
 import org.pentaho.di.core.exception.KettleException;
 
@@ -107,4 +108,7 @@ public interface RepositoryService {
      * @throws KettleException
      */
     public void saveTreeList(Integer repositoryId,Integer uId) throws KettleException;
+
+
+
 }

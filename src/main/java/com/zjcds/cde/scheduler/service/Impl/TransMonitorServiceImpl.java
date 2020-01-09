@@ -286,6 +286,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
             if(completionFlag==1){
                 templateOne.setNextExecuteTime(null);
             }
+            templateOne.setDelFlag(1);
             transMonitorDao.save(templateOne);
         } else {
             TransMonitor kTransMonitor = new TransMonitor();

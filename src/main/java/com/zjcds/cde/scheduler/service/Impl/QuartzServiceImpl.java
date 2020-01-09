@@ -113,6 +113,13 @@ public class QuartzServiceImpl implements QuartzService {
     public PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId) {
         queryString.add("delFlag~eq~1");
         queryString.add("createUser~eq~"+uId);
+        List<Quartz> quartzList=quartzDao.findByDelFlag(1);
+        for(Quartz quartz:quartzList){
+            if(quartz.getEndTime().after(new Date())){
+                quartz.setIfValid(1);
+                quartzDao.save(quartz);
+            }
+        }
         PageResult<Quartz> quartz = quartzDao.findAll(paging, queryString, orderBys);
         return quartz;
     }
