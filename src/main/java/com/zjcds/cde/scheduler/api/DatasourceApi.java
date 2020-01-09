@@ -11,7 +11,7 @@ import feign.RequestLine;
 /**
  * @author huangyj on 2019-12-11
  */
-@FeignApi(serviceUrl = "http://192.168.0.69:9007")
+@FeignApi(serviceUrl = "http://47.99.134.197:9111")
 public interface DatasourceApi {
 
     /**
