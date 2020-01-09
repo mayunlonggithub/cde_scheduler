@@ -101,7 +101,7 @@ public class JobRecordServiceImpl implements JobRecordService {
     @Override
     public String getLogContent(Integer recordId, Integer uId) throws IOException {
         Assert.notNull(uId,"未登录,请重新登录");
-        JobRecord kJobRecord = jobRecordDao.findByRecordIdAndCreateUser(recordId,uId);
+        JobRecord kJobRecord = jobRecordDao.findByRecordIdAndCreateUserAndDelFlag(recordId,uId,1);
         Assert.notNull(kJobRecord,"日志不存在或已删除");
         String logFilePath = kJobRecord.getLogFilePath();
 
@@ -125,7 +125,7 @@ public class JobRecordServiceImpl implements JobRecordService {
     @Override
     public  void getLogDownload(Integer recordId,Integer uId, HttpServletResponse response) throws Exception {
         Assert.notNull(uId,"未登录,请重新登录");
-        JobRecord kJobRecord = jobRecordDao.findByRecordIdAndCreateUser(recordId,uId);
+        JobRecord kJobRecord = jobRecordDao.findByRecordIdAndCreateUserAndDelFlag(recordId,uId,1);
         Assert.notNull(kJobRecord,"日志不存在或已删除");
         String logFilePath = kJobRecord.getLogFilePath();
         String fileName = logFilePath.split("/")[logFilePath.split("/").length-1];
@@ -185,7 +185,6 @@ public class JobRecordServiceImpl implements JobRecordService {
             }else {
                 j.setMonitorFail(0);
             }
-
             statis.add(j);
         };
         return statis;

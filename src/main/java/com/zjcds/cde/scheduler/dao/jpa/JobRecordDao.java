@@ -12,11 +12,11 @@ import java.util.List;
  */
 public interface JobRecordDao extends CustomRepostory<JobRecord,Integer> {
 
-    public JobRecord findByRecordIdAndCreateUser(Integer RecordId,Integer CreateUser);
+    public JobRecord findByRecordIdAndCreateUserAndDelFlag(Integer RecordId,Integer CreateUser,Integer delFlag);
 
-    public List<JobRecord> findByCreateUser(Integer createUser);
+    public List<JobRecord> findByCreateUserAndDelFlag(Integer createUser,Integer delFlag);
 
-    public List<JobRecord> findByCreateUserAndRecordStatus(Integer createUser,Integer recordStatus);
+    public List<JobRecord> findByCreateUserAndRecordStatusAndDelFlag(Integer createUser,Integer recordStatus,Integer delFlag);
 
-
+    public List<JobRecord>  findByRecordJobAndDelFlag(Integer recordJob,Integer delFlag);
 }

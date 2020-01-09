@@ -10,11 +10,9 @@ import java.util.List;
  */
 public interface JobMonitorDao extends CustomRepostory<JobMonitor,Integer> {
 
-    public List<JobMonitor> findByCreateUserAndMonitorStatus(Integer createUser,Integer monitorStatus);
+    public List<JobMonitor> findByCreateUserAndMonitorStatusAndDelFlag(Integer createUser,Integer monitorStatus,Integer delFlag);
 
-    public List<JobMonitor> findByCreateUser(Integer createUser);
+    public JobMonitor findByMonitorJobAndDelFlag(Integer monitorJob,Integer delFlag);
 
-    public JobMonitor findByMonitorJob(Integer monitorJob);
-
-    public JobMonitor findByMonitorJobAndCreateUser(Integer monitorJob,Integer createUser);
+    public JobMonitor findByMonitorJobAndCreateUserAndDelFlag(Integer monitorJob,Integer createUser,Integer delFlag);
 }

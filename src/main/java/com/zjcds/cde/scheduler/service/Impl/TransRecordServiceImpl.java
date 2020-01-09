@@ -89,7 +89,7 @@ public class TransRecordServiceImpl implements TransRecordService {
     @Override
     public String getLogContent(Integer recordId,Integer uId) throws IOException{
         Assert.notNull(uId,"未登录,请重新登录");
-        TransRecord transRecord = transRecordDao.findByRecordIdAndCreateUser(recordId,uId);
+        TransRecord transRecord = transRecordDao.findByRecordIdAndCreateUserAndDelFlag(recordId,uId,1);
         Assert.notNull(transRecord,"日志不存在或已删除");
         String logFilePath = transRecord.getLogFilePath();
 
@@ -112,7 +112,7 @@ public class TransRecordServiceImpl implements TransRecordService {
     @Override
     public  void getLogDownload(Integer recordId,Integer uId, HttpServletResponse response) throws Exception {
         Assert.notNull(uId,"未登录,请重新登录");
-        TransRecord transRecord = transRecordDao.findByRecordIdAndCreateUser(recordId,uId);
+        TransRecord transRecord = transRecordDao.findByRecordIdAndCreateUserAndDelFlag(recordId,uId,1);
         Assert.notNull(transRecord,"日志不存在或已删除");
         String logFilePath = transRecord.getLogFilePath();
         String fileName = logFilePath.split("/")[logFilePath.split("/").length-1];

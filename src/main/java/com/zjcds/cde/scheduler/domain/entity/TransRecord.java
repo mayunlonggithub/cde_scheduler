@@ -33,7 +33,8 @@ public class TransRecord {
     private Integer manualExecute;
     //计划开始时间
     private Date  planStartTime;
-
+    //是否删除
+    private Integer delFlag;
     @Id
     @Column(name = "record_id")
     @TableGenerator(name = "idGenerator", table = "t_id_generator", pkColumnName = "id_key", pkColumnValue = "transRecord", valueColumnName = "id_value")
@@ -143,4 +144,13 @@ public class TransRecord {
         this.planStartTime = planStartTime;
     }
 
+    @Basic
+    @Column(name = "del_Flag")
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
+    }
 }

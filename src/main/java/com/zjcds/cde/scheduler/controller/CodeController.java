@@ -90,13 +90,15 @@ public class CodeController {
     @GetMapping("/getQuartzList")
     public ResponseResult<List<BaseValue>> code() {
         List<Quartz> qList = quartzService.getQuartzByDelFlag(1);
-        BaseValue baseValue = new BaseValue();
         List<BaseValue> bList = new ArrayList<>();
-        for (Quartz quartz : qList) {
-            if (quartz.getEndTime().after(new Date())) {
-                baseValue.setKey(String.valueOf(quartz.getQuartzId()));
-                baseValue.setValue(quartz.getQuartzDescription());
-                bList.add(baseValue);
+        if(qList!=null) {
+            for (Quartz quartz : qList) {
+                BaseValue baseValue = new BaseValue();
+                if (quartz.getEndTime().after(new Date())) {
+                    baseValue.setKey(String.valueOf(quartz.getQuartzId()));
+                    baseValue.setValue(quartz.getQuartzName());
+                    bList.add(baseValue);
+                }
             }
         }
         return new ResponseResult(true, "请求成功", bList);

@@ -14,7 +14,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class TransMonitorForm {
-
     @Getter
     @Setter
     @ApiModel(value = "transMonitor",description ="转换监控信息" )

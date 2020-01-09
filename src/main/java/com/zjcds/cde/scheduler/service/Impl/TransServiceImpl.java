@@ -118,6 +118,14 @@ public class TransServiceImpl implements TransService {
         Assert.notNull(trans,"要删除的转换不存在或已删除");
         trans.setDelFlag(0);
         transDao.save(trans);
+        TransMonitor transMonitor=transMonitorDao.findByCreateUserAndMonitorTransAndDelFlag(uId,transId,1);
+        transMonitor.setDelFlag(0);
+        transMonitorDao.save(transMonitor);
+        List<TransRecord> transRecordList=transRecordDao.findByRecordTransAndDelFlag(transId,1);
+        for(TransRecord transRecord:transRecordList){
+            transRecord.setDelFlag(0);
+            transRecordDao.save(transRecord);
+        }
         //移除策略
         taskService.deleteTask(transId,"trans",uId);
     }
@@ -273,7 +281,7 @@ public class TransServiceImpl implements TransService {
 //    @Transactional
     public void manualRunRepositoryTrans(Repository repository, String transId, String transName, String transPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String,String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId,"未登录,请重新登录");
-        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(Integer.parseInt(transId),Integer.parseInt(userId));
+        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUserAndDelFlag(Integer.parseInt(transId),Integer.parseInt(userId),1);
         TransRecord transRecord = new TransRecord();
         transRecord.setRecordTrans(Integer.parseInt(transId));
         transRecord.setCreateUser(Integer.parseInt(userId));
@@ -283,6 +291,7 @@ public class TransServiceImpl implements TransService {
         }
         transRecord.setStartTime(executeTime);
         transRecord.setManualExecute(manualExe);
+        transRecord.setDelFlag(1);
         transRecordDao.save(transRecord);
         Integer runStatus = 2;
         KettleDatabaseRepository kettleDatabaseRepository  = initializeService.init(repository);
@@ -365,7 +374,7 @@ public class TransServiceImpl implements TransService {
         template.setCreateUser(transRecord.getCreateUser());
         template.setMonitorJob(transRecord.getRecordTrans());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
-        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUser(transRecord.getRecordTrans(),Integer.parseInt(uId));
+        TransMonitor templateOne = transMonitorDao.findByMonitorTransAndCreateUserAndDelFlag(transRecord.getRecordTrans(),Integer.parseInt(uId),1);
 //        templateOne.setRunStatus(runStatus);
 //        templateOne.setLastExecuteTime(lastExecuteTime);
 //        //在监控表中增加下一次执行时间

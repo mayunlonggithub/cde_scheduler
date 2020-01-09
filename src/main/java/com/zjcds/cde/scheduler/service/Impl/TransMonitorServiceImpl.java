@@ -95,7 +95,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Override
     public Integer getAllMonitorTrans(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatusAndDelFlag(uId,1,1);
         return transMonitorList.size();
     }
 
@@ -108,7 +108,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Override
     public Integer getAllSuccess(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatusAndDelFlag(uId,1,1);
         Integer allSuccess = 0;
         for (TransMonitor transMonitor : transMonitorList) {
             allSuccess += transMonitor.getMonitorSuccess();
@@ -125,7 +125,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Override
     public Integer getAllFail(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        List<TransMonitor> transMonitorList = transMonitorDao.findByCreateUserAndMonitorStatusAndDelFlag(uId,1,1);
         Integer allSuccess = 0;
         for (TransMonitor transMonitor : transMonitorList) {
             allSuccess += transMonitor.getMonitorFail();
@@ -146,7 +146,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
         //获取当前用户所有执行记录
-        List<TransRecord> transRecordList = transRecordDao.findByCreateUser(uId);
+        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndDelFlag(uId,1);
         //截取时间日期到日
         transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
@@ -189,7 +189,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
         //获取当前用户所有执行记录
-        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatus(uId,2);
+        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatusAndDelFlag(uId,2,1);
         //截取时间日期到日
 
         transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
@@ -233,7 +233,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
         //获取当前用户所有执行记录
-        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatus(uId,3);
+        List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatusAndDelFlag(uId,3,1);
         //截取时间日期到日
         transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
@@ -275,7 +275,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     @Transactional
     public void addMonitor(Integer userId, Integer transId, Date nextExecuteTime,Integer manualExe,Integer completionFlag) {
         Assert.notNull(userId,"未登录,请重新登录");
-        TransMonitor templateOne = transMonitorDao.findByCreateUserAndMonitorTrans(userId,transId);
+        TransMonitor templateOne = transMonitorDao.findByCreateUserAndMonitorTransAndDelFlag(userId,transId,1);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
             templateOne.setRunStatus(0);
@@ -318,7 +318,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
     public void updateRunStatusTrans(Integer transId,Integer uId,Integer runStatus) {
         Assert.notNull(transId, "转换id不能为空");
         Assert.notNull(uId, "用户id不能为空");
-        TransMonitor transMonitor = transMonitorDao.findByMonitorTransAndCreateUser(transId, uId);
+        TransMonitor transMonitor = transMonitorDao.findByMonitorTransAndCreateUserAndDelFlag(transId, uId,1);
         transMonitor.setRunStatus(runStatus);
         transMonitorDao.save(transMonitor);
     }

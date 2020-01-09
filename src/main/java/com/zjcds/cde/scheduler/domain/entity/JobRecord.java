@@ -41,6 +41,8 @@ public class JobRecord {
     private String duration;
     //是否手动执行
     private Integer manualExecute;
+    //是否删除
+    private Integer delFlag;
 
     @Id
     @Column(name = "record_id")
@@ -151,5 +153,15 @@ public class JobRecord {
 
     public void setManualExecute(Integer manualExecute) {
         this.manualExecute = manualExecute;
+    }
+
+    @Basic
+    @Column(name="del_flag")
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

@@ -83,7 +83,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Override
     public Integer getAllMonitorJob(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatusAndDelFlag(uId,1,1);
         return jobMonitorList.size();
     }
 
@@ -96,7 +96,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Override
     public Integer getAllSuccess(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatusAndDelFlag(uId,1,1);
         Integer allSuccess = 0;
         for (JobMonitor jobMonitor : jobMonitorList) {
             allSuccess += jobMonitor.getMonitorSuccess();
@@ -113,7 +113,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Override
     public Integer getAllFail(Integer uId) {
         Assert.notNull(uId,"未登录,请重新登录");
-        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatus(uId,1);
+        List<JobMonitor> jobMonitorList = jobMonitorDao.findByCreateUserAndMonitorStatusAndDelFlag(uId,1,1);
         Integer allSuccess = 0;
         for (JobMonitor jobMonitor : jobMonitorList) {
             allSuccess += jobMonitor.getMonitorFail();
@@ -133,7 +133,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
         //获取当前用户所有执行记录
-        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUser(uId);
+        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndDelFlag(uId,1);
         //截取时间日期到日
         jobRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
@@ -176,7 +176,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
         //获取当前用户所有执行记录
-        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndRecordStatus(uId,2);
+        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndRecordStatusAndDelFlag(uId,2,1);
         //截取时间日期到日
         jobRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
@@ -219,7 +219,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
         HashMap<String, Object> resultMap = new HashMap<String, Object>();
         List<Integer> resultList = new ArrayList<Integer>();
         //获取当前用户所有执行记录
-        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndRecordStatus(uId,3);
+        List<JobRecord> jobRecordList = jobRecordDao.findByCreateUserAndRecordStatusAndDelFlag(uId,3,1);
         //截取时间日期到日
         jobRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
@@ -262,7 +262,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     @Transactional
     public void addMonitor(Integer uId, Integer jobId, Date nextExecuteTime,Integer manualExe,Integer completionFlag) {
         Assert.notNull(uId,"未登录,请重新登录");
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobId,uId);
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUserAndDelFlag(jobId,uId,1);
         if (null != templateOne) {
             templateOne.setMonitorStatus(1);
             templateOne.setRunStatus(0);
@@ -307,7 +307,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
     public void updateRunStatusJob(Integer jobId,Integer uId,Integer runStatus) {
         Assert.notNull(jobId, "作业id不能为空");
         Assert.notNull(uId, "用户id不能为空");
-        JobMonitor jobMonitor = jobMonitorDao.findByMonitorJobAndCreateUser(jobId, uId);
+        JobMonitor jobMonitor = jobMonitorDao.findByMonitorJobAndCreateUserAndDelFlag(jobId, uId,1);
         jobMonitor.setRunStatus(runStatus);
         jobMonitorDao.save(jobMonitor);
     }

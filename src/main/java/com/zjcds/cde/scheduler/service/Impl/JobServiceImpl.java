@@ -118,11 +118,17 @@ public class JobServiceImpl implements JobService {
         Assert.notNull(job, "要删除的任务不存在或已删除");
         job.setDelFlag(0);
         jobDao.save(job);
-        JobMonitor jobMonitor=jobMonitorDao.findByMonitorJob(jobId);
+        JobMonitor jobMonitor=jobMonitorDao.findByMonitorJobAndDelFlag(jobId,1);
         jobMonitor.setDelFlag(0);
         jobMonitorDao.save(jobMonitor);
+        List<JobRecord> jobRecordList=jobRecordDao.findByRecordJobAndDelFlag(jobId,1);
+        for(JobRecord jobRecord:jobRecordList){
+            jobRecord.setDelFlag(0);
+            jobRecordDao.save(jobRecord);
+        }
         //移除策略
         taskService.deleteTask(jobId,"job",uId);
+
     }
 
     /**
@@ -275,7 +281,7 @@ public class JobServiceImpl implements JobService {
 //    @Transactional
     public void manualRunRepositoryJob(Repository repository, String jobId, String jobName, String jobPath, String userId, String logLevel, String logFilePath, Date executeTime, Date nexExecuteTime, Map<String, String> param,Integer manualExe) throws KettleException {
         Assert.notNull(userId, "未登录,请重新登录");
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(Integer.parseInt(jobId),Integer.parseInt(userId));
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUserAndDelFlag(Integer.parseInt(jobId),Integer.parseInt(userId),1);
         JobRecord jobRecord = new JobRecord();
         jobRecord.setRecordJob(Integer.parseInt(jobId));
         jobRecord.setCreateUser(Integer.parseInt(userId));
@@ -284,6 +290,7 @@ public class JobServiceImpl implements JobService {
         jobRecord.setPlanStartTime(templateOne.getNextExecuteTime());}
         jobRecord.setStartTime(executeTime);
         jobRecord.setManualExecute(manualExe);
+        jobRecord.setDelFlag(1);
         jobRecordDao.save(jobRecord);
         Integer recordStatus = 2;
         KettleDatabaseRepository kettleDatabaseRepository = initializeService.init(repository);
@@ -369,7 +376,7 @@ public class JobServiceImpl implements JobService {
         template.setCreateUser(jobRecord.getCreateUser());
         template.setMonitorJob(jobRecord.getRecordJob());
 //        JobMonitor templateOne = sqlManager.templateOne(template);
-        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUser(jobRecord.getRecordJob(), Integer.parseInt(uId));
+        JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUserAndDelFlag(jobRecord.getRecordJob(), Integer.parseInt(uId),1);
 //        templateOne.setLastExecuteTime(lastExecuteTime);
 //        templateOne.setRunStatus(runStatus);
 //        //在监控表中增加下一次执行时间

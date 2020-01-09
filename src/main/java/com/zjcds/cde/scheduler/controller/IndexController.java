@@ -69,7 +69,6 @@ public class IndexController {
 
     @GetMapping("/allMonitorTrans")
     @ApiOperation(value = "监控转换数", produces = "application/json;charset=utf-8")
-
     public ResponseResult<Integer> allMonitorTrans(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
@@ -92,7 +91,6 @@ public class IndexController {
 
     @GetMapping("/getJob")
     @ApiOperation(value = "作业监控记录Top5", produces = "application/json;charset=utf-8")
-
     public ResponseResult<JobMonitorForm.JobMonitorStatis> getJob(HttpServletRequest request){
         User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
         Assert.notNull(kUser,"未登录或登录已失效，请重新登录");

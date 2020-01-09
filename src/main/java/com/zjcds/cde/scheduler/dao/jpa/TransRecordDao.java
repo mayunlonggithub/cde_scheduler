@@ -10,9 +10,11 @@ import java.util.List;
  */
 public interface TransRecordDao extends CustomRepostory<TransRecord,Integer> {
 
-    public TransRecord findByRecordIdAndCreateUser(Integer recordId,Integer createUser);
+    public TransRecord findByRecordIdAndCreateUserAndDelFlag(Integer recordId,Integer createUser,Integer delFlag);
 
-    public List<TransRecord> findByCreateUser(Integer createUser);
+    public List<TransRecord> findByCreateUserAndDelFlag(Integer createUser,Integer delFlag);
 
-    public List<TransRecord> findByCreateUserAndRecordStatus(Integer createUser,Integer recordStatus);
+    public List<TransRecord> findByCreateUserAndRecordStatusAndDelFlag(Integer createUser,Integer recordStatus,Integer delFlag);
+
+    public List<TransRecord> findByRecordTransAndDelFlag(Integer recordTrans,Integer delFlag);
 }
