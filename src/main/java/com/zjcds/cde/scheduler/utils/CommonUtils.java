@@ -31,7 +31,7 @@ public class CommonUtils {
         StringBuilder allLogFilePath = new StringBuilder();
         allLogFilePath.append(kettleFileRepository).append("/")
                 .append(uId).append("/")
-                .append(new Date().getTime()).append("/")
+                .append(System.currentTimeMillis()).append("/")
                 .append(jobFile.getOriginalFilename());
         FileUtils.writeByteArrayToFile(new File(allLogFilePath.toString()), jobFile.getBytes());
         return allLogFilePath.toString();

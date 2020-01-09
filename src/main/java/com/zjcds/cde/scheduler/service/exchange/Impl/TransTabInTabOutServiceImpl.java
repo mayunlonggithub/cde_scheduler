@@ -39,7 +39,7 @@ public class TransTabInTabOutServiceImpl implements TransTabInTabOutService {
 
     @Resource
     private DatasourceApi datasourceApi;
-    @Resource
+    @Autowired
     private InitializeService initialize;
     @Autowired
     private QuartzService quartzService;

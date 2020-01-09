@@ -271,11 +271,11 @@ public class RepositoryServiceImpl implements RepositoryService {
             //过滤出路径
             List<RepositoryTree> path = repositoryTrees.stream().filter(e->e.getType() == null).collect(Collectors.toList());
             //过滤出作业
-            List<RepositoryTree> repositoryJob = repositoryTrees.stream().filter(e->e.getType() !=null && e.getType().equals("job")).collect(Collectors.toList());
+            List<RepositoryTree> repositoryJob = repositoryTrees.stream().filter(e->e.getType() !=null && "job".equals(e.getType())).collect(Collectors.toList());
             //取出作业路径信息
             repositoryJob = stream(path,repositoryJob);
             //过滤出转换
-            List<RepositoryTree> repositoryTrans = repositoryTrees.stream().filter(e->e.getType() !=null && e.getType().equals("transformation")).collect(Collectors.toList());
+            List<RepositoryTree> repositoryTrans = repositoryTrees.stream().filter(e->e.getType() !=null && "transformation".equals(e.getType())).collect(Collectors.toList());
             //取出转换路径信息
             repositoryTrans = stream(path,repositoryTrans);
 //        repositoryTreeDao.deleteByRepositoryId(repositoryId);

@@ -328,7 +328,7 @@ public class JobServiceImpl implements JobService {
                 StringBuilder allLogFilePath = new StringBuilder();
                 allLogFilePath.append(logFilePath).append("/").append(userId).append("/")
                         .append(StringUtils.remove(jobPath, "/")).append("@").append(jobName).append("-log")
-                        .append("/").append(new Date().getTime()).append(".").append("txt");
+                        .append("/").append(System.currentTimeMillis()).append(".").append("txt");
                 String logChannelId = job.getLogChannelId();
                 LoggingBuffer appender = KettleLogStore.getAppender();
                 logText = appender.getBuffer(logChannelId, true).toString();

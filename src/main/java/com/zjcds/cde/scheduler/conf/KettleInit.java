@@ -195,10 +195,11 @@ public class KettleInit {
 	 * @return 返回 true or false
 	 */
 	public static boolean isInitialized() {
-		if (initialized == null)
-			return false;
-		else
-			return true;
+		if (initialized == null) {
+            return false;
+        } else {
+            return true;
+        }
 	}
 
 	/**

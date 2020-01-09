@@ -17,9 +17,9 @@ public abstract class DateUtils {
 
     public static Date parse(String dateStr) {
         try {
-            if(StringUtils.isBlank(dateStr))
+            if(StringUtils.isBlank(dateStr)) {
                 return null;
-            else {
+            } else {
                 Date date = null;
                 dateStr = StringUtils.trim(dateStr);
                 if(dateStr.length() <= 10){

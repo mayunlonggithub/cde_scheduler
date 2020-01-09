@@ -34,8 +34,12 @@ public class RepositoryTransViewPK implements Serializable {
     }
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         RepositoryTransViewPK that = (RepositoryTransViewPK) o;
         return rId == that.rId &&
                 repositoryId == that.repositoryId;

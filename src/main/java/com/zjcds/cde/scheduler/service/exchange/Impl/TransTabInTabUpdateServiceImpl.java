@@ -41,7 +41,7 @@ public class TransTabInTabUpdateServiceImpl implements TransTabInTabUpdateServic
 
     @Resource
     private DatasourceApi datasourceApi;
-    @Resource
+    @Autowired
     private InitializeService initialize;
     @Autowired
     private QuartzService quartzService;

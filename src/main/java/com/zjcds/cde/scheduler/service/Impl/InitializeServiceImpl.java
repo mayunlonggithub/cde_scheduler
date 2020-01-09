@@ -21,7 +21,7 @@ public class InitializeServiceImpl implements InitializeService {
     @Override
     public KettleDatabaseRepository init(Repository repository)throws KettleException{
         KettleEnvironment.init();
-        DatabaseMeta databaseMeta = new DatabaseMeta(null, repository.getRepositoryType(), repository.getDatabaseAccess(),
+        DatabaseMeta databaseMeta = new DatabaseMeta(repository.getDatabaseName(), repository.getRepositoryType(), repository.getDatabaseAccess(),
                 repository.getDatabaseHost(), repository.getDatabaseName(), repository.getDatabasePort(), repository.getDatabaseUsername(), repository.getDatabasePassword());
         databaseMeta.addExtraOption(databaseMeta.getPluginId(), "characterEncoding", "UTF-8");
         databaseMeta.addExtraOption(databaseMeta.getPluginId(), "useUnicode", "true");

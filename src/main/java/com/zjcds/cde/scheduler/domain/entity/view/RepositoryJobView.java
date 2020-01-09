@@ -79,8 +79,12 @@ public class RepositoryJobView {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         RepositoryJobView that = (RepositoryJobView) o;
         return Objects.equals(rId, that.rId) &&
                 Objects.equals(parent, that.parent) &&

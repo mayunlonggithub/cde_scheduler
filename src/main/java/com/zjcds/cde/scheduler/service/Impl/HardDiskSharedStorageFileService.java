@@ -74,8 +74,9 @@ public class HardDiskSharedStorageFileService implements SharedStorageFileServic
         try {
 
             Path filePath = concatFilePath(fetchPath,fileName);
-            if(!Files.exists(filePath,LinkOption.NOFOLLOW_LINKS))
+            if(!Files.exists(filePath,LinkOption.NOFOLLOW_LINKS)) {
                 throw new IllegalArgumentException("文件不存在!");
+            }
             Files.copy(filePath,outputStream);
         }
         catch (Exception ex) {

@@ -327,7 +327,7 @@ public class TransServiceImpl implements TransService {
                 StringBuilder allLogFilePath = new StringBuilder();
                 allLogFilePath.append(logFilePath).append("/").append(userId).append("/")
                         .append(StringUtils.remove(transPath, "/")).append("@").append(transName).append("-log")
-                        .append("/").append(new Date().getTime()).append(".").append("txt");
+                        .append("/").append(System.currentTimeMillis()).append(".").append("txt");
                 String logChannelId = trans.getLogChannelId();
                 LoggingBuffer appender = KettleLogStore.getAppender();
                 logText = appender.getBuffer(logChannelId, true).toString();

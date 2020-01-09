@@ -18,10 +18,11 @@ public abstract class BeanPropertyCopyUtils {
     private static DozerBeanMapper dozerBeanMapper ;
 
     public static void init(DozerBeanMapper dozerBeanMapper){
-        if(BeanPropertyCopyUtils.dozerBeanMapper == null)
+        if(BeanPropertyCopyUtils.dozerBeanMapper == null) {
             BeanPropertyCopyUtils.dozerBeanMapper = dozerBeanMapper;
-        else
+        } else {
             throw new IllegalArgumentException("BeanCopyUtils不允许重复初始化！");
+        }
     }
 
     public static void valid(){
@@ -30,23 +31,26 @@ public abstract class BeanPropertyCopyUtils {
 
     public static <S,T> T copy(S source, T target){
         valid();
-        if(source == null || target == null)
+        if(source == null || target == null) {
             return null;
+        }
         dozerBeanMapper.map(source,target);
         return target;
     }
 
     public static <S,T> T copy(S source,Class<T> targetClass){
         valid();
-        if(source == null || targetClass == null)
+        if(source == null || targetClass == null) {
             return null;
+        }
         return dozerBeanMapper.map(source,targetClass);
     }
 
     public static <S,T> List<T> copy(List<S> source, List<T> target){
         valid();
-        if(source == null)
+        if(source == null) {
             return Collections.emptyList();
+        }
         dozerBeanMapper.map(source,target);
         return target;
     }
