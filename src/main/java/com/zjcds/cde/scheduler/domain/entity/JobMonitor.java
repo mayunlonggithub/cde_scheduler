@@ -31,6 +31,8 @@ public class JobMonitor {
     private Date nextExecuteTime;
     //作业名称
     private String monitorJobName;
+    //是否删除
+    private Integer delFlag;
 
     @Id
     @Column(name = "monitor_id")
@@ -131,5 +133,15 @@ public class JobMonitor {
 
     public void setMonitorJobName(String monitorJobName) {
         this.monitorJobName = monitorJobName;
+    }
+
+    @Basic
+    @Column(name = "del_flag")
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

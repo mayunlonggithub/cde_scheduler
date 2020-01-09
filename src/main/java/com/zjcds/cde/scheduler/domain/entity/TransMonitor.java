@@ -31,6 +31,8 @@ public class TransMonitor {
     private Date nextExecuteTime;
     //转换名称
     private String monitorTransName;
+    //是否删除
+    private Integer delFlag;
 
     @Id
     @Column(name = "monitor_id")
@@ -122,6 +124,15 @@ public class TransMonitor {
 
     public void setNextExecuteTime(Date nextExecuteTime) {
         this.nextExecuteTime = nextExecuteTime;
+    }
+
+    @Basic
+    @Column(name = "del_flag")
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 
     @Transient
