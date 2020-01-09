@@ -135,6 +135,7 @@ public class TransMonitor {
         this.delFlag = delFlag;
     }
 
+
     @Transient
     public String getMonitorTransName() {
         return monitorTransName;

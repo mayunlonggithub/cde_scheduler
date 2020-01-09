@@ -144,4 +144,5 @@ public class JobMonitor {
     public void setDelFlag(Integer delFlag) {
         this.delFlag = delFlag;
     }
+
 }
