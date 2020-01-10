@@ -90,10 +90,12 @@ public class QuartzServiceImpl implements QuartzService {
             updateQuartz.setQuartzCron(cron.get(0));
             updateQuartz.setQuartzDescription(cron.get(1));
         }
+        Quartz quartz1=quartzDao.findByQuartzId(updateQuartz.getQuartzId());
+        Integer accessFlag=quartz1.getAssTaskFlag();
         Quartz quartz = BeanPropertyCopyUtils.copy(updateQuartz, Quartz.class);
         quartz.setDelFlag(1);
-        quartz.setAssTaskFlag(1);
         quartz.setCreateUser(uId);
+        quartz.setAssTaskFlag(accessFlag);
         quartzDao.save(quartz);
         Integer[] staArray={Constant.COMPLETION,Constant.VALID};
         List<Task>  taskList=taskDao.findByQuartzIdAndStatusIn(quartz.getQuartzId(),staArray);
@@ -112,12 +114,14 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     public PageResult<Quartz> getList(Paging paging, List<String> queryString, List<String> orderBys,Integer uId) {
         queryString.add("delFlag~eq~1");
-        queryString.add("createUser~eq~"+uId);
-        List<Quartz> quartzList=quartzDao.findByDelFlag(1);
-        for(Quartz quartz:quartzList){
-            if(quartz.getEndTime().after(new Date())){
-                quartz.setIfValid(1);
-                quartzDao.save(quartz);
+        queryString.add("createUser~eq~" + uId);
+        List<Quartz> quartzList = quartzDao.findByDelFlag(1);
+        if (quartzList != null) {
+            for (Quartz quartz : quartzList) {
+                if (quartz.getEndTime().after(new Date())) {
+                    quartz.setIfValid(1);
+                    quartzDao.save(quartz);
+                }
             }
         }
         PageResult<Quartz> quartz = quartzDao.findAll(paging, queryString, orderBys);
