@@ -53,6 +53,8 @@ public class TUserForm {
         private List<TMenuForm.TMenuTree> tMenu;
         @ApiModelProperty(value = "token")
         private String token;
+        @ApiModelProperty(value = "更新标志位")
+        private BaseValue updateFlag;
     }
 
     @Getter

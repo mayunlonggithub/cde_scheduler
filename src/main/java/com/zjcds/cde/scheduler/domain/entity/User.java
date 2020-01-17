@@ -31,7 +31,7 @@ import java.util.List;
  * @author huangyj on 20190831
  */
 @Entity
-@Table(name = "user")
+@Table(name = "t_user")
 public class User extends CreateModifyTime implements UserDetails {
     private Integer id;
     private String account;
@@ -46,6 +46,7 @@ public class User extends CreateModifyTime implements UserDetails {
     private List<Role> roles;
     private Department department;
     private List<Menu> menus;
+    private Integer updateFlag;
 //    private Set<Role> roles = new HashSet<>();
 
     @Id
@@ -144,6 +145,16 @@ public class User extends CreateModifyTime implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Basic
+    @Column(name = "update_flag")
+    public Integer getUpdateFlag() {
+        return updateFlag;
+    }
+
+    public void setUpdateFlag(Integer updateFlag) {
+        this.updateFlag = updateFlag;
     }
 
 
