@@ -40,5 +40,4 @@ public abstract class BaseEnumConverter<T extends BaseEnum<K>, K> implements Att
 //        }
         return result;
     }
-
 }

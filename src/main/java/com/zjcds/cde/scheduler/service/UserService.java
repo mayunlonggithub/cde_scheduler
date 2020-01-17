@@ -1,83 +1,52 @@
 package com.zjcds.cde.scheduler.service;
 
-import com.zjcds.cde.scheduler.base.PageResult;
-import com.zjcds.cde.scheduler.base.Paging;
-import com.zjcds.cde.scheduler.domain.dto.UserForm;
 import com.zjcds.cde.scheduler.domain.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * jackson 相关配置
+ * 用户Service
+ * Created date:2019-08-21
  *
- * @author J on 20191107.
+ * @author shihuajie
  */
 public interface UserService {
 
     /**
-     * @Title login
-     * @Description 登陆
-     * @param userLogin 用户信息对象
-     * @return
-     * @return KUser
-     */
-    public User login(UserForm.UserLogin userLogin);
-
-    /**
-     * @Title isAdmin
-     * @Description 用户是否为管理员
-     * @param uId 用户ID
-     * @return
-     * @return boolean
-     */
-    public boolean isAdmin(Integer uId);
-
-    /**
-     * @Title getList
-     * @Description 获取用户分页列表
+     * 通过用户账号查询用户实体
+     * 未查到返回null
+     *
+     * @param accunt
      * @return
      */
-    public PageResult<User> getList(Paging paging, List<String> queryString, List<String> orderBys, Integer uId);
+    public User queryUserByAccount(String accunt);
 
     /**
-     * @Title delete
-     * @Description 删除用户
-     * @param uId 用户ID
-     * @return void
-     */
-    public void delete(Integer id,Integer uId);
-
-    /**
-     * @Title addUser
-     * @Description 插入一个用户
-     * @param addTUser
-     * @return void
-     */
-    public void addUser(UserForm.AddUser addTUser, Integer uId);
-
-    /**
-     * @Title IsAccountExist
-     * @Description 判断账号是否存在
-     * @param account
-     * @return void
-     */
-    public boolean isAccountExist(String account);
-
-    /**
-     * @Title getUser
-     * @Description 获取 用户
-     * @param uId 用户ID
+     * 根据用户id查询用户
+     * @param id
      * @return
-     * @return KUser
      */
-    public User getUser(Integer uId);
+    public User queryUserWithRole(Integer id);
 
     /**
-     * @Title update
-     * @Description 更新用户
-     * @param updateUser 用户对象
-     * @param uId 用户ID
-     * @return void
+     * 根据name查询角色
+     * @param name
+     * @return
      */
-    public void updateUser(UserForm.UpdateUser updateUser, Integer id,Integer uId);
+    public List<User> queryUsersByNameLike(String name);
+
+    /**
+     * 根据name查询角色
+     * @param name
+     * @return
+     */
+    public Long countUsersByNameLike(String name);
+
+    public List<User> queryActiveUserByAccountOrName(String account, String name);
+
+    public Long countActiveUserByAccountOrName(String account, String name);
+
+    public List<User> queryByIdIn(Set<Integer> userIdSet);
+
 }

@@ -1,78 +1,44 @@
 package com.zjcds.cde.scheduler.controller;
 
-import com.zjcds.cde.scheduler.base.*;
-import com.zjcds.cde.scheduler.domain.dto.UserForm;
-import com.zjcds.cde.scheduler.domain.entity.User;
-import com.zjcds.cde.scheduler.service.UserService;
-import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.base.PageResult;
+import com.zjcds.cde.scheduler.base.Paging;
+import com.zjcds.cde.scheduler.common.BaseResponse;
+import com.zjcds.cde.scheduler.domain.dto.TUserForm;
+import com.zjcds.cde.scheduler.service.TUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * @author J on 20191105
+ * @author huangyj on 20190831
  */
 @RestController
-
-@Api(description = "用户信息")
-@RequestMapping("/user")
+@RequestMapping("/tUser")
+@Api(value = "用户信息模块", tags = {"B-用户信息模块"})
 public class UserController {
 
-
     @Autowired
-    private UserService userService;
+    private TUserService tUserService;
 
-    @PostMapping("/login")
-    @ApiOperation(value = "用户登录", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<UserForm.User> login(@RequestBody UserForm.UserLogin userLogin, RedirectAttributes attr, HttpServletRequest request){
-        if (null != userLogin && StringUtils.isNotBlank(userLogin.getAccount()) &&
-                StringUtils.isNotBlank(userLogin.getPassword())){
-            User user = userService.login(userLogin);
-            UserForm.User owner = BeanPropertyCopyUtils.copy(user,UserForm.User.class);
-            if (null != user){
-                request.getSession().setAttribute(Constant.SESSION_ID, user);
-                return new ResponseResult<>(true,"登录成功",owner);
-            }
-            return new ResponseResult<>(false,"登录失败,账号或密码不正确");
-        }
-        return new ResponseResult<>(false,"登录失败,账号或密码不能为空");
-    }
-
-    @PostMapping("/logout")
-    @ApiOperation(value = "用户注销", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<Void> logout(HttpServletRequest request){
-        HttpSession session = request.getSession();
-        session.removeAttribute(Constant.SESSION_ID);
-        return new ResponseResult<>(true,"注销成功");
-    }
-
-    @GetMapping("/isAdmin")
-    @ApiOperation(value = "是否管理员", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<Void> isAdmin(HttpServletRequest request){
-        User user = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(user,"未登录或登录已失效，请重新登录");
-        boolean isAdmin = userService.isAdmin(user.getId());
-        return new ResponseResult(true,"请求成功",isAdmin);
-    }
-
-    @GetMapping("/getList")
-    @ApiOperation(value = "获取用户分页列表", produces = "application/json;charset=utf-8")
+    @GetMapping
+    @ApiOperation(value = "查询所有用户信息", produces = "application/json;charset=utf-8")
     @ApiImplicitParams({@ApiImplicitParam(
             name = "pageIndex",
             value = "分页页码",
@@ -100,76 +66,56 @@ public class UserController {
             paramType = "query",
             allowMultiple = true
     )})
-    public ResponseResult<UserForm.User> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        if (CollectionUtils.isEmpty((Collection) queryString)) {
-            queryString = new ArrayList();
-        }
+    public BaseResponse<PageResult<TUserForm.TUser>> queryAllTUser(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys){
         if (CollectionUtils.isEmpty((Collection) orderBys)) {
             orderBys = new ArrayList();
-            ((List) orderBys).add("createTimeDesc");
+            ((List) orderBys).add("modifyTimeDesc");
         }
-        PageResult<User> user = userService.getList(paging,queryString,orderBys,kUser.getId());
-        PageResult<UserForm.User> owner = PageUtils.copyPageResult(user,UserForm.User.class);
-        return new ResponseResult(true,"请求成功",owner);
+        PageResult<TUserForm.TUser> owner = tUserService.queryAllTUser(paging,queryString,orderBys);
+        return new BaseResponse<>(owner);
     }
 
-    @DeleteMapping("delete/{id}")
-    @ApiOperation(value = "删除用户", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<Void> delete(HttpServletRequest request,@PathVariable(required = true ,name = "id") Integer id){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Assert.notNull(id,"要删除的用户id不能为空");
-        userService.delete(id,kUser.getId());
-        return new ResponseResult(true,"请求成功");
+    @PostMapping
+    @ApiOperation(value = "新增用户信息", produces = "application/json;charset=utf-8")
+    public BaseResponse<TUserForm.TUser> addTUser(@RequestBody TUserForm.AddTUser addTUser){
+        TUserForm.TUser owner = tUserService.addTUser(addTUser);
+        return new BaseResponse(owner);
     }
 
-    @PostMapping("addTUser")
-    @ApiOperation(value = "插入一个用户", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<Void> addTUser(@RequestBody UserForm.AddUser addTUser, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        userService.addUser(addTUser,kUser.getId());
-        return new ResponseResult(true,"请求成功");
-    }
-
-
-    @PutMapping("/updateUser/{id}")
+    @PutMapping
     @ApiOperation(value = "修改用户信息", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<Void> updateUser(@PathVariable(required = true ,name = "id") Integer id,@RequestBody UserForm.UpdateUser updateUser, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        userService.updateUser(updateUser,id,kUser.getId());
-        return new ResponseResult(true,"请求成功");
+    public BaseResponse<TUserForm.TUser> updateTUser(Integer id, @RequestBody TUserForm.UpdateTUser updateTUser){
+        TUserForm.TUser owner = tUserService.updateTUser(id,updateTUser);
+        return new BaseResponse(owner);
     }
 
-    @PostMapping("/isAccountExist/{account}")
-    @ApiOperation(value = "判断账号是否存在", produces = "application/json;charset=utf-8")
-
-    public ResponseResult<Void> isAccountExist(@PathVariable(required = true ,name = "account") String account, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        boolean isAccountExist = userService.isAccountExist(account);
-        if(isAccountExist){
-            return new ResponseResult(true,"请求成功");
-        }else {
-            return new ResponseResult(false,"账号已存在");
-        }
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除用户信息", produces = "application/json;charset=utf-8")
+    public BaseResponse<Void> deleteTUser(@PathVariable("id") Integer id){
+        Assert.notNull(id,"要删除的用户id不能为空");
+        tUserService.deleteTUser(id);
+        return new BaseResponse();
     }
 
-    @PostMapping("/isAccountExist/{id}")
-    @ApiOperation(value = "判断账号是否存在", produces = "application/json;charset=utf-8")
+    @PostMapping("/{userId}")
+    @ApiOperation(value = "新增用户角色绑定信息", produces = "application/json;charset=utf-8")
+    public BaseResponse<List<TUserForm.AddRUserRole>> addRUserRole(@PathVariable(required = true ,name = "userId") Integer userId, @RequestBody List<TUserForm.AddRUserRole> addRUserRole){
+        List<TUserForm.AddRUserRole> owner = tUserService.addRUserRole(userId,addRUserRole);
+        return new BaseResponse(owner);
+    }
 
-    public ResponseResult<Void> isAccountExist(@PathVariable(required = true ,name = "id") Integer id, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        User user = userService.getUser(id);
-        UserForm.User owner = BeanPropertyCopyUtils.copy(user,UserForm.User.class);
-        return new ResponseResult(true,"请求成功",owner);
+    @PostMapping("/resetPassword/{userId}")
+    @ApiOperation(value = "重置密码", produces = "application/json;charset=utf-8")
+    public BaseResponse<Void> resetPassword(@PathVariable(required = true ,name = "userId") Integer userId){
+        tUserService.resetPassword(userId);
+        return new BaseResponse("重置成功");
+    }
+
+    @PostMapping("/updatePassword")
+    @ApiOperation(value = "修改密码", produces = "application/json;charset=utf-8")
+    public BaseResponse<Void> updatePassword(@RequestBody TUserForm.UpdatePassword updatePassword){
+        BaseResponse owner = tUserService.updatePassword(updatePassword);
+        return owner;
     }
 
 }

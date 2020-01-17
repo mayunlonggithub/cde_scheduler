@@ -4,17 +4,15 @@ import com.zjcds.cde.scheduler.base.PageResult;
 import com.zjcds.cde.scheduler.base.PageUtils;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.base.ResponseResult;
-import com.zjcds.cde.scheduler.domain.dto.TransForm;
 import com.zjcds.cde.scheduler.domain.dto.TransMonitorForm;
 import com.zjcds.cde.scheduler.domain.dto.TransRecordForm;
-import com.zjcds.cde.scheduler.domain.entity.TransMonitor;
-import com.zjcds.cde.scheduler.domain.entity.TransRecord;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.domain.entity.view.TransMonitorView;
 import com.zjcds.cde.scheduler.domain.entity.view.TransRecordView;
 import com.zjcds.cde.scheduler.service.TransMonitorService;
 import com.zjcds.cde.scheduler.service.TransRecordService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.WebSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -75,8 +73,7 @@ public class TransMonitorController {
             allowMultiple = true
     )})
     public ResponseResult<TransMonitorForm.TransMonitor> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer userId= WebSecurityUtils.currentUserId();
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -84,7 +81,7 @@ public class TransMonitorController {
             orderBys = new ArrayList();
             orderBys.add("monitorStatusDesc");
         }
-        PageResult<TransMonitorView> trans = transMonitorService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<TransMonitorView> trans = transMonitorService.getList(paging,queryString, orderBys,userId);
         PageResult<TransMonitorForm.TransMonitor>  owner = PageUtils.copyPageResult(trans,TransMonitorForm.TransMonitor.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -93,9 +90,8 @@ public class TransMonitorController {
     @ApiOperation(value = "获取所有的监控转换数", produces = "application/json;charset=utf-8")
 
     public ResponseResult<Integer> getAllMonitorTrans(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Integer allMonitorTrans= transMonitorService.getAllMonitorTrans(kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Integer allMonitorTrans= transMonitorService.getAllMonitorTrans(userId);
         return new ResponseResult<>(true,"请求成功",allMonitorTrans);
     }
 
@@ -103,9 +99,8 @@ public class TransMonitorController {
     @ApiOperation(value = "获取执行成功的数", produces = "application/json;charset=utf-8")
 
     public ResponseResult<Integer> getAllSuccess(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Integer allSuccess= transMonitorService.getAllSuccess(kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Integer allSuccess= transMonitorService.getAllSuccess(userId);
         return new ResponseResult<>(true,"请求成功",allSuccess);
     }
 
@@ -113,9 +108,8 @@ public class TransMonitorController {
     @ApiOperation(value = "获取执行失败的数", produces = "application/json;charset=utf-8")
 
     public ResponseResult<Integer> getAllFail(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Integer allFail= transMonitorService.getAllFail(kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Integer allFail= transMonitorService.getAllFail(userId);
         return new ResponseResult<>(true,"请求成功",allFail);
     }
 
@@ -149,8 +143,7 @@ public class TransMonitorController {
             allowMultiple = true
     )})
     public ResponseResult<TransRecordForm.TransRecord> getRecordList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,  HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer userId=WebSecurityUtils.currentUserId();
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -158,7 +151,7 @@ public class TransMonitorController {
             orderBys = new ArrayList();
             ((List) orderBys).add("startTimeDesc");
         }
-        PageResult<TransRecordView> trans = transRecordService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<TransRecordView> trans = transRecordService.getList(paging,queryString, orderBys,userId);
         PageResult<TransRecordForm.TransRecord>  owner = PageUtils.copyPageResult(trans,TransRecordForm.TransRecord.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -167,18 +160,16 @@ public class TransMonitorController {
     @ApiOperation(value = "日志详情", produces = "application/json;charset=utf-8")
 
     public ResponseResult<String> getAllFail(@PathVariable(required = true ,name = "recordId") Integer recordId,HttpServletRequest request)throws IOException {
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        String logContent= transRecordService.getLogContent(recordId,kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        String logContent= transRecordService.getLogContent(recordId,userId);
         return new ResponseResult(true,"请求成功",logContent);
     }
 
     @GetMapping("/getLogDownload/{recordId}")
     @ApiOperation(value = "日志下载", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> getLogDownload(@PathVariable(required = true ,name = "recordId") Integer recordId, HttpServletRequest request, HttpServletResponse response ) throws Exception {
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        transRecordService.getLogDownload(recordId,kUser.getId(),response);
+        Integer userId=WebSecurityUtils.currentUserId();
+        transRecordService.getLogDownload(recordId,userId,response);
         return new ResponseResult(true,"请求成功");
     }
 }

@@ -12,6 +12,7 @@ import com.zjcds.cde.scheduler.domain.entity.view.JobRecordView;
 import com.zjcds.cde.scheduler.service.JobMonitorService;
 import com.zjcds.cde.scheduler.service.JobRecordService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.WebSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -76,8 +77,7 @@ public class JobMonitorController {
             allowMultiple = true
     )})
     public ResponseResult<JobMonitorForm.JobMonitor> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer userId= WebSecurityUtils.currentUserId();
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -86,7 +86,7 @@ public class JobMonitorController {
             ((List) orderBys).add("monitorStatusDesc");
 
         }
-        PageResult<JobMonitorView> job = jobMonitorService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<JobMonitorView> job = jobMonitorService.getList(paging,queryString, orderBys,userId);
         PageResult<JobMonitorForm.JobMonitor>  owner = PageUtils.copyPageResult(job,JobMonitorForm.JobMonitor.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -94,27 +94,24 @@ public class JobMonitorController {
     @GetMapping("/getAllMonitorJob}")
     @ApiOperation(value = "获取所有的监控作业数", produces = "application/json;charset=utf-8")
     public ResponseResult<Integer> getAllMonitorJob(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Integer allMonitorJob= jobMonitorService.getAllMonitorJob(kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Integer allMonitorJob= jobMonitorService.getAllMonitorJob(userId);
         return new ResponseResult<>(true,"请求成功",allMonitorJob);
     }
 
     @GetMapping("/getAllSuccess}")
     @ApiOperation(value = "获取执行成功的数", produces = "application/json;charset=utf-8")
     public ResponseResult<Integer> getAllSuccess(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Integer allSuccess= jobMonitorService.getAllSuccess(kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Integer allSuccess= jobMonitorService.getAllSuccess(userId);
         return new ResponseResult<>(true,"请求成功",allSuccess);
     }
 
     @GetMapping("/getAllFail}")
     @ApiOperation(value = "获取执行失败的数", produces = "application/json;charset=utf-8")
     public ResponseResult<Integer> getAllFail(HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Integer allFail= jobMonitorService.getAllFail(kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Integer allFail= jobMonitorService.getAllFail(userId);
         return new ResponseResult<>(true,"请求成功",allFail);
     }
 
@@ -148,8 +145,7 @@ public class JobMonitorController {
             allowMultiple = true
     )})
     public ResponseResult<JobRecordForm.JobRecord> getRecordList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys,  HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer userId=WebSecurityUtils.currentUserId();
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -157,7 +153,7 @@ public class JobMonitorController {
             orderBys = new ArrayList();
             ((List) orderBys).add("startTimeDesc");
         }
-        PageResult<JobRecordView> job = jobRecordService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<JobRecordView> job = jobRecordService.getList(paging,queryString, orderBys, userId);
         PageResult<JobRecordForm.JobRecord>  owner = PageUtils.copyPageResult(job,JobRecordForm.JobRecord.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -165,18 +161,16 @@ public class JobMonitorController {
     @GetMapping("/getLogContent/{recordId}")
     @ApiOperation(value = "日志详情", produces = "application/json;charset=utf-8")
     public ResponseResult<String> getAllFail(@PathVariable(required = true ,name = "recordId") Integer recordId,HttpServletRequest request)throws IOException {
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        String logContent= jobRecordService.getLogContent(recordId,kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        String logContent= jobRecordService.getLogContent(recordId,userId);
         return new ResponseResult(true,"请求成功",logContent);
     }
 
     @GetMapping("/getLogDownload/{recordId}")
     @ApiOperation(value = "日志下载", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> getLogDownload(@PathVariable(required = true ,name = "recordId") Integer recordId,HttpServletRequest request,HttpServletResponse response ) throws Exception {
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        jobRecordService.getLogDownload(recordId,kUser.getId(),response);
+        Integer userId=WebSecurityUtils.currentUserId();
+        jobRecordService.getLogDownload(recordId,userId,response);
         return new ResponseResult(true,"请求成功");
     }
 

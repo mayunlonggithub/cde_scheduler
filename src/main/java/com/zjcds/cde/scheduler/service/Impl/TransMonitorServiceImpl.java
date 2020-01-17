@@ -191,7 +191,6 @@ public class TransMonitorServiceImpl implements TransMonitorService {
         //获取当前用户所有执行记录
         List<TransRecord> transRecordList = transRecordDao.findByCreateUserAndRecordStatusAndDelFlag(uId,2,1);
         //截取时间日期到日
-
         transRecordList.stream().forEach(e ->e.setStartTime(DateUtils.getYmd(e.getStartTime())));
         //group by 根据时间日期
         Map<Date,Long> trans = transRecordList.stream().collect(Collectors.groupingBy(TransRecord :: getStartTime,Collectors.counting()));

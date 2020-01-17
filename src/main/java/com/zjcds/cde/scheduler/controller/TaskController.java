@@ -5,11 +5,9 @@ import com.zjcds.cde.scheduler.base.PageUtils;
 import com.zjcds.cde.scheduler.base.Paging;
 import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.dto.TaskForm;
-import com.zjcds.cde.scheduler.domain.entity.Task;
-import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.domain.entity.view.JobTransView;
 import com.zjcds.cde.scheduler.service.TaskService;
-import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.WebSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -20,7 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -54,9 +57,8 @@ public class TaskController {
     @ApiOperation(value = "删除", produces = "application/json;charset=utf-8")
     public ResponseResult<Void> delete(@PathVariable("taskId") Integer taskId,HttpServletRequest request){
         Assert.notNull(taskId,"要删除的策略id不能为空");
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        taskService.deleteTask(taskId,kUser.getId());
+        Integer userId= WebSecurityUtils.currentUserId();
+        taskService.deleteTask(taskId,userId);
         return new ResponseResult(true,"请求成功");
     }
 
@@ -90,7 +92,7 @@ public class TaskController {
             allowMultiple = true
     )})
     public ResponseResult<TaskForm.TaskView> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request,@PathVariable("quartzId") Integer  quartzId){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
+        Integer userId=WebSecurityUtils.currentUserId();
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -98,7 +100,7 @@ public class TaskController {
             orderBys = new ArrayList();
             ((List) orderBys).add("createTimeDesc");
         }
-        PageResult<JobTransView> task= taskService.getList(paging,queryString,orderBys,kUser.getId(),quartzId);
+        PageResult<JobTransView> task= taskService.getList(paging,queryString,orderBys,userId,quartzId);
         PageResult<TaskForm.TaskView> owner = PageUtils.copyPageResult(task, TaskForm.TaskView.class);
         return new ResponseResult(true,"请求成功",owner);
     }

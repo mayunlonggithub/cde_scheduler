@@ -6,6 +6,7 @@ import com.zjcds.cde.scheduler.domain.entity.Trans;
 import com.zjcds.cde.scheduler.domain.entity.User;
 import com.zjcds.cde.scheduler.service.TransService;
 import com.zjcds.cde.scheduler.utils.Constant;
+import com.zjcds.cde.scheduler.utils.WebSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -64,8 +65,7 @@ public class TransController {
             allowMultiple = true
     )})
     public ResponseResult<TransForm.Trans> getList(Paging paging, @RequestParam(required = false,name = "queryString") List<String> queryString, @RequestParam(required = false, name = "orderBy") List<String> orderBys, HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+        Integer userId= WebSecurityUtils.currentUserId();
         if (CollectionUtils.isEmpty((Collection) queryString)) {
             queryString = new ArrayList();
         }
@@ -73,7 +73,7 @@ public class TransController {
             orderBys = new ArrayList();
             ((List) orderBys).add("transQuartzDesc");
         }
-        PageResult<Trans> trans = transService.getList(paging,queryString, orderBys, kUser.getId());
+        PageResult<Trans> trans = transService.getList(paging,queryString, orderBys, userId);
         PageResult<TransForm.Trans>  owner = PageUtils.copyPageResult(trans,TransForm.Trans.class);
         return new ResponseResult(true,"请求成功",owner);
     }
@@ -92,20 +92,18 @@ public class TransController {
     @ApiOperation(value = "修改转换信息", produces = "application/json;charset=utf-8")
 
     public ResponseResult<Void> update(@RequestBody TransForm.UpdateTrans updateTrans, @PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request) throws ParseException {
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        transService.update(updateTrans,transId,kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        transService.update(updateTrans,transId,userId);
         return new ResponseResult(true,"请求成功");
     }
 
     @DeleteMapping("/delete/{transId}")
     @ApiOperation(value = "删除转换信息", produces = "application/json;charset=utf-8")
 
-    public ResponseResult<Void> delete(@PathVariable(required = true ,name ="transId") Integer transId,HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
+    public ResponseResult<Void> delete(@PathVariable(required = true ,name ="transId") Integer transId,HttpServletRequest request){ ;
         Assert.notNull(transId,"要删除的转换id不能为空");
-        transService.delete(transId,kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        transService.delete(transId,userId);
         return new ResponseResult(true,"请求成功");
     }
 
@@ -113,9 +111,8 @@ public class TransController {
     @ApiOperation(value = "获取转换信息", produces = "application/json;charset=utf-8")
 
     public ResponseResult<TransForm.Trans> getTrans(@PathVariable(required = true ,name = "transId") Integer transId,HttpServletRequest request){
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        Trans trans = transService.getTrans(transId,kUser.getId());
+        Integer userId=WebSecurityUtils.currentUserId();
+        Trans trans = transService.getTrans(transId,userId);
         TransForm.Trans owner = BeanPropertyCopyUtils.copy(trans,TransForm.Trans.class);
         return new ResponseResult(false,"请求成功",owner);
     }
@@ -124,9 +121,8 @@ public class TransController {
     @ApiOperation(value = "开始转换", produces = "application/json;charset=utf-8")
 
     public ResponseResult<Void> start(@RequestBody TransForm.TransParam transParam, @PathVariable(required = true ,name = "transId") Integer transId, HttpServletRequest request) throws KettleException, ParseException {
-        User kUser = (User) request.getSession().getAttribute(Constant.SESSION_ID);
-        Assert.notNull(kUser,"未登录或登录已失效，请重新登录");
-        transService.start(transId,kUser.getId(),transParam.getParam(),1,0);
+        Integer userId=WebSecurityUtils.currentUserId();
+        transService.start(transId,userId,transParam.getParam(),1,0);
         return new ResponseResult(true,"请求成功");
     }
 }

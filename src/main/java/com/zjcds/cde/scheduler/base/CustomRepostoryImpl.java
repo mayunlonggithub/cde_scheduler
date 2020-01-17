@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.base;
 
 import com.google.common.collect.Iterators;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -392,6 +393,5 @@ public class CustomRepostoryImpl<T, ID extends Serializable> extends SimpleJpaRe
             Assert.notNull(found,"传入的操作符["+op+"]不合法!");
             return found;
         }
-
     }
 }
