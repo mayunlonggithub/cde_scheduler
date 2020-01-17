@@ -116,7 +116,7 @@ public class QuartzServiceImpl implements QuartzService {
         queryString.add("delFlag~eq~1");
         queryString.add("createUser~eq~" + uId);
         List<Quartz> quartzList = quartzDao.findByDelFlag(1);
-        if (quartzList != null) {
+        if (quartzList.size()>0&&quartzList != null) {
             for (Quartz quartz : quartzList) {
                 if (quartz.getEndTime().after(new Date())) {
                     quartz.setIfValid(1);

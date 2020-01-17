@@ -53,10 +53,11 @@ public class CdmJobServiceImpl implements CdmJobService {
         String logLevel = job.getJobLogLevel();
         String logFilePath = cdeLogFilePath1;
         Date executeTime = new Date();
-        Date nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());
+//        Date nexExecuteTime = quartzService.getNextValidTime(executeTime,job.getJobQuartz());
+        Date nexExecuteTime=null;
         //添加监控
         jobMonitorService.addMonitor(uId,job.getJobId(),nexExecuteTime,0,0);
-        jobService.manualRunRepositoryJob(repository,job.getJobId().toString(),job.getJobName(),job.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam(),null);
+        jobService.manualRunRepositoryJob(repository,job.getJobId().toString(),job.getJobName(),job.getJobPath(),uId.toString(),logLevel,logFilePath,executeTime,nexExecuteTime,cdmJobParam.getParam(),0);
     }
 
 

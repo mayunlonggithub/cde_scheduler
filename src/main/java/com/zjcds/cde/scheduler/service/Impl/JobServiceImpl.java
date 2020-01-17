@@ -289,10 +289,11 @@ public class JobServiceImpl implements JobService {
         jobRecord.setCreateUser(Integer.parseInt(userId));
         jobRecord.setRecordStatus(1);
         if(templateOne!=null&&manualExe==0){
-        jobRecord.setPlanStartTime(templateOne.getNextExecuteTime());}
-        jobRecord.setStartTime(executeTime);
-        jobRecord.setManualExecute(manualExe);
-        jobRecord.setDelFlag(1);
+            jobRecord.setPlanStartTime(templateOne.getNextExecuteTime());
+            jobRecord.setStartTime(executeTime);
+            jobRecord.setManualExecute(manualExe);
+            jobRecord.setDelFlag(1);
+        }
         jobRecordDao.save(jobRecord);
         Integer recordStatus = 2;
         KettleDatabaseRepository kettleDatabaseRepository = initializeService.init(repository);

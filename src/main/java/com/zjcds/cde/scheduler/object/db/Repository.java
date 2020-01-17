@@ -2,6 +2,8 @@ package com.zjcds.cde.scheduler.object.db;
 
 import com.zjcds.cde.scheduler.domain.dto.exchange.MetaDatasourceForm;
 import com.zjcds.cde.scheduler.domain.dto.exchange.RepositoryTreeForm;
+import com.zjcds.cde.scheduler.domain.enums.DbAccessTypeCodeEnum;
+import com.zjcds.cde.scheduler.domain.enums.DbTypeCodeEnum;
 import com.zjcds.cde.scheduler.utils.Constant;
 import org.pentaho.di.core.database.DatabaseMeta;
 import org.pentaho.di.core.exception.KettleException;
@@ -21,8 +23,6 @@ public class Repository {
     public static Map<Integer, KettleDatabaseRepository> KettleDatabaseRepositoryCatch
             = new HashMap<Integer, KettleDatabaseRepository>();
 
-    public static final String[] DBTYPECODE = { "oracle", "mysql", "db2", };
-    public static final String[] DBACCESSTYPECODE = { "Native(JDBC)", "ODBC", "OCI", "JNDI", };
 
 
     /**
@@ -35,8 +35,10 @@ public class Repository {
     public static KettleDatabaseRepository connectionRepository(MetaDatasourceForm.Detail detail) throws KettleException {
         if (null != detail){
             String name = detail.getDsId();
-            String type = Arrays.asList(DBTYPECODE).get(detail.getDsType()-1);
-            String access = Arrays.asList(DBACCESSTYPECODE).get(Integer.parseInt(detail.getConnectType())-1);
+            String type = DbTypeCodeEnum.valueOf(detail.getDsType().toString()).getValue();
+            String access = DbAccessTypeCodeEnum.valueOf(detail.getConnectType()).getValue();
+//            String type = "oracle";
+//            String access = "Navicat";
             String host = detail.getConnectIp();
             String db = detail.getSidName()+"?useSSL=false";
             String port = detail.getConnectPort();

@@ -83,26 +83,7 @@
             <artifactId>springfox-swagger2</artifactId>
             <version>2.9.2</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.zjcds.common</groupId>-->
-            <!--<artifactId>cds-starter-actuator-ext</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.zjcds.common</groupId>-->
-            <!--<artifactId>cds-starter-swagger</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.zjcds.common</groupId>-->
-            <!--<artifactId>cds-starter-dozer</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.zjcds.common</groupId>-->
-            <!--<artifactId>cds-starter-jpa</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.zjcds.common</groupId>-->
-            <!--<artifactId>cds-starter-db-auto-update</artifactId>-->
-        <!--</dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -127,10 +108,10 @@
             <!--<artifactId>hive-jdbc</artifactId>-->
             <!--<version>2.1.0</version>-->
             <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>ch.qos.logback</groupId>-->
-                    <!--<artifactId>logback-classic</artifactId>-->
-                <!--</exclusion>-->
+                <!--&lt;!&ndash;<exclusion>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<groupId>ch.qos.logback</groupId>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<artifactId>logback-classic</artifactId>&ndash;&gt;-->
+                <!--&lt;!&ndash;</exclusion>&ndash;&gt;-->
                 <!--<exclusion>-->
                     <!--<groupId>org.apache.logging.log4j</groupId>-->
                     <!--<artifactId>log4j-slf4j-impl</artifactId>-->
@@ -139,26 +120,26 @@
                     <!--<groupId>org.slf4j</groupId>-->
                     <!--<artifactId>slf4j-log4j12</artifactId>-->
                 <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-                    <!--<artifactId>*</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.eclipse.jetty.aggregate</groupId>-->
-                    <!--<artifactId>*</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>tomcat</groupId>-->
-                    <!--<artifactId>*</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>javax.servlet</groupId>-->
-                    <!--<artifactId>servlet-api</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.mortbay.jetty</groupId>-->
-                    <!--<artifactId>*</artifactId>-->
-                <!--</exclusion>-->
+                <!--&lt;!&ndash;<exclusion>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<groupId>org.eclipse.jetty.orbit</groupId>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<artifactId>*</artifactId>&ndash;&gt;-->
+                <!--&lt;!&ndash;</exclusion>&ndash;&gt;-->
+                <!--&lt;!&ndash;<exclusion>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<groupId>org.eclipse.jetty.aggregate</groupId>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<artifactId>*</artifactId>&ndash;&gt;-->
+                <!--&lt;!&ndash;</exclusion>&ndash;&gt;-->
+                <!--&lt;!&ndash;<exclusion>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<groupId>tomcat</groupId>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<artifactId>*</artifactId>&ndash;&gt;-->
+                <!--&lt;!&ndash;</exclusion>&ndash;&gt;-->
+                <!--&lt;!&ndash;<exclusion>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<groupId>javax.servlet</groupId>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<artifactId>servlet-api</artifactId>&ndash;&gt;-->
+                <!--&lt;!&ndash;</exclusion>&ndash;&gt;-->
+                <!--&lt;!&ndash;<exclusion>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<groupId>org.mortbay.jetty</groupId>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<artifactId>*</artifactId>&ndash;&gt;-->
+                <!--&lt;!&ndash;</exclusion>&ndash;&gt;-->
             <!--</exclusions>-->
         <!--</dependency>-->
 
@@ -208,6 +189,7 @@
         </dependency>
 
 
+
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetlsql</artifactId>
@@ -249,6 +231,7 @@
             <artifactId>feign-jackson</artifactId>
             <version>8.18.0</version>
         </dependency>
+
 
         <dependency>
             <groupId>io.github.lukehutch</groupId>

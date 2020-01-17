@@ -291,6 +291,7 @@ public class JobMonitorServiceImpl implements JobMonitorService {
             if(manualExe==0){
                 jobMonitor.setNextExecuteTime(nextExecuteTime);
             }
+            jobMonitor.setDelFlag(1);
             jobMonitorDao.save(jobMonitor);
 
         }
