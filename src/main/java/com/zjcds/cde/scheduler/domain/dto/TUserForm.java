@@ -54,7 +54,7 @@ public class TUserForm {
         @ApiModelProperty(value = "token")
         private String token;
         @ApiModelProperty(value = "更新标志位")
-        private BaseValue updateFlag;
+        private Integer updateFlag;
     }
 
     @Getter
