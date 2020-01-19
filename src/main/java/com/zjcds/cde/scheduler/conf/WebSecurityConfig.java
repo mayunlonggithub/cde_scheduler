@@ -70,6 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/range_code/**","/dept/**","/error_code/**").permitAll()
                 .antMatchers("/static/**", "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**").permitAll()
                 .antMatchers("/**").hasRole("DEFAULT")
+                .antMatchers("/cdeJob/**","/transTabInTabOut/**","/transTabInTabUpdate/**").permitAll()
                 //处理跨域请求中的Preflight请求
                 .anyRequest().authenticated()
                 .anyRequest().permitAll()
