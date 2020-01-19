@@ -113,8 +113,12 @@ public class TUserServiceImpl extends UserServiceImpl implements TUserService {
         String password = user.getPassword();
         user = BeanPropertyCopyUtils.copy(updateTUser, User.class);
         user.setPassword(password);
-        user.setDeptId(updateTUser.getTDepartment()[1]);
-        user.setDeptPid(updateTUser.getTDepartment()[0]);
+        if(updateTUser.getTDepartment().length==1){
+            user.setDeptPid(updateTUser.getTDepartment()[0]);}
+        else {
+            user.setDeptPid(updateTUser.getTDepartment()[0]);
+            user.setDeptId(updateTUser.getTDepartment()[1]);
+        }
         user = userDao.save(user);
         TUserForm.TUser owner = BeanPropertyCopyUtils.copy(user, TUserForm.TUser.class);
         Map<Integer,String> map = tDepartmentService.TDepartmentMap();

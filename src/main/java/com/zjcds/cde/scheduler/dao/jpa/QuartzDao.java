@@ -11,10 +11,14 @@ import java.util.List;
  * @author J on 20191024
  */
 public interface QuartzDao extends CustomRepostory<Quartz,Integer> {
-       List<Quartz> findByDelFlag(Integer delflag);
+       List<Quartz> findByDelFlagAndCreateUser(Integer delFlag,Integer uId);
        @Modifying
        void  deleteByQuartzId(Integer id);
 
        public Quartz findByQuartzId(Integer quartzId);
+
+       List<Quartz> findByDelFlag(Integer delFlag);
+
+
 }
 

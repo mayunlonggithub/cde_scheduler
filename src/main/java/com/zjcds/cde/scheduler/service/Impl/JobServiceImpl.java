@@ -287,14 +287,14 @@ public class JobServiceImpl implements JobService {
         Assert.notNull(userId, "未登录,请重新登录");
         JobMonitor templateOne = jobMonitorDao.findByMonitorJobAndCreateUserAndDelFlag(Integer.parseInt(jobId),Integer.parseInt(userId),1);
         JobRecord jobRecord = new JobRecord();
+        jobRecord.setStartTime(executeTime);
         jobRecord.setRecordJob(Integer.parseInt(jobId));
         jobRecord.setCreateUser(Integer.parseInt(userId));
         jobRecord.setRecordStatus(1);
+        jobRecord.setDelFlag(1);
+        jobRecord.setManualExecute(manualExe);
         if(templateOne!=null&&manualExe==0){
             jobRecord.setPlanStartTime(templateOne.getNextExecuteTime());
-            jobRecord.setStartTime(executeTime);
-            jobRecord.setManualExecute(manualExe);
-            jobRecord.setDelFlag(1);
         }
         jobRecordDao.save(jobRecord);
         Integer recordStatus = 2;
@@ -352,6 +352,7 @@ public class JobServiceImpl implements JobService {
                     jobRecord.setRecordStatus(recordStatus);
                     jobRecord.setStopTime(jobStopDate);
                     jobRecord.setDuration(DateUtils.getDuration(executeTime,jobStopDate));
+                    jobRecordDao.save(jobRecord);
                     writeToDBAndFile(jobRecord, logText, executeTime, nexExecuteTime, runStatus, userId);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -376,7 +377,6 @@ public class JobServiceImpl implements JobService {
         // 将日志信息写入文件
         FileUtils.writeStringToFile(new File(jobRecord.getLogFilePath()), logText, Constant.DEFAULT_ENCODING, false);
         // 写入转换运行记录到数据库
-        jobRecordDao.save(jobRecord);
         JobMonitor template = new JobMonitor();
         template.setCreateUser(jobRecord.getCreateUser());
         template.setMonitorJob(jobRecord.getRecordJob());

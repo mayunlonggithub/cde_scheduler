@@ -8,6 +8,7 @@ import com.zjcds.cde.scheduler.base.ResponseResult;
 import com.zjcds.cde.scheduler.domain.enums.BaseValue;
 import com.zjcds.cde.scheduler.service.CodeService;
 import com.zjcds.cde.scheduler.service.QuartzService;
+import com.zjcds.cde.scheduler.utils.WebSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +90,8 @@ public class CodeController {
 
     @GetMapping("/getQuartzList")
     public ResponseResult<List<BaseValue>> code() {
-        List<Quartz> qList = quartzService.getQuartzByDelFlag(1);
+        Integer userId= WebSecurityUtils.currentUserId();
+        List<Quartz> qList = quartzService.getQuartzByDelFlag(1,userId);
         List<BaseValue> bList = new ArrayList<>();
         if(qList!=null) {
             for (Quartz quartz : qList) {

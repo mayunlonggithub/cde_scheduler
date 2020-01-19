@@ -137,7 +137,7 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     @Override
-    public List<Quartz> getQuartzByDelFlag(Integer flag){
-        return quartzDao.findByDelFlag(flag);
+    public List<Quartz> getQuartzByDelFlag(Integer flag,Integer uId){
+        return quartzDao.findByDelFlagAndCreateUser(flag,uId);
     }
 }
