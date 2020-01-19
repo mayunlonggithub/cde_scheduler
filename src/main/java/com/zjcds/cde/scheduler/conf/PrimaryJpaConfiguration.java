@@ -65,6 +65,5 @@ public class PrimaryJpaConfiguration {
     public PlatformTransactionManager transactionManagerPrimary(EntityManagerFactoryBuilder builder) {
         return new JpaTransactionManager(entityManagerFactoryPrimary(builder).getObject());
     }
-
 }
 

@@ -119,12 +119,14 @@ public class TransServiceImpl implements TransService {
         trans.setDelFlag(0);
         transDao.save(trans);
         TransMonitor transMonitor=transMonitorDao.findByCreateUserAndMonitorTransAndDelFlag(uId,transId,1);
-        transMonitor.setDelFlag(0);
-        transMonitorDao.save(transMonitor);
-        List<TransRecord> transRecordList=transRecordDao.findByRecordTransAndDelFlag(transId,1);
-        for(TransRecord transRecord:transRecordList){
-            transRecord.setDelFlag(0);
-            transRecordDao.save(transRecord);
+        if(transMonitor!=null) {
+            transMonitor.setDelFlag(0);
+            transMonitorDao.save(transMonitor);
+            List<TransRecord> transRecordList = transRecordDao.findByRecordTransAndDelFlag(transId, 1);
+            for (TransRecord transRecord : transRecordList) {
+                transRecord.setDelFlag(0);
+                transRecordDao.save(transRecord);
+            }
         }
         //移除策略
         taskService.deleteTask(transId,"trans",uId);

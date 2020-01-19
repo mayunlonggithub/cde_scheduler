@@ -120,13 +120,15 @@ public class JobServiceImpl implements JobService {
         Assert.notNull(job, "要删除的任务不存在或已删除");
         job.setDelFlag(0);
         jobDao.save(job);
-        JobMonitor jobMonitor=jobMonitorDao.findByMonitorJobAndDelFlag(jobId,1);
-        jobMonitor.setDelFlag(0);
-        jobMonitorDao.save(jobMonitor);
-        List<JobRecord> jobRecordList=jobRecordDao.findByRecordJobAndDelFlag(jobId,1);
-        for(JobRecord jobRecord:jobRecordList){
-            jobRecord.setDelFlag(0);
-            jobRecordDao.save(jobRecord);
+        JobMonitor jobMonitor=jobMonitorDao.findByMonitorJobAndCreateUserAndDelFlag(jobId,uId,1);
+        if(jobMonitor!=null) {
+            jobMonitor.setDelFlag(0);
+            jobMonitorDao.save(jobMonitor);
+            List<JobRecord> jobRecordList = jobRecordDao.findByRecordJobAndDelFlag(jobId, 1);
+            for (JobRecord jobRecord : jobRecordList) {
+                jobRecord.setDelFlag(0);
+                jobRecordDao.save(jobRecord);
+            }
         }
         //移除策略
         taskService.deleteTask(jobId,"job",uId);

@@ -56,7 +56,6 @@ public class TUserServiceImpl extends UserServiceImpl implements TUserService {
         for (TUserForm.TUser u : ownerList){
             if(u.getDeptId()!=null){
                 u.getDeptId().setValue( map.get(Integer.valueOf(u.getDeptId().getKey())));
-
             }
             if(u.getDeptPid()!=null){
                 u.getDeptPid().setValue(map.get(Integer.valueOf(u.getDeptPid().getKey())));}
@@ -76,8 +75,13 @@ public class TUserServiceImpl extends UserServiceImpl implements TUserService {
         Assert.isNull(user,"该用户已存在");
         user = BeanPropertyCopyUtils.copy(addTUser, User.class);
         user.setPassword(passwordEncoder.encode("123456"));
-        user.setDeptId(addTUser.getTDepartment()[1]);
-        user.setDeptPid(addTUser.getTDepartment()[0]);
+        if(addTUser.getTDepartment().length==1){
+        user.setDeptPid(addTUser.getTDepartment()[0]);}
+        else {
+            user.setDeptPid(addTUser.getTDepartment()[0]);
+            user.setDeptId(addTUser.getTDepartment()[1]);
+        }
+
         user = userDao.save(user);
         TUserForm.TUser owner = BeanPropertyCopyUtils.copy(user, TUserForm.TUser.class);
         Map<Integer,String> map = tDepartmentService.TDepartmentMap();
