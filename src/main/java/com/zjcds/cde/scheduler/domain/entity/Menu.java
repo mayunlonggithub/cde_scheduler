@@ -2,18 +2,7 @@ package com.zjcds.cde.scheduler.domain.entity;
 
 import com.zjcds.cde.scheduler.base.CreateModifyTime;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,11 +119,12 @@ public class Menu extends CreateModifyTime {
         this.ifValid = ifValid;
     }
 
-    @JoinTable(name = "r_role_menu",
-            joinColumns = {@JoinColumn(name="role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "menu_id")}
-    )
-    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(name = "r_role_menu",
+//            joinColumns = {@JoinColumn(name="role_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "menu_id")}
+//    )
+//    @ManyToMany(fetch = FetchType.LAZY)
+    @Transient
     public List<Menu> getMenus() {
         return menus;
     }

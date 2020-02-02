@@ -302,6 +302,7 @@ public class TransMonitorServiceImpl implements TransMonitorService {
             }
             if(manualExe==0){
             kTransMonitor.setNextExecuteTime(nextExecuteTime);}
+            kTransMonitor.setDelFlag(1);
             transMonitorDao.save(kTransMonitor);
         }
     }

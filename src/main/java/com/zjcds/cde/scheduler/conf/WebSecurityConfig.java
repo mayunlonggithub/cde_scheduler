@@ -69,11 +69,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/range_code/**","/dept/**","/error_code/**").permitAll()
                 .antMatchers("/static/**", "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**").permitAll()
-                .antMatchers("/**").hasRole("DEFAULT")
                 .antMatchers("/cdeJob/**","/transTabInTabOut/**","/transTabInTabUpdate/**").permitAll()
+                .antMatchers("/**").hasRole("DEFAULT")
                 //处理跨域请求中的Preflight请求
                 .anyRequest().authenticated()
-                .anyRequest().permitAll()
+//                .anyRequest().permitAll()
 
                 .and()
                 //这里必须要写formLogin()，不然原有的UsernamePasswordAuthenticationFilter不会出现，也就无法配置自定义的UsernamePasswordAuthenticationFilter
