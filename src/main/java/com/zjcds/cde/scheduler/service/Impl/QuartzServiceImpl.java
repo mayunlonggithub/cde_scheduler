@@ -122,6 +122,10 @@ public class QuartzServiceImpl implements QuartzService {
                     quartz.setIfValid(1);
                     quartzDao.save(quartz);
                 }
+                else {
+                    quartz.setIfValid(0);
+                    quartzDao.save(quartz);
+                }
             }
         }
         PageResult<Quartz> quartz = quartzDao.findAll(paging, queryString, orderBys);

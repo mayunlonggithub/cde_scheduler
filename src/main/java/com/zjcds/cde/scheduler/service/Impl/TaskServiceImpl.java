@@ -178,7 +178,7 @@ public class TaskServiceImpl implements TaskService {
     public Trigger getTrigger(Task task) {
         return TriggerBuilder.newTrigger()
                 .withIdentity(task.getTaskName(), task.getTaskGroup())
-                .withSchedule(CronScheduleBuilder.cronSchedule(quartzDao.findByQuartzId(task.getQuartzId()).getQuartzCron()))
+                .withSchedule(CronScheduleBuilder.cronSchedule(quartzDao.findByQuartzId(task.getQuartzId()).getQuartzCron()).withMisfireHandlingInstructionDoNothing())
                 .startAt(task.getStartTime())
                 .endAt(task.getEndTime())
                 .build();
@@ -194,6 +194,7 @@ public class TaskServiceImpl implements TaskService {
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         Set<JobKey> set = scheduler.getJobKeys(GroupMatcher.anyGroup());
         for (JobKey jobKey : set) {
+            scheduler.pauseTrigger(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.deleteJob(jobKey);
         }
@@ -232,6 +233,7 @@ public class TaskServiceImpl implements TaskService {
         JobKey jobKey = getTaskKey(task);
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         try {
+            scheduler.pauseTrigger(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.deleteJob(jobKey);
         } catch (SchedulerException e) {

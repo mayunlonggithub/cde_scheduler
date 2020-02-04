@@ -2,6 +2,7 @@ package com.zjcds.cde.scheduler.utils;
 
 import com.zjcds.cde.scheduler.domain.dto.QuartzForm;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 public class CronUtils {
     /**
@@ -128,9 +129,13 @@ public class CronUtils {
         Integer secInterval = addQuartz.getSecInterval();
         Integer minInterval = addQuartz.getMinInterval();
         Integer hourInterval = addQuartz.getHourInterval();
-        quartzCron.append("*/").append(secInterval).append(" ");
-        quartzCron.append("*/").append(minInterval).append(" ");
-        quartzCron.append("*/").append(hourInterval).append(" ");
+        java.sql.Timestamp time = new java.sql.Timestamp(new java.util.Date().getTime());
+        Integer hour=time.getHours();//时
+        Integer min=time.getMinutes();//分
+        Integer sec=time.getSeconds();//秒
+        quartzCron.append(sec).append("/").append(secInterval).append(" ");
+        quartzCron.append(min).append("/").append(minInterval).append(" ");
+        quartzCron.append(hour).append("/").append(hourInterval).append(" ");
         //天
         quartzCron.append("*").append(" ");
         //月份
@@ -144,7 +149,6 @@ public class CronUtils {
     }
 
     public static void createSingleQuartzCronression(QuartzForm.AddQuartz addQuartz) {
-
         //一年中的哪一个月
         Integer month = addQuartz.getExecMonth();
         //月中的哪一天
@@ -167,7 +171,4 @@ public class CronUtils {
         quartzDescription.append(addQuartz.getExecSec()).append("秒");
         quartzDescription.append("执行一次");
     }
-
-
-
     }
