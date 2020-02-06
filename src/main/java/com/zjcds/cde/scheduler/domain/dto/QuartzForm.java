@@ -37,9 +37,9 @@ public class QuartzForm {
                 @ApiModelProperty(value = "单元选择")
                 private String unitType;
                 @ApiModelProperty(value = "秒间隔")
-                private int secInterval;
+                private Integer secInterval;
                 @ApiModelProperty(value = "分间隔")
-                private int minInterval;
+                private Integer minInterval;
                 @ApiModelProperty(value = "时间隔")
                 private Integer hourInterval;
                 @ApiModelProperty(value = "执行秒")
@@ -77,9 +77,9 @@ public class QuartzForm {
                 @ApiModelProperty(value = "策略结束时间")
                 private Date endTime;
                 @ApiModelProperty(value = "秒间隔")
-                private int secInterval;
+                private Integer secInterval;
                 @ApiModelProperty(value = "分间隔")
-                private int minInterval;
+                private Integer minInterval;
                 @ApiModelProperty(value = "时间隔")
                 private Integer hourInterval;
                 @ApiModelProperty(value = "执行秒")

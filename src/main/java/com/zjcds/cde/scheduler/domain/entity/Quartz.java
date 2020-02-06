@@ -161,21 +161,21 @@ public class Quartz extends CreateModifyTime {
 
     @Basic
     @Column(name = "sec_interval")
-    public int getSecInterval() {
+    public Integer getSecInterval() {
         return secInterval;
     }
 
-    public void setSecInterval(int secInterval) {
+    public void setSecInterval(Integer secInterval) {
         this.secInterval = secInterval;
     }
 
     @Basic
     @Column(name = "min_interval")
-    public int getMinInterval() {
+    public Integer getMinInterval() {
         return minInterval;
     }
 
-    public void setMinInterval(int minInterval) {
+    public void setMinInterval(Integer minInterval) {
         this.minInterval = minInterval;
     }
 

@@ -109,6 +109,8 @@ public class QuartzServiceImpl implements QuartzService {
                 taskService.addTask(addTask,uId,task.getJobId());
                 }
         }
+
+
     }
 
     @Override

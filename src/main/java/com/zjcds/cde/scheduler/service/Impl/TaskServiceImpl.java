@@ -82,7 +82,6 @@ public class TaskServiceImpl implements TaskService {
         Date date = new Date();
         if (date.after(quartz.getEndTime())) {
             task.setStatus(Constant.COMPLETION);
-            jobMonitorService.addMonitor(uId,jobId,null,0,1);
         } else {
             task.setStatus(Constant.VALID);
         }
@@ -90,6 +89,11 @@ public class TaskServiceImpl implements TaskService {
         task.setQuartzDesc(quartz.getQuartzDescription());
         taskDao.save(task);
         runTask(task.getTaskId());
+        if ("trans".equals(task.getTaskGroup())) {
+            transService.updateTransQuartz(task.getJobId(),addTask.getQuartzId());
+        } else if ("job".equals(task.getTaskGroup())) {
+            jobService.updateJobQuartz(task.getJobId(),addTask.getQuartzId());
+        }
     }
 
     @Override

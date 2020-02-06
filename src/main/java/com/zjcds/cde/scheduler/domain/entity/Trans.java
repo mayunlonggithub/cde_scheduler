@@ -183,5 +183,4 @@ public class Trans extends CreateModifyTime {
         this.delFlag = delFlag;
     }
 
-
 }

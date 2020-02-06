@@ -133,19 +133,29 @@ public class CronUtils {
         Integer hour=time.getHours();//时
         Integer min=time.getMinutes();//分
         Integer sec=time.getSeconds();//秒
-        quartzCron.append(sec).append("/").append(secInterval).append(" ");
-        quartzCron.append(min).append("/").append(minInterval).append(" ");
-        quartzCron.append(hour).append("/").append(hourInterval).append(" ");
+        if(secInterval!=null) {
+            quartzCron.append("*").append("/").append(secInterval).append(" ");
+            quartzCron.append("*").append(" ");
+            quartzCron.append("*").append(" ");
+            quartzDescription.append("每隔").append(addQuartz.getSecInterval()).append("秒").append("执行");
+
+        }else if(minInterval!=null){
+            quartzCron.append(sec).append(" ");
+            quartzCron.append("*").append("/").append(minInterval).append(" ");
+            quartzCron.append("*").append(" ");
+            quartzDescription.append("每隔").append(addQuartz.getMinInterval()).append("分钟").append("执行");
+        }else {
+            quartzCron.append(sec).append(" ");
+            quartzCron.append(min).append(" ");
+            quartzCron.append("*").append("/").append(hourInterval).append(" ");
+            quartzDescription.append("每隔").append(addQuartz.getHourInterval()).append("小时").append("执行");
+        }
         //天
         quartzCron.append("*").append(" ");
         //月份
         quartzCron.append("*").append(" ");
         //周
         quartzCron.append("?").append(" ");
-        quartzDescription.append("每隔").append(addQuartz.getHourInterval()).append("时");
-        quartzDescription.append(addQuartz.getMinInterval()).append("分");
-        quartzDescription.append(addQuartz.getSecInterval()).append("秒");
-        quartzDescription.append("执行");
     }
 
     public static void createSingleQuartzCronression(QuartzForm.AddQuartz addQuartz) {
